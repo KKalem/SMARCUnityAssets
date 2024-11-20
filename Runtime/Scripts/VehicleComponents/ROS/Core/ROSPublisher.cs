@@ -42,7 +42,7 @@ namespace VehicleComponents.ROS.Core
             
             InitializePublication();
 
-            InvokeRepeating("Publish", 1f, period);
+            InvokeRepeating("Publish", 0f, period);
         }
 
         protected virtual void UpdateMessage()

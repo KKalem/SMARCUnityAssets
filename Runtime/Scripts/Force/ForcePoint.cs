@@ -61,6 +61,11 @@ namespace Force
         public Vector3 CustomForce = Vector3.zero;
 
 
+        public int graceTicks = 100;
+        public int numTicks = 1000;
+        public int forward = 0;
+        public int backward = 0;
+
         private MixedBody body;
         private WaterQueryModel waterModel;
         private ForcePoint[] allForcePoints;
@@ -178,6 +183,43 @@ namespace Force
                     forcePointPosition,
                     ForceMode.Force);
             }
+
+            // log the velocity of the body
+            Debug.Log($"[fp] body.v={body.velocity}");
+
+            if(graceTicks > 0) graceTicks --;
+            if(graceTicks == 0) 
+            {
+                forward = numTicks;
+                graceTicks = -1;
+            }
+
+            if(forward > 0)
+            {
+                body.AddForceAtPosition(
+                    new Vector3(1, 0, 0),
+                    forcePointPosition,
+                    ForceMode.Force);
+                forward--;
+            }
+            if(forward == 0 && graceTicks == -1) 
+            {
+                backward = numTicks;
+                graceTicks = -2;
+            }
+
+            if(backward > 0)
+            {
+                body.AddForceAtPosition(
+                    new Vector3(-1, 0, 0),
+                    forcePointPosition,
+                    ForceMode.Force);
+                backward--;
+            }
+            
+
+
+            
         }
 
     }

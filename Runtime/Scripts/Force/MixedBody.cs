@@ -100,6 +100,15 @@ namespace Force
             get {return ab ? ab.transform.rotation : rb.transform.rotation; }
         }
 
+        public Vector3 velocity
+        {
+            get {return ab ? ab.velocity : rb.velocity; }
+            set {
+                if(ab != null) return;
+                else rb.velocity = value;
+            }
+        }
+
         public void AddForceAtPosition(Vector3 force, Vector3 position, ForceMode mode = ForceMode.Force)
         {
             if(ab != null)
