@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using Force;
 using UnityEngine;
 using Hinge = VehicleComponents.Actuators.Hinge;
@@ -6,7 +7,7 @@ using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
 using Prismatic = VehicleComponents.Actuators.Prismatic;
 
-namespace GameUI
+namespace SmarcGUI
 {
     public class SAMKeyboardControl : KeyboardController
     {
@@ -50,6 +51,12 @@ namespace GameUI
             backProp = backPropGo.GetComponent<Propeller>();
             vbs = vbsGo.GetComponent<VBS>();
             lcg = lcgGo.GetComponent<Prismatic>();
+
+            KeysAndFunctions.Add(new Tuple<string, string>("up,down", "Thrust"));
+            KeysAndFunctions.Add(new Tuple<string, string>("q,e", "Roll "));
+            KeysAndFunctions.Add(new Tuple<string, string>("w,a,s,d", "Thrust Vec."));
+            KeysAndFunctions.Add(new Tuple<string, string>("r,f,c", "VBS 0,50,100"));
+            KeysAndFunctions.Add(new Tuple<string, string>("t,g,v", "LCG 0,50,100"));
         }
 
         void Update()

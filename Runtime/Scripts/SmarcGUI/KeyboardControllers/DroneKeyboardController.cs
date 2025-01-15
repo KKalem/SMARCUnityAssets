@@ -1,9 +1,8 @@
-using System.Collections.Generic;
-using Force;
+using System;
 using UnityEngine;
 using Propeller = VehicleComponents.Actuators.Propeller;
 
-namespace GameUI
+namespace SmarcGUI
 {
     public class DroneKeyboardController : KeyboardController
     {
@@ -29,6 +28,11 @@ namespace GameUI
             frontrightProp = frontrightPropGo.GetComponent<Propeller>();
             backrightProp = backrightPropGo.GetComponent<Propeller>();
             backleftProp = backleftPropGo.GetComponent<Propeller>();
+
+            KeysAndFunctions.Add(new Tuple<string, string>("i,k", "forw/back"));
+            KeysAndFunctions.Add(new Tuple<string, string>("j,l", "left/right"));
+            KeysAndFunctions.Add(new Tuple<string, string>("u,n", "up/down"));
+            KeysAndFunctions.Add(new Tuple<string, string>("space", "extra RPMs"));
         }
 
         void Update()

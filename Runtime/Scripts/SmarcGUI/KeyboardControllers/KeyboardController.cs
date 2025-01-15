@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine; 
+
+namespace SmarcGUI
+{
+    // Base class for keyboard controllers of all robots
+
+    
+    public class KeyboardController : MonoBehaviour
+    {
+        public List<Tuple<string, string>> KeysAndFunctions = new List<Tuple<string, string>>();
+
+    }
+}

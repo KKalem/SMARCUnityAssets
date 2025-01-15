@@ -11,13 +11,14 @@ namespace SmarcGUI
     {
         Monitoring,
         MissionPlanning,
-        RemoteControlling
+        KeyboardControl
     }
 
     public class GUIState : MonoBehaviour
     {
         [Header("State")]
         public GuiMode CurrentMode;
+        public string SelectedRobotName;
 
         [Header("Colors")]
         public Color ColorMonitoring = Color.green;
@@ -28,10 +29,24 @@ namespace SmarcGUI
         [Header("GUI Elements")]
         public TMP_Dropdown modeDropdown;
         public TMP_Dropdown cameraDropdown;
+        public TMP_Dropdown robotDropdown;
+
+        public GameObject KeyboardButtonsPanel;
+        public TMP_Text KeyboardButtonsText;
+
+
+        [Header("Defaults")]
+        public GuiMode DefaultMode = GuiMode.Monitoring;
+        public int DefaultRobotIndex = 0;
+        public int DefaultCameraIndex = 0;
+
 
 
         Dictionary<string, string> cameraTextToObjectPath;
         Camera currentCam;
+        GameObject selectedRobot;
+        KeyboardController[] keyboardControllers;
+
 
 
         void InitModeDropdown()
@@ -42,8 +57,8 @@ namespace SmarcGUI
                 modeDropdown.options.Add(new TMP_Dropdown.OptionData(){text=modeString});
             }
 
-            modeDropdown.value = 0;
-            CurrentMode = GuiMode.Monitoring;
+            CurrentMode = DefaultMode;
+            modeDropdown.value = (int)DefaultMode;
             modeDropdown.RefreshShownValue();
         }
 
@@ -68,15 +83,33 @@ namespace SmarcGUI
                 cameraTextToObjectPath.Add(ddText, objectPath);
                 cameraDropdown.options.Add(new TMP_Dropdown.OptionData(){text=ddText});
             }
-            cameraDropdown.value = 0;
+
+            cameraDropdown.value = DefaultCameraIndex;
             cameraDropdown.RefreshShownValue();
-            OnCameraChanged(0);
+            OnCameraChanged(cameraDropdown.value);
         }
 
-        void Start()
+        void InitRobotDropdown()
         {
-            InitModeDropdown();
-            InitCameraDropdown();
+            robotDropdown.onValueChanged.AddListener(OnRobotChanged);
+
+            var robots = GameObject.FindGameObjectsWithTag("robot");
+            if(robots.Length <= 0) return;
+            foreach(var robot in robots)
+            {
+                robotDropdown.options.Add(new TMP_Dropdown.OptionData(){text=robot.name});
+            }
+            robotDropdown.value = DefaultRobotIndex;
+            robotDropdown.RefreshShownValue();
+            OnRobotChanged(robotDropdown.value);
+        }
+
+
+        void InitKeyboardControllers()
+        {
+            keyboardControllers = FindObjectsByType<KeyboardController>(FindObjectsSortMode.None);
+            foreach(var k in keyboardControllers) k.enabled = false;
+            KeyboardButtonsPanel.SetActive(false);
         }
 
 
@@ -87,7 +120,7 @@ namespace SmarcGUI
             {
                 GuiMode.Monitoring => ColorMonitoring,
                 GuiMode.MissionPlanning => ColorMissionPlanning,
-                GuiMode.RemoteControlling => ColorRemoteControlling,
+                GuiMode.KeyboardControl => ColorRemoteControlling,
                 _ => Color.white,
             };
             int borderSize = 1;
@@ -102,11 +135,6 @@ namespace SmarcGUI
             GUI.DrawTexture(new Rect(Screen.width - borderSize, 0, borderSize, Screen.height), Texture2D.whiteTexture);
         }
 
-        void OnGUI()
-        {
-            DrawModeBorder();
-        }
-
         public void OnModeChanged(int modeIndex)
         {
             var selection = modeDropdown.options[modeIndex];
@@ -114,6 +142,8 @@ namespace SmarcGUI
             modeDropdown.value = modeIndex;
             modeDropdown.RefreshShownValue();
         }
+
+
 
         public void OnCameraChanged(int camIndex)
         {
@@ -126,6 +156,56 @@ namespace SmarcGUI
             currentCam = selectedGO.GetComponent<Camera>();
             currentCam.enabled = true;
         }
+
+        public void OnRobotChanged(int robotIndex)
+        {
+            SelectedRobotName = robotDropdown.options[robotIndex].text;
+            selectedRobot = GameObject.Find(SelectedRobotName);
+        }
+
+        void Start()
+        {
+            InitKeyboardControllers();
+            InitModeDropdown();
+            InitCameraDropdown();
+            InitRobotDropdown();
+        }
+
+        void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                OnModeChanged((int)DefaultMode);
+            }
+
+            if (CurrentMode == GuiMode.KeyboardControl)
+            {
+                KeyboardButtonsPanel.SetActive(true);
+                string text = "";
+                text += $"Keyboard Controls: ";
+                var kbController = selectedRobot.GetComponentInChildren<KeyboardController>();
+                foreach(var kf in kbController.KeysAndFunctions)
+                {
+                    text += $"{kf.Item1}={kf.Item2}  ";
+                }
+                KeyboardButtonsText.text = text;
+                foreach (var k in keyboardControllers) k.enabled = k.gameObject == selectedRobot;
+            }
+            else
+            {
+                KeyboardButtonsPanel.SetActive(false);
+                foreach (var k in keyboardControllers) k.enabled = false;
+            }
+            
+        }
+
+        void OnGUI()
+        {
+            // for things that dont need any interaction, we can draw straight to the screen
+            // things like status strings, etc.
+            DrawModeBorder();
+        }
+
 
     }
 }
