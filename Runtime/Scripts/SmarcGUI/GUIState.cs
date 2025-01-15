@@ -35,6 +35,7 @@ namespace SmarcGUI
         public TMP_Text KeyboardButtonsText;
 
 
+
         [Header("Defaults")]
         public GuiMode DefaultMode = GuiMode.Monitoring;
         public int DefaultRobotIndex = 0;
@@ -47,6 +48,7 @@ namespace SmarcGUI
         GameObject selectedRobot;
         KeyboardController[] keyboardControllers;
 
+        List<IRobotChangedListener> robotChangedListeners = new List<IRobotChangedListener>();
 
 
         void InitModeDropdown()
@@ -156,12 +158,23 @@ namespace SmarcGUI
             currentCam = selectedGO.GetComponent<Camera>();
             currentCam.enabled = true;
         }
+        
 
         public void OnRobotChanged(int robotIndex)
         {
             SelectedRobotName = robotDropdown.options[robotIndex].text;
             selectedRobot = GameObject.Find(SelectedRobotName);
+            foreach(var listener in robotChangedListeners)
+            {
+                listener.OnRobotChanged(selectedRobot);
+            }
         }
+
+        public void AddRobotChangedListener(IRobotChangedListener listener)
+        {
+            robotChangedListeners.Add(listener);
+        }
+
 
         void Start()
         {
