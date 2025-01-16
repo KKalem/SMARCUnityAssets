@@ -182,6 +182,23 @@ namespace SmarcGUI
             InitModeDropdown();
             InitCameraDropdown();
             InitRobotDropdown();
+
+            var mt = new MoveTo(
+                "WP1",
+                MoveTo.SPEED_STANDARD,
+                new GeoPointValue()
+                {
+                    Latitude=0,
+                    Longitude=0,
+                    Altitude=0
+                }
+            );
+
+            var st = new StartTaskCommand(mt, "robot1");
+
+            Debug.Log(st.ToJson());
+
+            
         }
 
         void Update()
@@ -218,6 +235,7 @@ namespace SmarcGUI
             // things like status strings, etc.
             DrawModeBorder();
         }
+
 
 
     }
