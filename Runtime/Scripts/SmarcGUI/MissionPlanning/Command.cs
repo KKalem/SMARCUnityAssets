@@ -10,7 +10,7 @@ namespace SmarcGUI
 
     public class Command : IJsonSerializable
     {
-        public Dictionary<string, string> fields = new Dictionary<string, string>();
+        public Dictionary<string, object> fields = new();
         public string ToJson()
         {
             return JsonConvert.SerializeObject(fields);
@@ -61,7 +61,7 @@ namespace SmarcGUI
 
             fields["execution_unit"] = robot_name;
             fields["task-uuid"] = Guid.NewGuid().ToString();
-            fields["task"] = task.ToJson();    
+            fields["task"] = task;    
         }
         
 

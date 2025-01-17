@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Utils = DefaultNamespace.Utils;
 using VehicleComponents.Sensors;
+using System.IO;
 
 namespace SmarcGUI
 {
@@ -40,7 +41,6 @@ namespace SmarcGUI
         public GuiMode DefaultMode = GuiMode.Monitoring;
         public int DefaultRobotIndex = 0;
         public int DefaultCameraIndex = 0;
-
 
 
         Dictionary<string, string> cameraTextToObjectPath;
@@ -182,21 +182,6 @@ namespace SmarcGUI
             InitModeDropdown();
             InitCameraDropdown();
             InitRobotDropdown();
-
-            var mt = new MoveTo(
-                "WP1",
-                MoveTo.SPEED_STANDARD,
-                new GeoPointValue()
-                {
-                    Latitude=0,
-                    Longitude=0,
-                    Altitude=0
-                }
-            );
-
-            var st = new StartTaskCommand(mt, "robot1");
-
-            Debug.Log(st.ToJson());
 
             
         }

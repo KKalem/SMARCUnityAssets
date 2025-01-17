@@ -4,36 +4,26 @@ using System;
 
 namespace SmarcGUI
 {
-    public class GeoPointValue : IJsonSerializable
+    public class GeoPoint
     {
-        public double Latitude{get; set;}
-        public double Longitude{get; set;}
-        public double Altitude{get; set;}
-
-
-        public string ToJson()
-        {
-            Dictionary<string, string> fields = new Dictionary<string, string>();
-            fields["latitude"] = Latitude.ToString();
-            fields["longitude"] = Longitude.ToString();
-            fields["altitude"] = Altitude.ToString();
-            return JsonUtility.ToJson(fields);
-        }
+        public double latitude{get; set;}
+        public double longitude{get; set;}
+        public double altitude{get; set;}
     }
 
-    public class MoveTo : Task, IJsonSerializable
+    public class MoveTo : Task
     {
         public static string SPEED_FAST{ get{return "fast";} }
         public static string SPEED_STANDARD{ get{return "standard";} }
         public static string SPEED_SLOW{ get{return "slow";} }
 
 
-        public MoveTo(string description, string speed, GeoPointValue waypoint)
+        public MoveTo(string description, string speed, GeoPoint waypoint)
         {
             Name = "move-to";
             Description = description;
-            Params.Add(new TaskParam(){Name="speed", Value=speed});
-            Params.Add(new TaskParam(){Name="waypoint", Value=waypoint});
+            Params.Add("speed", speed);
+            Params.Add("waypoint", waypoint);
         }
 
     }
