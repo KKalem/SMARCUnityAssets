@@ -182,45 +182,6 @@ namespace SmarcGUI
             InitModeDropdown();
             InitCameraDropdown();
             InitRobotDropdown();
-
-            var mt = new MoveTo(
-                "WP1",
-                MoveSpeed.STANDARD,
-                new GeoPoint()
-                {
-                    latitude=0,
-                    longitude=0,
-                    altitude=0
-                }
-            );
-
-            var mp = new MovePath(
-                "1 to 3",
-                MoveSpeed.STANDARD,
-                new List<GeoPoint>()
-                {
-                    new(){latitude=1, longitude=1, altitude=1},
-                    new(){latitude=2, longitude=2, altitude=2},
-                    new(){latitude=3, longitude=3, altitude=3}
-                }
-            );
-
-            var st = new StartTaskCommand(mp, SelectedRobotName);
-
-            string d = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-            d += "/debug";
-            Directory.CreateDirectory(d);
-            string f = d + "/st.json";
-
-            try 
-            {
-                File.AppendAllText(f, st.ToJson() + "\n");
-            }
-            catch 
-            {
-                // careful not to create a loop of logging!
-            }
-
             
         }
 
