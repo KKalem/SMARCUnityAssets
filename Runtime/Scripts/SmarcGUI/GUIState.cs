@@ -20,6 +20,7 @@ namespace SmarcGUI
         [Header("State")]
         public GuiMode CurrentMode;
         public string SelectedRobotName;
+        public string UUID;
 
         [Header("Colors")]
         public Color ColorMonitoring = Color.green;
@@ -178,11 +179,11 @@ namespace SmarcGUI
 
         void Start()
         {
+            UUID = System.Guid.NewGuid().ToString();
             InitKeyboardControllers();
             InitModeDropdown();
             InitCameraDropdown();
             InitRobotDropdown();
-            
         }
 
         void Update()
@@ -218,6 +219,9 @@ namespace SmarcGUI
             // for things that dont need any interaction, we can draw straight to the screen
             // things like status strings, etc.
             DrawModeBorder();
+            // Draw the UUID at the bottom left of the screen
+            GUI.color = Color.white;
+            GUI.Label(new Rect(0, Screen.height - 20, 400, 20), $"UUID: {UUID}");
         }
 
 

@@ -28,24 +28,26 @@ namespace SmarcGUI
         }
     }
 
+    public static class WaraSignals
+    {
+        public static string ENOUGH = "$enough";
+        public static string PAUSE = "$pause";
+        public static string CONTINUE = "$continue";
+        public static string ABORT = "$abort";
+    }
+
     public class SigntalTaskCommand: BaseCommand
     {
-        public static string ENOUGH{ get{return "$enough";} }
-        public static string PAUSE{ get{return "$pause";} }
-        public static string CONTINUE{ get{return "$continue";} }
-        public static string ABORT{ get{return "$abort";} }
-
-
         public string Signal;
         public string TaskUuid;
 
-        public SigntalTaskCommand(string signal)
+        public SigntalTaskCommand(string signal, string taskUuid)
         {
             Command = "signal-task";
             ComUuid = Guid.NewGuid().ToString();
 
             this.Signal = signal;
-            TaskUuid = Guid.NewGuid().ToString();
+            this.TaskUuid = taskUuid;
         }
 
     }

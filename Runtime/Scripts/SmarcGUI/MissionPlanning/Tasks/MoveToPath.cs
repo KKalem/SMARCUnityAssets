@@ -7,7 +7,7 @@ namespace SmarcGUI
         public double latitude{get; set;}
         public double longitude{get; set;}
         public double altitude{get; set;}
-        public string rostype{ get{return "GeoPoint";} }
+        public readonly string rostype{ get{return "GeoPoint";} }
     }
 
     public struct MoveSpeed
@@ -26,7 +26,6 @@ namespace SmarcGUI
             Params.Add("speed", speed);
             Params.Add("waypoint", waypoint);
         }
-
     }
 
     public class MovePath : Task
