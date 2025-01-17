@@ -13,8 +13,11 @@ using UnityEngine.UI;
 
 namespace SmarcGUI
 {
+    [RequireComponent(typeof(GUIState))]
     public class MisionPlanStore : MonoBehaviour
     {
+        GUIState guiState;
+
         [Tooltip("Path to store mission plans")]
         public string MissionStoragePath;
         public List<TaskSpecTree> MissionPlans = new();
@@ -22,9 +25,19 @@ namespace SmarcGUI
         [Header("GUI Elements")]
         public TMP_Dropdown MissionPlanDropdown;
         public TMP_InputField MissionPlanNameField;
-
         public Button NewMissionPlanButton;
         public Button DeleteMissionPlanButton;
+        public TMP_Dropdown AvailableTasksDropdown;
+        public Button AddTaskButton;
+        public Transform TasksScrollContent;
+
+        [Header("Prefabs")]
+        public GameObject TaskTemplatePrefab;
+
+
+        // TODO read these options from the robot
+        public List<string> AvailableTasks = new() { "move-to", "move-path", "custom" };
+
 
 
         void LoadMissionPlans()
@@ -59,6 +72,12 @@ namespace SmarcGUI
             NewMissionPlanButton.onClick.AddListener(OnNewMissionPlan);
             DeleteMissionPlanButton.onClick.AddListener(OnDeleteMissionPlan);
             MissionPlanNameField.onEndEdit.AddListener(OnMissionPlanNameChanged);
+
+            foreach(var taskType in AvailableTasks)
+            {
+                AvailableTasksDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskType });
+            }
+            AddTaskButton.onClick.AddListener(() => OnTaskAdded(AvailableTasksDropdown.value));
         }
 
         void RefreshNamesToLastMission()
@@ -76,6 +95,7 @@ namespace SmarcGUI
             MissionPlans.Add(newPlan);
             MissionPlanDropdown.options.Add(new TMP_Dropdown.OptionData() { text = newPlan.Name });
             RefreshNamesToLastMission();
+            RefreshTasksGUI();
         }
 
         public void OnDeleteMissionPlan()
@@ -85,7 +105,7 @@ namespace SmarcGUI
             MissionPlans.RemoveAt(index);
             MissionPlanDropdown.options.RemoveAt(index);
             RefreshNamesToLastMission();
-           
+            RefreshTasksGUI();
         }
 
         public void OnMissionPlanNameChanged(string name)
@@ -96,15 +116,57 @@ namespace SmarcGUI
             MissionPlanDropdown.RefreshShownValue();
         }
 
-
         void OnMissionPlanChanged(int index)
         {
             var plan = MissionPlans[index];
             MissionPlanNameField.text = plan.Name;
+            RefreshTasksGUI();
         }
+
+        void OnTaskAdded(int index)
+        {
+            if(MissionPlans.Count == 0) return;
+            if(MissionPlanDropdown.value < 0) return;
+            var plan = MissionPlans[MissionPlanDropdown.value];
+            var taskType = AvailableTasks[index];
+            Task newTask = null;
+            switch(taskType)
+            {
+                case "move-to":
+                    newTask = new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint());
+                    break;
+                case "move-path":
+                    newTask = new MovePath("Move along a path", MoveSpeed.STANDARD, new List<GeoPoint>());
+                    break;
+                case "custom":
+                    newTask = new CustomTask("Custom task with a JSON attached", "{}");
+                    break;
+            }
+            plan.Children.Add(newTask);
+            RefreshTasksGUI();
+        }
+
+        void RefreshTasksGUI()
+        {
+            foreach(Transform child in TasksScrollContent)
+            {
+                Destroy(child.gameObject);
+            }
+            if(MissionPlans.Count == 0) return;
+            var plan = MissionPlans[MissionPlanDropdown.value];
+            foreach(var task in plan.Children)
+            {
+                var taskGO = Instantiate(TaskTemplatePrefab, TasksScrollContent);
+                var taskGUI = taskGO.GetComponent<BaseTaskGUI>();
+                taskGUI.SetTask(task);
+            }
+        }
+        
 
         void Awake()
         {
+            guiState = GetComponent<GUIState>();
+
             // Desktop on win, user home on linux/mac
             MissionStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), Path.Combine("SMaRCUnity", "MissionPlans"));
             Directory.CreateDirectory(MissionStoragePath);
@@ -113,7 +175,19 @@ namespace SmarcGUI
             InitGUIElements();
         }
 
+        void OnGUI()
+        {
+            bool enabled = false;
+            if(MissionPlans.Count > 0)
+            {
+                enabled = MissionPlans[MissionPlanDropdown.value] != null;
+            }
+            AvailableTasksDropdown.interactable = enabled;
+            AddTaskButton.interactable = enabled;
+            DeleteMissionPlanButton.interactable = enabled;
+            MissionPlanNameField.interactable = enabled;
 
+        }
 
     }
 }

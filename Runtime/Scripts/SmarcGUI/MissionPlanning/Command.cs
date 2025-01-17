@@ -46,8 +46,8 @@ namespace SmarcGUI
             Command = "signal-task";
             ComUuid = Guid.NewGuid().ToString();
 
-            this.Signal = signal;
-            this.TaskUuid = taskUuid;
+            Signal = signal;
+            TaskUuid = taskUuid;
         }
 
     }

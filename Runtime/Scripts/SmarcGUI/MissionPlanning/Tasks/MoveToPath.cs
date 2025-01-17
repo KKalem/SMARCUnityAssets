@@ -19,6 +19,11 @@ namespace SmarcGUI
 
     public class MoveTo : Task
     {
+        public MoveTo()
+        {
+            new MoveTo("...", MoveSpeed.SLOW, new GeoPoint());
+        }
+
         public MoveTo(string description, string speed, GeoPoint waypoint)
         {
             Name = "move-to";
@@ -30,6 +35,10 @@ namespace SmarcGUI
 
     public class MovePath : Task
     {
+        public MovePath()
+        {
+            new MovePath("...", MoveSpeed.SLOW, new List<GeoPoint>());
+        }
         public MovePath(string description, string speed, List<GeoPoint> waypoints)
         {
             Name = "move-path";

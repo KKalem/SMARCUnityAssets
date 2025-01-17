@@ -11,9 +11,9 @@ namespace SmarcGUI
         // so im just implementing the basic "list of tasks" here. Which corresponds to their "L3" agents.
         // That means, this is a "linear tree" where the root is a sequence and thats it.
         // if anyone wants the _entire_ L4 spec, i wish you good luck :)
-        public Dictionary<string, object> CommonParams;
+        public Dictionary<string, object> CommonParams = new();
         public string Name;
-        public Dictionary<string, object> Params;
-        public List<Task> Children;
+        public Dictionary<string, object> Params = new();
+        public List<Task> Children = new();
     }
 }

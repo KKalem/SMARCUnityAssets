@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace SmarcGUI
 {
     public class CustomTask : Task

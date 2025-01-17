@@ -17,10 +17,9 @@ namespace SmarcGUI
 
     public class GUIState : MonoBehaviour
     {
-        [Header("State")]
-        public GuiMode CurrentMode;
-        public string SelectedRobotName;
-        public string UUID;
+        public GuiMode CurrentMode{get; private set;}
+        public string SelectedRobotName{get; private set;}
+        public string UUID{get; private set;}
 
         [Header("Colors")]
         public Color ColorMonitoring = Color.green;
@@ -49,7 +48,6 @@ namespace SmarcGUI
         GameObject selectedRobot;
         KeyboardController[] keyboardControllers;
 
-        List<IRobotChangedListener> robotChangedListeners = new List<IRobotChangedListener>();
 
 
         void InitModeDropdown()
@@ -165,16 +163,8 @@ namespace SmarcGUI
         {
             SelectedRobotName = robotDropdown.options[robotIndex].text;
             selectedRobot = GameObject.Find(SelectedRobotName);
-            foreach(var listener in robotChangedListeners)
-            {
-                listener.OnRobotChanged(selectedRobot);
-            }
         }
 
-        public void AddRobotChangedListener(IRobotChangedListener listener)
-        {
-            robotChangedListeners.Add(listener);
-        }
 
 
         void Start()
