@@ -8,26 +8,29 @@ namespace SmarcGUI
 {
     //https://api-docs.waraps.org/#/agent_communication/tasks/commands
 
-    public class Command : IJsonSerializable
+    [JsonObject(NamingStrategyType = typeof(Newtonsoft.Json.Serialization.KebabCaseNamingStrategy))]
+    public class BaseCommand
     {
-        public Dictionary<string, object> fields = new();
+        public string Command;
+        public string ComUuid;
+        public string Sender = "UnityGUI";
+
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(fields);
+            return JsonConvert.SerializeObject(this);
         }
     }
 
-    public class PingCommand : Command
+    public class PingCommand : BaseCommand
     {
         public PingCommand()
         {
-            fields["command"] = "ping";
-            fields["com-uuid"] = Guid.NewGuid().ToString();
-            fields["sender"] = "UnityGUI";
+            Command = "ping";
+            ComUuid = Guid.NewGuid().ToString();
         }
     }
 
-    public class SigntalTaskCommand: Command
+    public class SigntalTaskCommand: BaseCommand
     {
         public static string ENOUGH{ get{return "$enough";} }
         public static string PAUSE{ get{return "$pause";} }
@@ -35,33 +38,34 @@ namespace SmarcGUI
         public static string ABORT{ get{return "$abort";} }
 
 
+        public string Signal;
+        public string TaskUuid;
+
         public SigntalTaskCommand(string signal)
         {
-            fields["command"] = "signal-task";
-            fields["com-uuid"] = Guid.NewGuid().ToString();
-            fields["sender"] = "UnityGUI";
+            Command = "signal-task";
+            ComUuid = Guid.NewGuid().ToString();
 
-            fields["signal"] = signal;
-            fields["task-uuid"] = Guid.NewGuid().ToString();
+            this.Signal = signal;
+            TaskUuid = Guid.NewGuid().ToString();
         }
 
     }
 
-    public class StartTaskCommand : Command
+    public class StartTaskCommand : BaseCommand
     {
-        public string execution_unit;
-        public Task task;
-        public string task_uuid;
+        public string ExecutionUnit;
+        public Task Task;
+        public string TaskUuid;
 
         public StartTaskCommand(Task task, string robot_name)
         {
-            fields["command"] = "start-task";
-            fields["com-uuid"] = Guid.NewGuid().ToString();
-            fields["sender"] = "UnityGUI";
+            Command = "start-task";
+            ComUuid = Guid.NewGuid().ToString();
 
-            fields["execution_unit"] = robot_name;
-            fields["task-uuid"] = Guid.NewGuid().ToString();
-            fields["task"] = task;    
+            ExecutionUnit = robot_name;
+            TaskUuid = Guid.NewGuid().ToString();
+            Task = task;    
         }
         
 
