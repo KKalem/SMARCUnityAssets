@@ -53,6 +53,7 @@ namespace SmarcGUI
                     ChoiceDropdown.gameObject.SetActive(true);
                     ChoiceDropdown.ClearOptions();
                     ChoiceDropdown.AddOptions(choices);
+                    ChoiceDropdown.onValueChanged.AddListener(OnChoiceChanged);
                     break;
                 default:
                     InputField.gameObject.SetActive(true);
@@ -79,6 +80,11 @@ namespace SmarcGUI
                         paramValue = f;
                     break;
             }
+        }
+
+        void OnChoiceChanged(int index)
+        {
+            paramValue = ChoiceDropdown.options[index].text;
         }
 
     }
