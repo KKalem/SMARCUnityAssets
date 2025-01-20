@@ -11,7 +11,7 @@ using System.Collections;
 
 namespace SmarcGUI
 {
-    public class BaseTaskGUI : MonoBehaviour
+    public class BaseTaskGUI : MonoBehaviour, IHeightUpdatable
     {
         public float BottomPadding = 5;
         public Task task;
@@ -46,6 +46,11 @@ namespace SmarcGUI
                 paramGO.GetComponent<PrimitiveParamGUI>().SetParam(task.Params, param.Key);
                 paramGO.SetActive(true);
             }
+            UpdateHeight();
+        }
+
+        public void UpdateHeight()
+        {
             StartCoroutine(UpdateHeightWithDelay());
         }
 

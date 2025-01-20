@@ -78,6 +78,8 @@ namespace SmarcGUI
                 AvailableTasksDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskType });
             }
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(AvailableTasksDropdown.value));
+
+            RefreshTasksGUI();
         }
 
         void RefreshNamesToLastMission()
