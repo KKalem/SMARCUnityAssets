@@ -2,15 +2,11 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
-using Utils = DefaultNamespace.Utils;
-using VehicleComponents.Sensors;
-using System.IO;
-using System;
 
 namespace SmarcGUI
 {
 
-    class PrimitiveParamGUI : MonoBehaviour
+    class PrimitiveParamGUI : MonoBehaviour, ITaskParamGUI
     {
         public TMP_Text LabelText;
         public TMP_InputField InputField;
@@ -57,7 +53,7 @@ namespace SmarcGUI
                     break;
                 default:
                     InputField.gameObject.SetActive(true);
-                    InputField.text = $"Unsupported type: {paramValue.GetType()}";
+                    InputField.text = $"Non-primitive type: {paramValue.GetType()}";
                     InputField.contentType = TMP_InputField.ContentType.Standard;
                     InputField.interactable = false;
                     break;

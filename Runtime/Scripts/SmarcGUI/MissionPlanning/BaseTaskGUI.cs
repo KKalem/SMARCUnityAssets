@@ -2,10 +2,6 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
-using Utils = DefaultNamespace.Utils;
-using VehicleComponents.Sensors;
-using System.IO;
-using System;
 using System.Collections;
 
 
@@ -21,6 +17,7 @@ namespace SmarcGUI
         public TMP_Text TaskName;
 
         public GameObject PrimitiveParamPrefab;
+        public GameObject GeoPointParamPrefab;
 
         RectTransform rt;
         Vector2 baseSizeDelta;
@@ -30,6 +27,11 @@ namespace SmarcGUI
         {
             rt = GetComponent<RectTransform>();
             baseSizeDelta = rt.sizeDelta;
+        }
+
+        void OnEnable()
+        {
+            UpdateHeight();
         }
 
         public void SetTask(Task task)
@@ -42,8 +44,24 @@ namespace SmarcGUI
 
             foreach (var param in task.Params)
             {
-                var paramGO = Instantiate(PrimitiveParamPrefab, Params.transform);
-                paramGO.GetComponent<PrimitiveParamGUI>().SetParam(task.Params, param.Key);
+                var paramVal = param.Value;
+                GameObject paramGO;
+                switch(paramVal)
+                {
+                    case string s:
+                    case int i:
+                    case float f:
+                    case List<string> choices:
+                        paramGO = Instantiate(PrimitiveParamPrefab, Params.transform);
+                        paramGO.GetComponent<PrimitiveParamGUI>().SetParam(task.Params, param.Key);
+                        break;
+                    case GeoPoint gp:
+                        paramGO = Instantiate(GeoPointParamPrefab, Params.transform);
+                        paramGO.GetComponent<GeoPointParamGUI>().SetParam(task.Params, param.Key);
+                        break;
+                    default:
+                        return;
+                }
                 paramGO.SetActive(true);
             }
             UpdateHeight();
