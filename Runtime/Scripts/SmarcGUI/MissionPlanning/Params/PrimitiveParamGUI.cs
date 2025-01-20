@@ -1,29 +1,24 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 
 namespace SmarcGUI
 {
 
-    class PrimitiveParamGUI : MonoBehaviour, ITaskParamGUI
+    class PrimitiveParamGUI : ParamGUI
     {
         public TMP_Text LabelText;
         public TMP_InputField InputField;
         public TMP_Dropdown ChoiceDropdown;
-
-        Dictionary<string, object> allParams;
-        string paramKey;
-        object paramValue{get{return allParams[paramKey];} set{allParams[paramKey] = value;}}
-
         
-        public void SetParam(Dictionary<string, object> allParams, string paramKey)
-        {
-            this.allParams = allParams;
-            this.paramKey = paramKey;
 
-            LabelText.text = paramKey;
-            
+        protected override void SetupFields()
+        {
+
+            LabelText.text = paramKey ?? paramIndex.ToString();
+
             switch (paramValue)
             {
                 case string s:
@@ -37,7 +32,6 @@ namespace SmarcGUI
                     InputField.text = i.ToString();
                     InputField.contentType = TMP_InputField.ContentType.IntegerNumber;
                     InputField.onValueChanged.AddListener(OnInputFieldChanged);
-
                     break;
                 case float f:
                     InputField.gameObject.SetActive(true);

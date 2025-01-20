@@ -42,21 +42,24 @@ namespace SmarcGUI
             DescriptionField.onValueChanged.AddListener((string desc) => task.Description = desc);
 
             foreach (var param in task.Params)
-                InstantiateParam(Params.transform, param);
+                InstantiateParam(Params.transform, task.Params, param.Key);
 
             UpdateHeight();
         }
 
-        void InstantiateParam(Transform parent, KeyValuePair<string, object> param)
+        void InstantiateParam(Transform parent, Dictionary<string, object> taskParams, string paramKey)
         {
             GameObject paramGO;
-            GameObject paramPrefab = missionPlanStore.GetParamPrefab(param.Value);
+            GameObject paramPrefab = missionPlanStore.GetParamPrefab(taskParams[paramKey]);
             paramGO = Instantiate(paramPrefab, parent);
-            paramGO.GetComponent<ITaskParamGUI>().SetParam(task.Params, param.Key);
+            paramGO.GetComponent<ParamGUI>().SetParam(taskParams, paramKey);
         }
+
 
         public void UpdateHeight()
         {
+            // Why? because this is under a scroll view and we cant have size-fitter component without problems
+            // this seems to let the scroll view do its thing, and then update the size after.
             StartCoroutine(UpdateHeightWithDelay());
         }
 

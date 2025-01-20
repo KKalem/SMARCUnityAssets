@@ -1,26 +1,23 @@
-using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
+
 
 
 namespace SmarcGUI
 {
 
-    class GeoPointParamGUI : MonoBehaviour, ITaskParamGUI
+    class GeoPointParamGUI : ParamGUI
     {
+        public TMP_Text Label;
         public TMP_InputField LatField, LonField, AltField;
-        Dictionary<string, object> allParams;
-        string paramKey;
 
-        public void SetParam(Dictionary<string, object> allParams, string paramKey)
+        protected override void SetupFields()
         {
-            var gp = (GeoPoint)allParams[paramKey];
+            Label.text = paramKey ?? paramIndex.ToString();
+
+            var gp = (GeoPoint)paramValue;
             LatField.text = gp.latitude.ToString();
             LonField.text = gp.longitude.ToString();
             AltField.text = gp.altitude.ToString();
-
-            this.allParams = allParams;
-            this.paramKey = paramKey;
 
             LatField.onValueChanged.AddListener(OnLatChanged);
             LonField.onValueChanged.AddListener(OnLonChanged);
@@ -29,23 +26,23 @@ namespace SmarcGUI
 
         void OnLatChanged(string s)
         {
-            var gp = (GeoPoint)allParams[paramKey];
+            var gp = (GeoPoint)paramValue;
             gp.latitude = double.Parse(s);
-            allParams[paramKey] = gp;
+            paramValue = gp;
         }
 
         void OnLonChanged(string s)
         {
-            var gp = (GeoPoint)allParams[paramKey];
+            var gp = (GeoPoint)paramValue;
             gp.longitude = double.Parse(s);
-            allParams[paramKey] = gp;
+            paramValue = gp;
         }   
 
         void OnAltChanged(string s)
         {
-            var gp = (GeoPoint)allParams[paramKey];
+            var gp = (GeoPoint)paramValue;
             gp.altitude = double.Parse(s);
-            allParams[paramKey] = gp;
+            paramValue = gp;
         }
     }
 }

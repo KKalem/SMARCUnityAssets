@@ -2,13 +2,11 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
-// using Utils = DefaultNamespace.Utils;
-using VehicleComponents.Sensors;
 using System.IO;
 using System;
 using Newtonsoft.Json;
-using UnityEditor.EditorTools;
 using UnityEngine.UI;
+using System.Collections;
 
 
 namespace SmarcGUI
@@ -35,6 +33,7 @@ namespace SmarcGUI
         public GameObject TaskPrefab;
         public GameObject PrimitiveParamPrefab;
         public GameObject GeoPointParamPrefab;
+        public GameObject ListParamPrefab;
 
 
         // TODO read these options from the robot
@@ -137,13 +136,19 @@ namespace SmarcGUI
             switch(taskType)
             {
                 case "move-to":
-                    newTask = new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint());
+                    newTask = new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint(){latitude=1, longitude=2, altitude=3});
                     break;
                 case "move-path":
-                    newTask = new MovePath("Move along a path", MoveSpeed.STANDARD, new List<GeoPoint>());
+                    var list = new List<GeoPoint>
+                    {
+                        new() { latitude = 0, longitude = 0, altitude = 0 },
+                        new() { latitude = 0, longitude = 0, altitude = 1 },
+                        new() { latitude = 0, longitude = 0, altitude = 2 }
+                    };
+                    newTask = new MovePath("Move along a path", MoveSpeed.STANDARD, list);
                     break;
                 case "custom":
-                    newTask = new CustomTask("Custom task with a JSON attached", "{}");
+                    newTask = new CustomTask("Custom task with a JSON attached", "{amazing-thing: 42}");
                     break;
             }
             plan.Children.Add(newTask);
@@ -171,7 +176,8 @@ namespace SmarcGUI
             return paramValue switch
             {
                 string or int or float or bool => PrimitiveParamPrefab,
-                GeoPoint gp => GeoPointParamPrefab,
+                GeoPoint => GeoPointParamPrefab,
+                IList => ListParamPrefab,
                 _ => PrimitiveParamPrefab,
             };
         }
