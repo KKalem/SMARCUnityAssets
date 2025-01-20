@@ -14,7 +14,7 @@ using UnityEngine.UI;
 namespace SmarcGUI
 {
     [RequireComponent(typeof(GUIState))]
-    public class MisionPlanStore : MonoBehaviour
+    public class MissionPlanStore : MonoBehaviour
     {
         GUIState guiState;
 
@@ -32,7 +32,9 @@ namespace SmarcGUI
         public Transform TasksScrollContent;
 
         [Header("Prefabs")]
-        public GameObject TaskTemplatePrefab;
+        public GameObject TaskPrefab;
+        public GameObject PrimitiveParamPrefab;
+        public GameObject GeoPointParamPrefab;
 
 
         // TODO read these options from the robot
@@ -158,10 +160,20 @@ namespace SmarcGUI
             var plan = MissionPlans[MissionPlanDropdown.value];
             foreach(var task in plan.Children)
             {
-                var taskGO = Instantiate(TaskTemplatePrefab, TasksScrollContent);
-                var taskGUI = taskGO.GetComponent<BaseTaskGUI>();
-                taskGUI.SetTask(task);
+                var taskGO = Instantiate(TaskPrefab, TasksScrollContent);
+                var taskGUI = taskGO.GetComponent<TaskGUI>();
+                taskGUI.SetTask(task, this);
             }
+        }
+
+        public GameObject GetParamPrefab(object paramValue)
+        {
+            return paramValue switch
+            {
+                string or int or float or bool => PrimitiveParamPrefab,
+                GeoPoint gp => GeoPointParamPrefab,
+                _ => PrimitiveParamPrefab,
+            };
         }
         
 

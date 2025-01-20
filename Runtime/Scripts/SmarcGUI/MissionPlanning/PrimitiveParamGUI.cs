@@ -45,10 +45,10 @@ namespace SmarcGUI
                     InputField.contentType = TMP_InputField.ContentType.DecimalNumber;
                     InputField.onValueChanged.AddListener(OnInputFieldChanged);
                     break;
-                case List<string> choices:
+                case bool b:
                     ChoiceDropdown.gameObject.SetActive(true);
                     ChoiceDropdown.ClearOptions();
-                    ChoiceDropdown.AddOptions(choices);
+                    ChoiceDropdown.AddOptions(new List<string>{"True", "False"});
                     ChoiceDropdown.onValueChanged.AddListener(OnChoiceChanged);
                     break;
                 default:
@@ -80,7 +80,7 @@ namespace SmarcGUI
 
         void OnChoiceChanged(int index)
         {
-            paramValue = ChoiceDropdown.options[index].text;
+            paramValue = bool.Parse(ChoiceDropdown.options[index].text);
         }
 
     }
