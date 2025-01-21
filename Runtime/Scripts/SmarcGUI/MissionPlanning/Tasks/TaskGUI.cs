@@ -3,11 +3,13 @@ using TMPro;
 using System.Collections.Generic;
 
 using System.Collections;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 
 namespace SmarcGUI
 {
-    public class TaskGUI : MonoBehaviour, IHeightUpdatable
+    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler
     {
         public float BottomPadding = 5;
         public Task task;
@@ -15,11 +17,12 @@ namespace SmarcGUI
         public GameObject Params;
         public TMP_InputField DescriptionField;
         public TMP_Text TaskName;
+        public RectTransform HighlightRT;
 
 
         MissionPlanStore missionPlanStore;
-
         RectTransform rt;
+
 
         
         void Awake()
@@ -78,6 +81,22 @@ namespace SmarcGUI
         }
 
 
-        
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if(eventData.button == PointerEventData.InputButton.Right)
+            {
+                // Show right click menu with options
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            HighlightRT.gameObject.SetActive(false);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            HighlightRT.gameObject.SetActive(true);
+        }
     }
 }
