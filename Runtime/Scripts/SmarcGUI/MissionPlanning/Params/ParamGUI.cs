@@ -15,10 +15,17 @@ namespace SmarcGUI
         public RectTransform HighlightRT;
         public GameObject ContextMenuPrefab;
 
-        protected object paramValue
+        MissionPlanStore missionPlanStore;
+
+        void Awake()
+        {
+            missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+        }
+
+        public object paramValue
         {
             get => paramsDict!=null? paramsDict[paramKey] : paramsList[paramIndex];
-            set
+            protected set
             {
                 if(paramsDict!=null)
                     paramsDict[paramKey] = value;
@@ -53,7 +60,7 @@ namespace SmarcGUI
                 var contextMenuGO = Instantiate(ContextMenuPrefab, transform.parent);
                 contextMenuGO.GetComponent<RectTransform>().position = eventData.position;
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
-                contextMenu.SetParam(paramsList, paramIndex);
+                contextMenu.SetParam(paramIndex, this);
             }
         }
 
@@ -65,6 +72,30 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightRT?.gameObject.SetActive(true);
+        }
+
+        public void MoveParamUp(int paramIndex)
+        {
+            if(paramIndex == 0) return;
+            var temp = paramsList[paramIndex];
+            paramsList[paramIndex] = paramsList[paramIndex-1];
+            paramsList[paramIndex-1] = temp;
+            missionPlanStore.RefreshTasksGUI();
+        }
+        
+        public void MoveParamDown(int paramIndex)
+        {
+            if(paramIndex == paramsList.Count-1) return;
+            var temp = paramsList[paramIndex];
+            paramsList[paramIndex] = paramsList[paramIndex+1];
+            paramsList[paramIndex+1] = temp;
+            missionPlanStore.RefreshTasksGUI();
+        }
+
+        public void DeleteParam(int paramIndex)
+        {
+            paramsList.RemoveAt(paramIndex);
+            missionPlanStore.RefreshTasksGUI();
         }
 
     }

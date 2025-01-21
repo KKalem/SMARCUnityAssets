@@ -11,12 +11,16 @@ namespace SmarcGUI
         Task task;
         MissionPlanStore missionPlanStore;
 
-        IList paramsList;
+        ParamGUI paramGui;
         int paramIndex;
+
 
         public Button DeleteButton;
         public Button MoveUpButton;
         public Button MoveDownButton;
+
+        public RectTransform GeoPointExtension;
+        public Toggle ShowGeoPointInWorldToggle;
 
         void Awake()
         {
@@ -25,9 +29,9 @@ namespace SmarcGUI
 
 
         // For params in a param-list
-        public void SetParam(IList paramsList, int paramIndex)
+        public void SetParam(int paramIndex, ParamGUI paramGui)
         {
-            this.paramsList = paramsList;
+            this.paramGui = paramGui;
             this.paramIndex = paramIndex;
             DeleteButton.onClick.AddListener(OnParamDelete);
             MoveUpButton.onClick.AddListener(OnParamUp);
@@ -36,29 +40,20 @@ namespace SmarcGUI
 
         void OnParamDelete()
         {
-            paramsList.RemoveAt(paramIndex);
+            paramGui.DeleteParam(paramIndex);
             Destroy(gameObject);
-            missionPlanStore.RefreshTasksGUI();
         }
 
         void OnParamUp()
         {
-            if(paramIndex == 0) return;
-            var param = paramsList[paramIndex];
-            paramsList.RemoveAt(paramIndex);
-            paramsList.Insert(paramIndex-1, param);
+            paramGui.MoveParamUp(paramIndex);
             Destroy(gameObject);
-            missionPlanStore.RefreshTasksGUI();
         }
 
         void OnParamDown()
         {
-            if(paramIndex == paramsList.Count-1) return;
-            var param = paramsList[paramIndex];
-            paramsList.RemoveAt(paramIndex);
-            paramsList.Insert(paramIndex+1, param);
+            paramGui.MoveParamDown(paramIndex);
             Destroy(gameObject);
-            missionPlanStore.RefreshTasksGUI();
         }
 
         // For tasks in a task-list

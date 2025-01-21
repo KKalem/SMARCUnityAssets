@@ -27,6 +27,8 @@ namespace SmarcGUI
         public TMP_Dropdown MissionPlanDropdown;
         public TMP_InputField MissionPlanNameField;
         public Button NewMissionPlanButton;
+        public Button LoadMissionsButton;
+        public Button SaveMissionsButton;
         public Button DeleteMissionPlanButton;
         public TMP_Dropdown AvailableTasksDropdown;
         public Button AddTaskButton;
@@ -64,25 +66,52 @@ namespace SmarcGUI
                 }
             }
             print($"Loaded {i} mission plans");
+            RefreshMissionPlansDropdown();
+        }
+
+        void SaveMissionPlans()
+        {
+            var i=0;
+            foreach (var plan in MissionPlans)
+            {
+                var json = JsonConvert.SerializeObject(plan, Formatting.Indented);
+                var path = Path.Combine(MissionStoragePath, $"{plan.Name}.json");
+                File.WriteAllText(path, json);
+                i++;
+            }
+            print($"Saved {i} mission plans");
+        }
+
+        void RefreshMissionPlansDropdown()
+        {
+            MissionPlanDropdown.options.Clear();
+            foreach (var plan in MissionPlans)
+            {
+                MissionPlanDropdown.options.Add(new TMP_Dropdown.OptionData() { text = plan.Name });
+            }
+        }
+
+        void RefreshAvailableTasksDropdown()
+        {
+            AvailableTasksDropdown.options.Clear();
+            foreach (var taskType in AvailableTasks)
+            {
+                AvailableTasksDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskType });
+            }
         }
 
         void InitGUIElements()
         {
             MissionPlanDropdown.onValueChanged.AddListener(OnMissionPlanChanged);
-            foreach (var plan in MissionPlans)
-            {
-                MissionPlanDropdown.options.Add(new TMP_Dropdown.OptionData() { text = plan.Name });
-            }
             NewMissionPlanButton.onClick.AddListener(OnNewMissionPlan);
             DeleteMissionPlanButton.onClick.AddListener(OnDeleteMissionPlan);
+            LoadMissionsButton.onClick.AddListener(LoadMissionPlans);
+            SaveMissionsButton.onClick.AddListener(SaveMissionPlans);
             MissionPlanNameField.onEndEdit.AddListener(OnMissionPlanNameChanged);
-
-            foreach(var taskType in AvailableTasks)
-            {
-                AvailableTasksDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskType });
-            }
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(AvailableTasksDropdown.value));
 
+            RefreshAvailableTasksDropdown();
+            RefreshMissionPlansDropdown();
             RefreshTasksGUI();
         }
 
