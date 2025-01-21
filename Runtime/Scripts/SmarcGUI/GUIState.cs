@@ -173,6 +173,10 @@ namespace SmarcGUI
         {
             string currentTime = System.DateTime.Now.ToString("HH:mm:ss");
             LogText.text = $"[{currentTime}] {text}\n{LogText.text}";
+            if(LogText.text.Length > 5000)
+            {
+                LogText.text = LogText.text[..1000];
+            }
         }
 
 

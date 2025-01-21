@@ -24,12 +24,14 @@ namespace SmarcGUI
 
         MissionPlanStore missionPlanStore;
         RectTransform rt;
+        Canvas canvas;
 
 
         
         void Awake()
         {
             rt = GetComponent<RectTransform>();
+            canvas = transform.root.GetComponentInChildren<Canvas>();
         }
 
         void OnEnable()
@@ -87,10 +89,9 @@ namespace SmarcGUI
         {
             if(eventData.button == PointerEventData.InputButton.Right)
             {
-                var contextMenuGO = Instantiate(ContextMenuPrefab, transform.parent);
-                contextMenuGO.GetComponent<RectTransform>().position = eventData.position;
+                var contextMenuGO = Instantiate(ContextMenuPrefab);
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
-                contextMenu.SetTask(task);
+                contextMenu.SetTask(eventData.position, task);
             }
         }
 

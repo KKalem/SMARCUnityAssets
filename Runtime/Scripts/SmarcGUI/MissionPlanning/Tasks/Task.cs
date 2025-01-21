@@ -22,7 +22,7 @@ namespace SmarcGUI
         {
             // Cant modify a dictionary while iterating over it
             Dictionary<string, object> paramUpdates = new();
-            
+
             foreach (var param in Params)
             {
                 var paramValue = param.Value;
@@ -36,6 +36,11 @@ namespace SmarcGUI
                 {
                     var geoPoints = JsonConvert.DeserializeObject<List<GeoPoint>>(paramValue.ToString());
                     paramUpdates.Add(param.Key, geoPoints);
+                }
+                else
+                {
+                    // We don't know what this is... so we turn it into a string and show it
+                    paramUpdates.Add(param.Key, paramValue.ToString());
                 }
                 // Add other known stuff like this...
             }

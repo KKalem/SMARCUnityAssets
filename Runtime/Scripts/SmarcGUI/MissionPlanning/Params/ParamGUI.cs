@@ -16,6 +16,7 @@ namespace SmarcGUI
         public GameObject ContextMenuPrefab;
 
         MissionPlanStore missionPlanStore;
+ 
 
         void Awake()
         {
@@ -57,10 +58,9 @@ namespace SmarcGUI
         {
             if(eventData.button == PointerEventData.InputButton.Right)
             {
-                var contextMenuGO = Instantiate(ContextMenuPrefab, transform.parent);
-                contextMenuGO.GetComponent<RectTransform>().position = eventData.position;
+                var contextMenuGO = Instantiate(ContextMenuPrefab);
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
-                contextMenu.SetParam(paramIndex, this);
+                contextMenu.SetParam(eventData.position, paramIndex, this);
             }
         }
 
@@ -76,24 +76,23 @@ namespace SmarcGUI
 
         public void MoveParamUp(int paramIndex)
         {
+            if(paramsList == null) return;
             if(paramIndex == 0) return;
-            var temp = paramsList[paramIndex];
-            paramsList[paramIndex] = paramsList[paramIndex-1];
-            paramsList[paramIndex-1] = temp;
+            (paramsList[paramIndex-1], paramsList[paramIndex]) = (paramsList[paramIndex], paramsList[paramIndex-1]);
             missionPlanStore.RefreshTasksGUI();
         }
         
         public void MoveParamDown(int paramIndex)
         {
+            if(paramsList == null) return;
             if(paramIndex == paramsList.Count-1) return;
-            var temp = paramsList[paramIndex];
-            paramsList[paramIndex] = paramsList[paramIndex+1];
-            paramsList[paramIndex+1] = temp;
+            (paramsList[paramIndex+1], paramsList[paramIndex]) = (paramsList[paramIndex], paramsList[paramIndex+1]);
             missionPlanStore.RefreshTasksGUI();
         }
 
         public void DeleteParam(int paramIndex)
         {
+            if(paramsList == null) return;
             paramsList.RemoveAt(paramIndex);
             missionPlanStore.RefreshTasksGUI();
         }

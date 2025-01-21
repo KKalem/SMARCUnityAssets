@@ -70,7 +70,7 @@ namespace SmarcGUI
                 }
             }
             guiState.Log($"Loaded {i} mission plans");
-            RefreshMissionPlansDropdown();
+            OnMissionPlanChanged(0);
         }
 
         void SaveMissionPlans()

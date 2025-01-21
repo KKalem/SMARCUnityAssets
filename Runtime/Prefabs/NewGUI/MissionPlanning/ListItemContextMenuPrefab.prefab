@@ -713,6 +713,8 @@ MonoBehaviour:
   DeleteButton: {fileID: 8979511990128720826}
   MoveUpButton: {fileID: 7590567646927706414}
   MoveDownButton: {fileID: 5372381984777913457}
+  GeoPointExtension: {fileID: 0}
+  ShowGeoPointInWorldToggle: {fileID: 0}
 --- !u!222 &5857424841084125130
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -737,7 +739,7 @@ MonoBehaviour:
   m_Color: {r: 0, g: 0, b: 1, a: 0.02745098}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

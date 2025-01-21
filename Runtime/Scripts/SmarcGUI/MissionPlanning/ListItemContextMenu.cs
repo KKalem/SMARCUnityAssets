@@ -10,6 +10,8 @@ namespace SmarcGUI
     {
         Task task;
         MissionPlanStore missionPlanStore;
+        Canvas canvas;
+        RectTransform rt;
 
         ParamGUI paramGui;
         int paramIndex;
@@ -25,17 +27,27 @@ namespace SmarcGUI
         void Awake()
         {
             missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+            rt = GetComponent<RectTransform>();
+            canvas = FindFirstObjectByType<Canvas>();
         }
 
+        void SetOnTop(Vector2 position)
+        {
+            rt.SetParent(canvas.transform, false);
+            rt.position = position;
+            rt.SetAsLastSibling();
+        }
 
         // For params in a param-list
-        public void SetParam(int paramIndex, ParamGUI paramGui)
+        public void SetParam(Vector2 position, int paramIndex, ParamGUI paramGui)
         {
             this.paramGui = paramGui;
             this.paramIndex = paramIndex;
             DeleteButton.onClick.AddListener(OnParamDelete);
             MoveUpButton.onClick.AddListener(OnParamUp);
             MoveDownButton.onClick.AddListener(OnParamDown);
+
+            SetOnTop(position);
         }
 
         void OnParamDelete()
@@ -57,12 +69,14 @@ namespace SmarcGUI
         }
 
         // For tasks in a task-list
-        public void SetTask(Task task)
+        public void SetTask(Vector2 position, Task task)
         {
             this.task = task;
             DeleteButton.onClick.AddListener(OnTaskDelete);
             MoveUpButton.onClick.AddListener(OnTaskUp);
             MoveDownButton.onClick.AddListener(OnTaskDown);
+
+            SetOnTop(position);
         }
 
         void OnTaskDelete()
