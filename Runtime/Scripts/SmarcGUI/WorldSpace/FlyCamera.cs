@@ -4,7 +4,7 @@ using UnityEngine;
 // with some mods.
 
 
-namespace GameUI
+namespace SmarcGUI
 {
 	[RequireComponent( typeof(Camera) )]
 	public class FlyCamera : MonoBehaviour {
@@ -18,9 +18,12 @@ namespace GameUI
 
 		Camera cam;
 
+		GUIState guiState;
+
 		void Start()
 		{
 			cam = GetComponentInParent<Camera>();
+			guiState = FindFirstObjectByType<GUIState>();
 		}
 
 		static bool Focused {
@@ -38,6 +41,12 @@ namespace GameUI
 		void OnDisable() => Focused = false;
 
 		void Update() {
+			if(guiState.MouseOnGUI)
+			{
+				Focused = false;
+				return;
+			}
+			
 			// Input
 			if( Focused )
 				UpdateInput();

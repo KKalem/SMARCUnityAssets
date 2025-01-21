@@ -49,7 +49,7 @@ namespace SmarcGUI
         {
             if(eventData.button == PointerEventData.InputButton.Right)
             {
-                // Show right click menu with options
+                print($"Clicked on {paramKey} or {paramIndex}");
             }
         }
 

@@ -7,6 +7,7 @@ using System;
 using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Collections;
+using Codice.Client.Common.GameUI;
 
 
 namespace SmarcGUI
@@ -19,6 +20,8 @@ namespace SmarcGUI
         [Tooltip("Path to store mission plans")]
         public string MissionStoragePath;
         public List<TaskSpecTree> MissionPlans = new();
+
+        TaskSpecTree SelectedMissionPlan => MissionPlans[MissionPlanDropdown.value];
 
         [Header("GUI Elements")]
         public TMP_Dropdown MissionPlanDropdown;
@@ -87,7 +90,7 @@ namespace SmarcGUI
         {
             MissionPlanDropdown.value = MissionPlans.Count==0? -1 : MissionPlans.Count - 1;
             MissionPlanDropdown.RefreshShownValue();
-            MissionPlanNameField.text = MissionPlans.Count == 0 ? "NO MISSION PLAN" : MissionPlans[MissionPlanDropdown.value].Name;
+            MissionPlanNameField.text = MissionPlans.Count == 0 ? "NO MISSION PLAN" : SelectedMissionPlan.Name;
         }
 
         public void OnNewMissionPlan()
@@ -130,7 +133,6 @@ namespace SmarcGUI
         {
             if(MissionPlans.Count == 0) return;
             if(MissionPlanDropdown.value < 0) return;
-            var plan = MissionPlans[MissionPlanDropdown.value];
             var taskType = AvailableTasks[index];
             Task newTask = null;
             switch(taskType)
@@ -151,7 +153,31 @@ namespace SmarcGUI
                     newTask = new CustomTask("Custom task with a JSON attached", "{amazing-thing: 42}");
                     break;
             }
-            plan.Children.Add(newTask);
+            SelectedMissionPlan.Children.Add(newTask);
+            RefreshTasksGUI();
+        }
+
+        public void DeleteTask(Task task)
+        {
+            SelectedMissionPlan.Children.Remove(task);
+            RefreshTasksGUI();
+        }
+
+        public void MoveTaskUp(Task task)
+        {
+            var index = SelectedMissionPlan.Children.IndexOf(task);
+            if(index == 0) return;
+            SelectedMissionPlan.Children.RemoveAt(index);
+            SelectedMissionPlan.Children.Insert(index-1, task);
+            RefreshTasksGUI();
+        }
+
+        public void MoveTaskDown(Task task)
+        {
+            var index = SelectedMissionPlan.Children.IndexOf(task);
+            if(index == SelectedMissionPlan.Children.Count-1) return;
+            SelectedMissionPlan.Children.RemoveAt(index);
+            SelectedMissionPlan.Children.Insert(index+1, task);
             RefreshTasksGUI();
         }
 
@@ -162,7 +188,7 @@ namespace SmarcGUI
                 Destroy(child.gameObject);
             }
             if(MissionPlans.Count == 0) return;
-            var plan = MissionPlans[MissionPlanDropdown.value];
+            var plan = SelectedMissionPlan;
             foreach(var task in plan.Children)
             {
                 var taskGO = Instantiate(TaskPrefab, TasksScrollContent);
@@ -200,7 +226,7 @@ namespace SmarcGUI
             bool enabled = false;
             if(MissionPlans.Count > 0)
             {
-                enabled = MissionPlans[MissionPlanDropdown.value] != null;
+                enabled = SelectedMissionPlan != null;
             }
             AvailableTasksDropdown.interactable = enabled;
             AddTaskButton.interactable = enabled;

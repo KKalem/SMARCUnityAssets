@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Utils = DefaultNamespace.Utils;
 using VehicleComponents.Sensors;
 using System.IO;
+using UnityEngine.EventSystems;
 
 namespace SmarcGUI
 {
@@ -15,11 +16,12 @@ namespace SmarcGUI
         KeyboardControl
     }
 
-    public class GUIState : MonoBehaviour
+    public class GUIState : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler
     {
         public GuiMode CurrentMode{get; private set;}
         public string SelectedRobotName{get; private set;}
         public string UUID{get; private set;}
+        public bool MouseOnGUI{get; private set;}
 
         [Header("Colors")]
         public Color ColorMonitoring = Color.green;
@@ -212,6 +214,16 @@ namespace SmarcGUI
             // Draw the UUID at the bottom left of the screen
             GUI.color = Color.white;
             GUI.Label(new Rect(0, Screen.height - 20, 400, 20), $"UUID: {UUID}");
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            MouseOnGUI = false;
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            MouseOnGUI = true;
         }
 
 

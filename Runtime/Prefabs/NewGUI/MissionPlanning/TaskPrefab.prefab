@@ -619,6 +619,7 @@ MonoBehaviour:
   DescriptionField: {fileID: 6980279389155491615}
   TaskName: {fileID: 24795841691342612}
   HighlightRT: {fileID: 5901254615039856712}
+  TaskContextMenuPrefab: {fileID: 5700513683117687523, guid: dc50e97ebddcc6a47ac3dec88f9b8116, type: 3}
 --- !u!1 &6214090480317902547
 GameObject:
   m_ObjectHideFlags: 0
