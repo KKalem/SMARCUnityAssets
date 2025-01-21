@@ -37,6 +37,8 @@ namespace SmarcGUI
         public GameObject KeyboardButtonsPanel;
         public TMP_Text KeyboardButtonsText;
 
+        public TMP_Text LogText;
+
 
 
         [Header("Defaults")]
@@ -165,6 +167,12 @@ namespace SmarcGUI
         {
             SelectedRobotName = robotDropdown.options[robotIndex].text;
             selectedRobot = GameObject.Find(SelectedRobotName);
+        }
+
+        public void Log(string text)
+        {
+            string currentTime = System.DateTime.Now.ToString("HH:mm:ss");
+            LogText.text = $"[{currentTime}] {text}\n{LogText.text}";
         }
 
 

@@ -15,5 +15,11 @@ namespace SmarcGUI
         public string Name;
         public Dictionary<string, object> Params = new();
         public List<Task> Children = new();
+
+        public void RecoverFromJson()
+        {
+            foreach (var task in Children)
+                task.RecoverFromJson();
+        }
     }
 }

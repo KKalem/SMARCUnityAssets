@@ -56,16 +56,20 @@ namespace SmarcGUI
                 try
                 {
                     var plan = JsonConvert.DeserializeObject<TaskSpecTree>(json);
+                    // Json does not know about _classes_ so we need to recover the types
+                    // by checking for simple fields, and matching them to known classes
+                    // Most of the work is done in the Task class
+                    plan.RecoverFromJson();
                     MissionPlans.Add(plan);
                     i++;
                 }
                 catch (Exception e)
                 {
-                    print($"Failed to load mission plan from {file}: {e.Message}");
+                    guiState.Log($"Failed to load mission plan from {file}: {e.Message}");
                     continue;
                 }
             }
-            print($"Loaded {i} mission plans");
+            guiState.Log($"Loaded {i} mission plans");
             RefreshMissionPlansDropdown();
         }
 
@@ -79,7 +83,7 @@ namespace SmarcGUI
                 File.WriteAllText(path, json);
                 i++;
             }
-            print($"Saved {i} mission plans");
+            guiState.Log($"Saved {i} mission plans");
         }
 
         void RefreshMissionPlansDropdown()
