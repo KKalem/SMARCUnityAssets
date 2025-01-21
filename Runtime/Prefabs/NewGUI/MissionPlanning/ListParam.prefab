@@ -218,6 +218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HighlightRT: {fileID: 1738855234795724007}
+  ContextMenuPrefab: {fileID: 5700513683117687523, guid: dc50e97ebddcc6a47ac3dec88f9b8116, type: 3}
   content: {fileID: 5053223329182269072}
   Label: {fileID: 5698395585727424811}
 --- !u!222 &5521613876678499697

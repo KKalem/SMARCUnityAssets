@@ -19,7 +19,7 @@ namespace SmarcGUI
         public TMP_Text TaskName;
         public RectTransform HighlightRT;
 
-        public GameObject TaskContextMenuPrefab;
+        public GameObject ContextMenuPrefab;
 
 
         MissionPlanStore missionPlanStore;
@@ -87,9 +87,9 @@ namespace SmarcGUI
         {
             if(eventData.button == PointerEventData.InputButton.Right)
             {
-                var contextMenuGO = Instantiate(TaskContextMenuPrefab, transform.parent);
+                var contextMenuGO = Instantiate(ContextMenuPrefab, transform.parent);
                 contextMenuGO.GetComponent<RectTransform>().position = eventData.position;
-                var contextMenu = contextMenuGO.GetComponent<TaskContextMenu>();
+                var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
                 contextMenu.SetTask(task);
             }
         }

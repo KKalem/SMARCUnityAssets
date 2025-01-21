@@ -13,6 +13,7 @@ namespace SmarcGUI
         protected int paramIndex;
 
         public RectTransform HighlightRT;
+        public GameObject ContextMenuPrefab;
 
         protected object paramValue
         {
@@ -49,7 +50,10 @@ namespace SmarcGUI
         {
             if(eventData.button == PointerEventData.InputButton.Right)
             {
-                print($"Clicked on {paramKey} or {paramIndex}");
+                var contextMenuGO = Instantiate(ContextMenuPrefab, transform.parent);
+                contextMenuGO.GetComponent<RectTransform>().position = eventData.position;
+                var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
+                contextMenu.SetParam(paramsList, paramIndex);
             }
         }
 

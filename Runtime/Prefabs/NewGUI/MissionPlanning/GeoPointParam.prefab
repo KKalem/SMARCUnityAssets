@@ -1148,6 +1148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HighlightRT: {fileID: 6279876883339760572}
+  ContextMenuPrefab: {fileID: 5700513683117687523, guid: dc50e97ebddcc6a47ac3dec88f9b8116, type: 3}
   Label: {fileID: 4302279444427772950}
   LatField: {fileID: 5860177524517708484}
   LonField: {fileID: 5151769899253396062}

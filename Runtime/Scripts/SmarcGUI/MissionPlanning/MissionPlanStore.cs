@@ -181,7 +181,7 @@ namespace SmarcGUI
             RefreshTasksGUI();
         }
 
-        void RefreshTasksGUI()
+        public void RefreshTasksGUI()
         {
             foreach(Transform child in TasksScrollContent)
             {
@@ -232,6 +232,7 @@ namespace SmarcGUI
             AddTaskButton.interactable = enabled;
             DeleteMissionPlanButton.interactable = enabled;
             MissionPlanNameField.interactable = enabled;
+            MissionPlanDropdown.interactable = enabled;
 
         }
 

@@ -33,7 +33,7 @@ namespace SmarcGUI
             if(ResizeParent)
             {
                 var parent = ToggledObject.transform.parent.GetComponent<IHeightUpdatable>();
-                parent.UpdateHeight();
+                parent?.UpdateHeight();
             }
         }
     }
