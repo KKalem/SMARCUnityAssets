@@ -7,7 +7,6 @@ using System;
 using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Collections;
-using Codice.Client.Common.GameUI;
 
 
 namespace SmarcGUI
@@ -71,6 +70,7 @@ namespace SmarcGUI
             }
             guiState.Log($"Loaded {i} mission plans");
             OnMissionPlanChanged(0);
+            RefreshMissionPlansDropdown();
         }
 
         void SaveMissionPlans()
@@ -157,6 +157,7 @@ namespace SmarcGUI
 
         void OnMissionPlanChanged(int index)
         {
+            if(MissionPlans.Count == 0) return;
             var plan = MissionPlans[index];
             MissionPlanNameField.text = plan.Name;
             FullRefreshTasksGUI();
@@ -171,19 +172,13 @@ namespace SmarcGUI
             switch(taskType)
             {
                 case "move-to":
-                    newTask = new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint(){latitude=1, longitude=2, altitude=3});
+                    newTask = new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint());
                     break;
                 case "move-path":
-                    var list = new List<GeoPoint>
-                    {
-                        new() { latitude = 0, longitude = 0, altitude = 0 },
-                        new() { latitude = 0, longitude = 0, altitude = 1 },
-                        new() { latitude = 0, longitude = 0, altitude = 2 }
-                    };
-                    newTask = new MovePath("Move along a path", MoveSpeed.STANDARD, list);
+                    newTask = new MovePath("Move along a path", MoveSpeed.STANDARD, new List<GeoPoint>());
                     break;
                 case "custom":
-                    newTask = new CustomTask("Custom task with a JSON attached", "{amazing-thing: 42}");
+                    newTask = new CustomTask("Custom task with a JSON attached", "{\"totally-valid-json\": 42}");
                     break;
             }
             SelectedMissionPlan.Children.Add(newTask);

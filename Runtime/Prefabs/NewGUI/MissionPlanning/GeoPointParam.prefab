@@ -876,6 +876,7 @@ MonoBehaviour:
   LatField: {fileID: 5860177524517708484}
   LonField: {fileID: 5151769899253396062}
   AltField: {fileID: 7133159887186779746}
+  WorldMarkerPrefab: {fileID: 6626474355297443708, guid: 0dee47864bca1804697ede1872ff04f6, type: 3}
 --- !u!222 &5675629765310258330
 CanvasRenderer:
   m_ObjectHideFlags: 0

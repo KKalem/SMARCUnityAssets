@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Linq;
 
 
 namespace SmarcGUI
@@ -50,8 +51,10 @@ namespace SmarcGUI
 
             DescriptionField.onValueChanged.AddListener((string desc) => task.Description = desc);
 
-            foreach (var param in task.Params)
-                InstantiateParam(Params.transform, task.Params, param.Key);
+            // instead of a foreach, we need to iterate over index because the param itself could modify the
+            // individual parameter at this point
+            for(int i=0; i<task.Params.Count; i++)
+                InstantiateParam(Params.transform, task.Params, task.Params.Keys.ElementAt(i));
 
             UpdateHeight();
         }

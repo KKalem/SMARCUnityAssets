@@ -48,7 +48,7 @@ namespace SmarcGUI
 
 
         Dictionary<string, string> cameraTextToObjectPath;
-        Camera currentCam;
+        public Camera CurrentCam { get; private set; }
         GameObject selectedRobot;
         KeyboardController[] keyboardControllers;
 
@@ -157,9 +157,9 @@ namespace SmarcGUI
             GameObject selectedGO = GameObject.Find(objectPath);
             if(selectedGO == null) return;
 
-            if(currentCam != null) currentCam.enabled = false;
-            currentCam = selectedGO.GetComponent<Camera>();
-            currentCam.enabled = true;
+            if(CurrentCam != null) CurrentCam.enabled = false;
+            CurrentCam = selectedGO.GetComponent<Camera>();
+            CurrentCam.enabled = true;
         }
         
 

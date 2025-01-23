@@ -76,6 +76,16 @@ namespace GeoRef
             var unityZ = transform.position.z + northingDiff;
             return ((float)unityX, (float)unityZ);
         }
+
+        public (double lat, double lon) GetLatLonFromUnityXZ(float x, float z)
+        {
+            var eastingDiff = x - transform.position.x;
+            var northingDiff = z - transform.position.z;
+            var utm_easting = easting + eastingDiff;
+            var utm_northing = northing + northingDiff;
+            (var lat, var lon) = GetLatLonFromUTM(utm_easting, utm_northing);
+            return (lat, lon);
+        }
     }
     
 }
