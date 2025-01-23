@@ -109,5 +109,13 @@ namespace SmarcGUI
                 selfHeight += child.GetComponent<RectTransform>().sizeDelta.y;
             rt.sizeDelta = new Vector2(rt.sizeDelta.x, selfHeight);
         }
+
+        public void OnDestroy()
+        {
+            foreach (Transform child in content)
+            {
+                Destroy(child.gameObject);
+            }
+        }
     }
 }

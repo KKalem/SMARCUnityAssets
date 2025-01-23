@@ -114,5 +114,14 @@ namespace SmarcGUI
         {
             if(needsHeightUpdate) ActuallyUpdateHeight();
         }
+
+        public void OnDestroy()
+        {
+            foreach (Transform child in Params.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
     }
 }

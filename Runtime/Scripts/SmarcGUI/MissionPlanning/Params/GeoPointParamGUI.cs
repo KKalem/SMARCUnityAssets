@@ -109,5 +109,10 @@ namespace SmarcGUI
             paramValue = gp;
             worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
         }
+
+        void OnDestroy()
+        {
+            Destroy(worldMaker);
+        }
     }
 }

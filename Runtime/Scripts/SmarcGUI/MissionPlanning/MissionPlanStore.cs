@@ -277,7 +277,6 @@ namespace SmarcGUI
             DeleteMissionPlanButton.interactable = enabled;
             MissionPlanNameField.interactable = enabled;
             MissionPlanDropdown.interactable = enabled;
-
         }
 
     }
