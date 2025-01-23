@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,11 +7,14 @@ namespace SmarcGUI
 {
     public class ParamGUI : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler
     {
+        public TMP_Text Label;
+        
         protected IDictionary paramsDict;
         protected string paramKey;
 
         protected IList paramsList;
-        protected int paramIndex;
+        public int paramIndex{get; protected set;}
+        protected ListParamGUI listParamGUI;
 
         public RectTransform HighlightRT;
         public GameObject ContextMenuPrefab;
@@ -41,18 +45,47 @@ namespace SmarcGUI
         {
             this.paramsDict = paramsDict;
             this.paramKey = paramKey;
+            UpdateLabel();
             SetupFields();
         }
-        public void SetParam(IList paramsList, int paramIndex)
+        public void SetParam(IList paramsList, int paramIndex, ListParamGUI listParamGUI)
         {   
             this.paramsList = paramsList;
             this.paramIndex = paramIndex;
+            this.listParamGUI = listParamGUI;
+            UpdateLabel();
             SetupFields();
+        }
+
+        void UpdateLabel()
+        {
+            Label.text = paramKey ?? paramIndex.ToString();
+        }
+
+        public void UpdateIndex(int newIndex)
+        {
+            paramIndex = newIndex;
+            UpdateLabel();
         }
 
         protected virtual void SetupFields()
         {
             throw new System.NotImplementedException();
+        }
+
+        public void DeleteParam()
+        {
+            listParamGUI.DeleteParam(this);
+        }
+
+        public void MoveParamUp()
+        {
+            listParamGUI.MoveParamUp(this);
+        }
+
+        public void MoveParamDown()
+        {
+            listParamGUI.MoveParamDown(this);
         }
 
 
@@ -62,7 +95,7 @@ namespace SmarcGUI
             {
                 var contextMenuGO = Instantiate(ContextMenuPrefab);
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
-                contextMenu.SetParam(eventData.position, paramIndex, this);
+                contextMenu.SetParam(eventData.position, this);
             }
         }
 
@@ -74,29 +107,6 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightRT?.gameObject.SetActive(true);
-        }
-
-        public void MoveParamUp(int paramIndex)
-        {
-            if(paramsList == null) return;
-            if(paramIndex == 0) return;
-            (paramsList[paramIndex-1], paramsList[paramIndex]) = (paramsList[paramIndex], paramsList[paramIndex-1]);
-            missionPlanStore.FullRefreshTasksGUI();
-        }
-        
-        public void MoveParamDown(int paramIndex)
-        {
-            if(paramsList == null) return;
-            if(paramIndex == paramsList.Count-1) return;
-            (paramsList[paramIndex+1], paramsList[paramIndex]) = (paramsList[paramIndex], paramsList[paramIndex+1]);
-            missionPlanStore.FullRefreshTasksGUI();
-        }
-
-        public void DeleteParam(int paramIndex)
-        {
-            if(paramsList == null) return;
-            paramsList.RemoveAt(paramIndex);
-            missionPlanStore.FullRefreshTasksGUI();
         }
 
     }

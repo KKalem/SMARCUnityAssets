@@ -14,7 +14,6 @@ namespace SmarcGUI
         RectTransform rt;
 
         ParamGUI paramGui;
-        int paramIndex;
 
 
         public Button DeleteButton;
@@ -39,10 +38,9 @@ namespace SmarcGUI
         }
 
         // For params in a param-list
-        public void SetParam(Vector2 position, int paramIndex, ParamGUI paramGui)
+        public void SetParam(Vector2 position, ParamGUI paramGui)
         {
             this.paramGui = paramGui;
-            this.paramIndex = paramIndex;
             DeleteButton.onClick.AddListener(OnParamDelete);
             MoveUpButton.onClick.AddListener(OnParamUp);
             MoveDownButton.onClick.AddListener(OnParamDown);
@@ -52,19 +50,19 @@ namespace SmarcGUI
 
         void OnParamDelete()
         {
-            paramGui.DeleteParam(paramIndex);
+            paramGui.DeleteParam();
             Destroy(gameObject);
         }
 
         void OnParamUp()
         {
-            paramGui.MoveParamUp(paramIndex);
+            paramGui.MoveParamUp();
             Destroy(gameObject);
         }
 
         void OnParamDown()
         {
-            paramGui.MoveParamDown(paramIndex);
+            paramGui.MoveParamDown();
             Destroy(gameObject);
         }
 

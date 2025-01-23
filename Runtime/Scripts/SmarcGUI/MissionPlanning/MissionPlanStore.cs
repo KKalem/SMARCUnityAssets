@@ -225,7 +225,7 @@ namespace SmarcGUI
             nextTaskGO.transform.SetSiblingIndex(index);
         }
 
-        public void FullRefreshTasksGUI()
+        void FullRefreshTasksGUI()
         {
             foreach(Transform child in TasksScrollContent)
             {

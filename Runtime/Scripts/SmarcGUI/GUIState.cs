@@ -45,6 +45,8 @@ namespace SmarcGUI
         public GuiMode DefaultMode = GuiMode.Monitoring;
         public int DefaultRobotIndex = 0;
         public int DefaultCameraIndex = 0;
+        public float DefaultCameraLookAtMin = 1;
+        public float DefaultCameraLookAtMax = 100;
 
 
         Dictionary<string, string> cameraTextToObjectPath;
@@ -180,6 +182,28 @@ namespace SmarcGUI
         }
 
 
+        public Vector3 GetCameraLookAtPoint()
+        {
+            Ray ray = CurrentCam.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+            Plane zeroPlane = new(Vector3.up, Vector3.zero);
+            var dist = 10f;
+            bool hitWater = false;
+            if (zeroPlane.Raycast(ray, out float camToPlaneDist))
+            {
+                // dont want it too far...
+                dist = camToPlaneDist;
+                hitWater = true;
+            }
+            if(!hitWater)
+            {
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    dist = hit.distance;
+                }
+            }
+            dist = Mathf.Clamp(dist, DefaultCameraLookAtMin, DefaultCameraLookAtMax);
+            return ray.GetPoint(dist);
+        }
 
         void Start()
         {

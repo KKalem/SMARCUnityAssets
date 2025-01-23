@@ -9,16 +9,12 @@ namespace SmarcGUI
 
     class PrimitiveParamGUI : ParamGUI
     {
-        public TMP_Text LabelText;
         public TMP_InputField InputField;
         public TMP_Dropdown ChoiceDropdown;
         
 
         protected override void SetupFields()
         {
-
-            LabelText.text = paramKey ?? paramIndex.ToString();
-
             switch (paramValue)
             {
                 case string s:

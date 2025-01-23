@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using GeoRef;
 using TMPro;
 using UnityEngine;
@@ -9,7 +10,6 @@ namespace SmarcGUI
 
     class GeoPointParamGUI : ParamGUI
     {
-        public TMP_Text Label;
         public TMP_InputField LatField, LonField, AltField;
 
         public GameObject WorldMarkerPrefab;
@@ -26,8 +26,6 @@ namespace SmarcGUI
 
         protected override void SetupFields()
         {
-            Label.text = paramKey ?? paramIndex.ToString();
-
             var gp = (GeoPoint)paramValue;
             if(gp.altitude == 0 && gp.latitude == 0 && gp.longitude == 0)
             {
@@ -44,25 +42,7 @@ namespace SmarcGUI
                 // if there is no previous geo point, set it to where the camera is looking at
                 else
                 {
-                    Ray ray = guiState.CurrentCam.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
-                    Plane zeroPlane = new(Vector3.up, Vector3.zero);
-                    var dist = 10f;
-                    bool hitWater = false;
-                    if (zeroPlane.Raycast(ray, out float camToPlaneDist))
-                    {
-                        // dont want it too far...
-                        dist = camToPlaneDist;
-                        hitWater = true;
-                    }
-                    if(!hitWater)
-                    {
-                        if (Physics.Raycast(ray, out RaycastHit hit))
-                        {
-                            dist = hit.distance;
-                        }
-                    }
-                    dist = Mathf.Clamp(dist, 1, 100);
-                    var point = ray.GetPoint(dist);
+                    var point = guiState.GetCameraLookAtPoint();
                     var (lat, lon) = globalReferencePoint.GetLatLonFromUnityXZ(point.x, point.z);
                     gp.latitude = lat;
                     gp.longitude = lon;
@@ -88,7 +68,14 @@ namespace SmarcGUI
         void OnLatChanged(string s)
         {
             var gp = (GeoPoint)paramValue;
-            gp.latitude = double.Parse(s);
+            try
+            {
+                gp.latitude = double.Parse(s);
+            }
+            catch
+            {
+                return;
+            }
             paramValue = gp;
             worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
         }
@@ -96,7 +83,14 @@ namespace SmarcGUI
         void OnLonChanged(string s)
         {
             var gp = (GeoPoint)paramValue;
-            gp.longitude = double.Parse(s);
+            try
+            {
+                gp.longitude = double.Parse(s);
+            }
+            catch
+            {
+                return;
+            }
             paramValue = gp;
             worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
         }   
@@ -104,7 +98,14 @@ namespace SmarcGUI
         void OnAltChanged(string s)
         {
             var gp = (GeoPoint)paramValue;
-            gp.altitude = double.Parse(s);
+            try
+            {
+                gp.altitude = double.Parse(s);
+            }
+            catch
+            {
+                return;
+            }
             paramValue = gp;
             worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
         }

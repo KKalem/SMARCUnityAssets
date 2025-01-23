@@ -12,10 +12,9 @@ namespace SmarcGUI
         RectTransform rt;
 
         public RectTransform content;
-        public TMP_Text Label;
         public Button AddButton;
 
-        IList theList => (IList)paramValue;
+        IList paramList => (IList)paramValue;
 
         void Awake()
         {
@@ -28,16 +27,14 @@ namespace SmarcGUI
         }
 
         protected override void SetupFields()
-        {
-            Label.text = paramKey ?? paramIndex.ToString();
-            
+        {            
             MissionPlanStore missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
             for(int i=0; i<((IList)paramValue).Count; i++)
             {
                 GameObject paramGO;
                 GameObject paramPrefab = missionPlanStore.GetParamPrefab(((IList)paramValue)[i]);
                 paramGO = Instantiate(paramPrefab, content);
-                paramGO.GetComponent<ParamGUI>().SetParam((IList)paramValue, i);
+                paramGO.GetComponent<ParamGUI>().SetParam((IList)paramValue, i, this);
             }
 
             AddButton.onClick.AddListener(AddParamToList);
@@ -47,27 +44,58 @@ namespace SmarcGUI
 
         void AddParamToList()
         {
-            if (theList is null)
+            if (paramList is null)
                 return;
 
             // Assuming theList contains elements of a specific type, e.g., ParamType
             // if this is not the case, something has gone horribly wrong on the
             // TaskSpecTree side of things.
             // This aint python, lists usually cant contain arbitrary mixes of types
-            var paramType = theList.GetType().GetGenericArguments()[0];
+            var paramType = paramList.GetType().GetGenericArguments()[0];
             var newParam = System.Activator.CreateInstance(paramType);
 
-            theList.Add(newParam);
+            paramList.Add(newParam);
 
             // Instantiate the new parameter GUI")
             missionPlanStore ??= FindFirstObjectByType<MissionPlanStore>();
             GameObject paramPrefab = missionPlanStore.GetParamPrefab(newParam);
             GameObject paramGO = Instantiate(paramPrefab, content);
-            paramGO.GetComponent<ParamGUI>().SetParam(theList, math.max(0, theList.Count - 1));
+            paramGO.GetComponent<ParamGUI>().SetParam(paramList, math.max(0, paramList.Count - 1), this);
 
             UpdateHeight();
             transform.parent.GetComponentInParent<IHeightUpdatable>().UpdateHeight();
         }
+
+        public void MoveParamUp(ParamGUI paramgui)
+        {
+            if(paramList == null) return;
+            if(paramgui.paramIndex == 0) return;
+            (paramList[paramgui.paramIndex-1], paramList[paramgui.paramIndex]) = (paramList[paramgui.paramIndex], paramList[paramgui.paramIndex-1]);
+            paramgui.transform.SetSiblingIndex(paramgui.paramIndex - 1);
+            paramgui.UpdateIndex(paramgui.paramIndex - 1);
+            paramgui.transform.parent.GetChild(paramgui.paramIndex+1).GetComponent<ParamGUI>().UpdateIndex(paramgui.paramIndex+1);
+        }
+        
+
+        public void MoveParamDown(ParamGUI paramgui)
+        {
+            if(paramList == null) return;
+            if(paramgui.paramIndex == paramList.Count-1) return;
+            (paramList[paramgui.paramIndex+1], paramList[paramgui.paramIndex]) = (paramList[paramgui.paramIndex], paramList[paramgui.paramIndex+1]);
+            paramgui.transform.SetSiblingIndex(paramgui.paramIndex + 1);
+            paramgui.UpdateIndex(paramgui.paramIndex + 1);
+            paramgui.transform.parent.GetChild(paramgui.paramIndex-1).GetComponent<ParamGUI>().UpdateIndex(paramgui.paramIndex-1);
+        }
+
+        public void DeleteParam(ParamGUI paramgui)
+        {
+            if(paramList == null) return;
+            paramList.RemoveAt(paramgui.paramIndex);
+            Destroy(paramgui.gameObject);
+            UpdateHeight();
+            transform.parent.GetComponentInParent<IHeightUpdatable>()?.UpdateHeight();
+        }
+
 
         public void UpdateHeight()
         {
