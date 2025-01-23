@@ -116,7 +116,7 @@ namespace SmarcGUI
 
             RefreshAvailableTasksDropdown();
             RefreshMissionPlansDropdown();
-            RefreshTasksGUI();
+            FullRefreshTasksGUI();
         }
 
         void RefreshNamesToLastMission()
@@ -134,7 +134,7 @@ namespace SmarcGUI
             MissionPlans.Add(newPlan);
             MissionPlanDropdown.options.Add(new TMP_Dropdown.OptionData() { text = newPlan.Name });
             RefreshNamesToLastMission();
-            RefreshTasksGUI();
+            FullRefreshTasksGUI();
         }
 
         public void OnDeleteMissionPlan()
@@ -144,7 +144,7 @@ namespace SmarcGUI
             MissionPlans.RemoveAt(index);
             MissionPlanDropdown.options.RemoveAt(index);
             RefreshNamesToLastMission();
-            RefreshTasksGUI();
+            FullRefreshTasksGUI();
         }
 
         public void OnMissionPlanNameChanged(string name)
@@ -159,7 +159,7 @@ namespace SmarcGUI
         {
             var plan = MissionPlans[index];
             MissionPlanNameField.text = plan.Name;
-            RefreshTasksGUI();
+            FullRefreshTasksGUI();
         }
 
         void OnTaskAdded(int index)
@@ -187,13 +187,21 @@ namespace SmarcGUI
                     break;
             }
             SelectedMissionPlan.Children.Add(newTask);
-            RefreshTasksGUI();
+
+            var taskGO = Instantiate(TaskPrefab, TasksScrollContent);
+            var taskGUI = taskGO.GetComponent<TaskGUI>();
+            taskGUI.SetTask(newTask, this);
         }
 
         public void DeleteTask(Task task)
         {
-            SelectedMissionPlan.Children.Remove(task);
-            RefreshTasksGUI();
+            var index = SelectedMissionPlan.Children.IndexOf(task);
+            if (index >= 0 && index < TasksScrollContent.childCount)
+            {
+                SelectedMissionPlan.Children.RemoveAt(index);
+                Destroy(TasksScrollContent.GetChild(index).gameObject);
+            }
+
         }
 
         public void MoveTaskUp(Task task)
@@ -202,7 +210,11 @@ namespace SmarcGUI
             if(index == 0) return;
             SelectedMissionPlan.Children.RemoveAt(index);
             SelectedMissionPlan.Children.Insert(index-1, task);
-            RefreshTasksGUI();
+            // Swap the two TaskGUI objects
+            var taskGO = TasksScrollContent.GetChild(index).gameObject;
+            var prevTaskGO = TasksScrollContent.GetChild(index - 1).gameObject;
+            taskGO.transform.SetSiblingIndex(index - 1);
+            prevTaskGO.transform.SetSiblingIndex(index);
         }
 
         public void MoveTaskDown(Task task)
@@ -211,10 +223,14 @@ namespace SmarcGUI
             if(index == SelectedMissionPlan.Children.Count-1) return;
             SelectedMissionPlan.Children.RemoveAt(index);
             SelectedMissionPlan.Children.Insert(index+1, task);
-            RefreshTasksGUI();
+            // Swap the two TaskGUI objects
+            var taskGO = TasksScrollContent.GetChild(index).gameObject;
+            var nextTaskGO = TasksScrollContent.GetChild(index + 1).gameObject;
+            taskGO.transform.SetSiblingIndex(index + 1);
+            nextTaskGO.transform.SetSiblingIndex(index);
         }
 
-        public void RefreshTasksGUI()
+        public void FullRefreshTasksGUI()
         {
             foreach(Transform child in TasksScrollContent)
             {

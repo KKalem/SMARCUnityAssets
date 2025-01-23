@@ -81,7 +81,7 @@ namespace SmarcGUI
             if(paramsList == null) return;
             if(paramIndex == 0) return;
             (paramsList[paramIndex-1], paramsList[paramIndex]) = (paramsList[paramIndex], paramsList[paramIndex-1]);
-            missionPlanStore.RefreshTasksGUI();
+            missionPlanStore.FullRefreshTasksGUI();
         }
         
         public void MoveParamDown(int paramIndex)
@@ -89,14 +89,14 @@ namespace SmarcGUI
             if(paramsList == null) return;
             if(paramIndex == paramsList.Count-1) return;
             (paramsList[paramIndex+1], paramsList[paramIndex]) = (paramsList[paramIndex], paramsList[paramIndex+1]);
-            missionPlanStore.RefreshTasksGUI();
+            missionPlanStore.FullRefreshTasksGUI();
         }
 
         public void DeleteParam(int paramIndex)
         {
             if(paramsList == null) return;
             paramsList.RemoveAt(paramIndex);
-            missionPlanStore.RefreshTasksGUI();
+            missionPlanStore.FullRefreshTasksGUI();
         }
 
     }

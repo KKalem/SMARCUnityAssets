@@ -26,6 +26,8 @@ namespace SmarcGUI
         RectTransform rt;
         Canvas canvas;
 
+        bool needsHeightUpdate = false;
+
 
         
         void Awake()
@@ -67,12 +69,12 @@ namespace SmarcGUI
         {
             // Why? because this is under a scroll view and we cant have size-fitter component without problems
             // this seems to let the scroll view do its thing, and then update the size after.
-            StartCoroutine(UpdateHeightWithDelay());
+            // Basically delaying the update by one frame.
+            needsHeightUpdate = true;
         }
 
-        IEnumerator UpdateHeightWithDelay()
+        void ActuallyUpdateHeight()
         {
-            yield return new WaitForSeconds(0.01f);
             float totalHeight = 0;
             var paramsRT = Params.GetComponent<RectTransform>();
             totalHeight += paramsRT.sizeDelta.y;
@@ -80,8 +82,8 @@ namespace SmarcGUI
             totalHeight += nameRT.sizeDelta.y;
             var descRT = DescriptionField.GetComponent<RectTransform>();
             totalHeight += descRT.sizeDelta.y;
-
             rt.sizeDelta = new Vector2(rt.sizeDelta.x, totalHeight + BottomPadding);
+            needsHeightUpdate = false;
         }
 
 
@@ -103,6 +105,11 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightRT.gameObject.SetActive(true);
+        }
+
+        public void OnGUI()
+        {
+            if(needsHeightUpdate) ActuallyUpdateHeight();
         }
     }
 }
