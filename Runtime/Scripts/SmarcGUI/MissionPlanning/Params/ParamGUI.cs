@@ -15,12 +15,14 @@ namespace SmarcGUI
         public RectTransform HighlightRT;
         public GameObject ContextMenuPrefab;
 
-        MissionPlanStore missionPlanStore;
+        protected MissionPlanStore missionPlanStore;
+        protected GUIState guiState;
  
 
         void Awake()
         {
             missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+            guiState = FindFirstObjectByType<GUIState>();
         }
 
         public object paramValue

@@ -1,6 +1,9 @@
 using System.Collections;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.UI;
 
 namespace SmarcGUI
 {
@@ -10,6 +13,9 @@ namespace SmarcGUI
 
         public RectTransform content;
         public TMP_Text Label;
+        public Button AddButton;
+
+        IList theList => (IList)paramValue;
 
         void Awake()
         {
@@ -34,7 +40,33 @@ namespace SmarcGUI
                 paramGO.GetComponent<ParamGUI>().SetParam((IList)paramValue, i);
             }
 
+            AddButton.onClick.AddListener(AddParamToList);
+
             UpdateHeight();
+        }
+
+        void AddParamToList()
+        {
+            if (theList is null)
+                return;
+
+            // Assuming theList contains elements of a specific type, e.g., ParamType
+            // if this is not the case, something has gone horribly wrong on the
+            // TaskSpecTree side of things.
+            // This aint python, lists usually cant contain arbitrary mixes of types
+            var paramType = theList.GetType().GetGenericArguments()[0];
+            var newParam = System.Activator.CreateInstance(paramType);
+
+            theList.Add(newParam);
+
+            // Instantiate the new parameter GUI")
+            missionPlanStore ??= FindFirstObjectByType<MissionPlanStore>();
+            GameObject paramPrefab = missionPlanStore.GetParamPrefab(newParam);
+            GameObject paramGO = Instantiate(paramPrefab, content);
+            paramGO.GetComponent<ParamGUI>().SetParam(theList, math.max(0, theList.Count - 1));
+
+            UpdateHeight();
+            transform.parent.GetComponentInParent<IHeightUpdatable>().UpdateHeight();
         }
 
         public void UpdateHeight()
