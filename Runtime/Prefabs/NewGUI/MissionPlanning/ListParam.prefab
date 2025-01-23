@@ -355,7 +355,7 @@ MonoBehaviour:
   ContextMenuPrefab: {fileID: 5700513683117687523, guid: dc50e97ebddcc6a47ac3dec88f9b8116, type: 3}
   content: {fileID: 5053223329182269072}
   Label: {fileID: 5698395585727424811}
-  AddButton: {fileID: 0}
+  AddButton: {fileID: 2473697380082421635}
 --- !u!222 &5521613876678499697
 CanvasRenderer:
   m_ObjectHideFlags: 0
