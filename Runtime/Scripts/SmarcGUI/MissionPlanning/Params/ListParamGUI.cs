@@ -90,8 +90,15 @@ namespace SmarcGUI
         public void DeleteParam(ParamGUI paramgui)
         {
             if(paramList == null) return;
+            var originalIndex = paramgui.paramIndex;
             paramList.RemoveAt(paramgui.paramIndex);
             Destroy(paramgui.gameObject);
+            // Update the indices of the remaining parameters that was originally below deleted one
+            for(int i=originalIndex; i<paramgui.transform.parent.childCount; i++)
+            {
+                var childparamgui = paramgui.transform.parent.GetChild(i).GetComponent<ParamGUI>();
+                childparamgui.UpdateIndex(i-1);
+            }
             UpdateHeight();
             transform.parent.GetComponentInParent<IHeightUpdatable>()?.UpdateHeight();
         }
