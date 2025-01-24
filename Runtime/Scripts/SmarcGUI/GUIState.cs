@@ -6,6 +6,7 @@ using Utils = DefaultNamespace.Utils;
 using VehicleComponents.Sensors;
 using System.IO;
 using UnityEngine.EventSystems;
+using DefaultNamespace.Water;
 
 namespace SmarcGUI
 {
@@ -53,7 +54,7 @@ namespace SmarcGUI
         public Camera CurrentCam { get; private set; }
         GameObject selectedRobot;
         KeyboardController[] keyboardControllers;
-
+        WaterRenderToggle[] waterRenderToggles;
 
 
         void InitModeDropdown()
@@ -148,6 +149,17 @@ namespace SmarcGUI
             CurrentMode = (GuiMode)System.Enum.Parse(typeof(GuiMode), selection.text);
             modeDropdown.value = modeIndex;
             modeDropdown.RefreshShownValue();
+            
+            if(CurrentMode == GuiMode.MissionPlanning)
+            {
+                Log("Mission Planning mode selected. Disabling water rendering.");
+                foreach(var w in waterRenderToggles) w.ToggleWaterRender(false);
+            }
+            else
+            {
+                Log("Enabling water rendering.");
+                foreach(var w in waterRenderToggles) w.ToggleWaterRender(true);
+            }
         }
 
 
@@ -205,6 +217,7 @@ namespace SmarcGUI
             return ray.GetPoint(dist);
         }
 
+
         void Start()
         {
             UUID = System.Guid.NewGuid().ToString();
@@ -212,6 +225,7 @@ namespace SmarcGUI
             InitModeDropdown();
             InitCameraDropdown();
             InitRobotDropdown();
+            waterRenderToggles = FindObjectsByType<WaterRenderToggle>(FindObjectsSortMode.None);
         }
 
         void Update()
