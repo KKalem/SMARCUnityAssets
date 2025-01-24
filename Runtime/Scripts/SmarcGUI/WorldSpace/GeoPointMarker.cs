@@ -18,10 +18,12 @@ namespace SmarcGUI
         public Color UnderwaterColor = new(1f,0.4f,0f); //orange
         public Color InAirColor = Color.cyan;
 
+        GUIState guiState;
 
         void Awake()
         {
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
+            guiState = FindFirstObjectByType<GUIState>();
         }
 
         public void SetGeoPoint(GeoPoint gp)
@@ -78,5 +80,7 @@ namespace SmarcGUI
             SurfacePointer.SetPositions(pointerPoints);
             SetCommonLRParams(SurfacePointer);
         }
+
+        
     }
 }

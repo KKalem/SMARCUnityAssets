@@ -4,9 +4,7 @@ using System.Collections.Generic;
 
 using Utils = DefaultNamespace.Utils;
 using VehicleComponents.Sensors;
-using System.IO;
 using UnityEngine.EventSystems;
-using DefaultNamespace.Water;
 
 namespace SmarcGUI
 {
@@ -45,7 +43,7 @@ namespace SmarcGUI
         [Header("Defaults")]
         public GuiMode DefaultMode = GuiMode.Monitoring;
         public int DefaultRobotIndex = 0;
-        public int DefaultCameraIndex = 0;
+        public Camera DefaultCamera;
         public float DefaultCameraLookAtMin = 1;
         public float DefaultCameraLookAtMax = 100;
 
@@ -70,6 +68,11 @@ namespace SmarcGUI
             modeDropdown.RefreshShownValue();
         }
 
+        string CameraTextFromCamera(Camera c)
+        {
+            return $"{c.transform.root.name}/{c.name}";
+        }
+
         void InitCameraDropdown()
         {
             cameraDropdown.onValueChanged.AddListener(OnCameraChanged);
@@ -87,12 +90,21 @@ namespace SmarcGUI
                 if(c.gameObject.TryGetComponent<AudioListener>(out AudioListener al)) al.enabled=false;
                 
                 string objectPath = Utils.GetGameObjectPath(c.gameObject);
-                string ddText = $"{c.transform.root.name}/{c.name}";
+                string ddText = CameraTextFromCamera(c);
                 cameraTextToObjectPath.Add(ddText, objectPath);
                 cameraDropdown.options.Add(new TMP_Dropdown.OptionData(){text=ddText});
             }
 
-            cameraDropdown.value = DefaultCameraIndex;
+            int defaultCameraIndex = 0;
+            for (int i = 0; i < cameraDropdown.options.Count; i++)
+            {
+                if (cameraDropdown.options[i].text == CameraTextFromCamera(DefaultCamera))
+                {
+                    defaultCameraIndex = i;
+                    break;
+                }
+            }
+            cameraDropdown.value = defaultCameraIndex;
             cameraDropdown.RefreshShownValue();
             OnCameraChanged(cameraDropdown.value);
         }
@@ -149,7 +161,7 @@ namespace SmarcGUI
             CurrentMode = (GuiMode)System.Enum.Parse(typeof(GuiMode), selection.text);
             modeDropdown.value = modeIndex;
             modeDropdown.RefreshShownValue();
-            
+
             if(CurrentMode == GuiMode.MissionPlanning)
             {
                 Log("Mission Planning mode selected. Disabling water rendering.");
@@ -220,6 +232,7 @@ namespace SmarcGUI
 
         void Start()
         {
+            if(DefaultCamera == null) DefaultCamera = Camera.main;
             UUID = System.Guid.NewGuid().ToString();
             InitKeyboardControllers();
             InitModeDropdown();
