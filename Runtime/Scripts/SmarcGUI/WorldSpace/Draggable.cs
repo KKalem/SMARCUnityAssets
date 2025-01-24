@@ -14,10 +14,12 @@ namespace SmarcGUI
         NONE
     }
 
-    public class Draggable : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPointerExitHandler
+    public class Draggable : MonoBehaviour, IDragHandler, IEndDragHandler
     {
-        public GameObject Highlight;
         public DragConstraint DragConstraint = DragConstraint.XZ;
+        public Transform DraggedObject;
+
+        Vector3 motion;
 
         GUIState guiState;
 
@@ -63,18 +65,21 @@ namespace SmarcGUI
                     break;
             }
 
-            transform.position = newPos;
+            if (DraggedObject != null)
+            {
+                motion = newPos - transform.position;
+                DraggedObject.position += motion;
+            }
+            else
+            {
+                transform.position = newPos;
+            }
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public void OnEndDrag(PointerEventData eventData)
         {
-            Highlight.SetActive(true);
+            DraggedObject?.GetComponent<IWorldDraggable>()?.OnWorldDragEnd(motion);
+            motion = Vector3.zero;
         }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            Highlight.SetActive(false);
-        }
-        
     }
 }

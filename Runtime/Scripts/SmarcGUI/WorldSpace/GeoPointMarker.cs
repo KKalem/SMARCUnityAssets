@@ -4,9 +4,9 @@ using UnityEngine;
 namespace SmarcGUI
 {
 
-    public class GeoPointMarker : MonoBehaviour
+    public class GeoPointMarker : MonoBehaviour, IWorldDraggable
     {
-        public GeoPoint gp = new();
+        GeoPointParamGUI gppgui;
 
         GlobalReferencePoint globalReferencePoint;
         public LineRenderer Circle, SurfacePointer;
@@ -26,17 +26,16 @@ namespace SmarcGUI
             guiState = FindFirstObjectByType<GUIState>();
         }
 
-        public void SetGeoPoint(GeoPoint gp)
+        public void SetGeoPointParamGUI(GeoPointParamGUI gppgui)
         {
-            this.gp = gp;
-            if(gp.altitude == 0 && gp.latitude == 0 && gp.longitude == 0)
+            this.gppgui = gppgui;
+            if(gppgui.altitude == 0 && gppgui.latitude == 0 && gppgui.longitude == 0)
             {
                 gameObject.SetActive(false);
                 return;
             }
 
-            var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(gp.latitude, gp.longitude);
-            transform.position = new Vector3((float)x, (float)gp.altitude, (float)z);
+            
             UpdateLines();
         }
 
@@ -45,13 +44,16 @@ namespace SmarcGUI
             lr.startWidth = lineThickness;
             lr.endWidth = lineThickness;
             lr.material = lineMaterial;
-            if(gp.altitude < 0) lr.startColor = lr.endColor = UnderwaterColor;
-            else if(gp.altitude > 0) lr.startColor = lr.endColor = InAirColor;
+            if(gppgui.altitude < 0) lr.startColor = lr.endColor = UnderwaterColor;
+            else if(gppgui.altitude > 0) lr.startColor = lr.endColor = InAirColor;
             else lr.startColor = lr.endColor = SurfaceColor;
         }
 
-        void UpdateLines()
+        public void UpdateLines()
         {
+            var (tx,tz) = globalReferencePoint.GetUnityXZFromLatLon(gppgui.latitude, gppgui.longitude);
+            transform.position = new Vector3((float)tx, gppgui.altitude, (float)tz);
+
             var circlePoints = new Vector3[numPtsOnCircle];
             for(int i=0; i<numPtsOnCircle; i++)
             {
@@ -81,6 +83,16 @@ namespace SmarcGUI
             SetCommonLRParams(SurfacePointer);
         }
 
-        
+        public void OnWorldDragEnd(Vector3 motion)
+        {
+            transform.position += motion;
+            var (lat, lon) = globalReferencePoint.GetLatLonFromUnityXZ(transform.position.x, transform.position.z);
+            gppgui.latitude = lat;
+            gppgui.longitude = lon;
+            gppgui.altitude = transform.position.y;
+            gppgui.UpdateTexts();
+            UpdateLines();
+        }
+
     }
 }

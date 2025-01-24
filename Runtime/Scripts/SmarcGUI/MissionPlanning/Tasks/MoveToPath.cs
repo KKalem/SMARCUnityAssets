@@ -6,7 +6,7 @@ namespace SmarcGUI
     {
         public double latitude{get; set;}
         public double longitude{get; set;}
-        public double altitude{get; set;}
+        public float altitude{get; set;}
         public readonly string rostype{ get{return "GeoPoint";} }
     }
 

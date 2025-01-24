@@ -1,6 +1,7 @@
 using GeoRef;
 using TMPro;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 
 
@@ -8,15 +9,43 @@ namespace SmarcGUI
 {
 
 
-    class GeoPointParamGUI : ParamGUI
+    public class GeoPointParamGUI : ParamGUI
     {
         public TMP_InputField LatField, LonField, AltField;
 
         public GameObject WorldMarkerPrefab;
         public string WorldMarkersName = "WorldMarkers";
 
-        GameObject worldMaker;
+        GeoPointMarker worldMaker;
         GlobalReferencePoint globalReferencePoint;
+
+        public float altitude
+        {
+            get{return (float)((GeoPoint)paramValue).altitude; }
+            set{
+                var gp = (GeoPoint)paramValue;
+                gp.altitude = value;
+                paramValue = gp;
+            }
+        }
+        public double latitude
+        {
+            get{return ((GeoPoint)paramValue).latitude; }
+            set{
+                var gp = (GeoPoint)paramValue;
+                gp.latitude = value;
+                paramValue = gp;
+            }
+        }
+        public double longitude
+        {
+            get{return ((GeoPoint)paramValue).longitude; }
+            set{
+                var gp = (GeoPoint)paramValue;
+                gp.longitude = value;
+                paramValue = gp;
+            }
+        }
 
         void Awake()
         {
@@ -26,17 +55,15 @@ namespace SmarcGUI
 
         protected override void SetupFields()
         {
-            var gp = (GeoPoint)paramValue;
-            if(gp.altitude == 0 && gp.latitude == 0 && gp.longitude == 0)
+            if(altitude == 0 && latitude == 0 && longitude == 0)
             {
                 // set this to be the same as the previous geo point
                 if (paramIndex > 0)
                 {
                     var previousGp = (GeoPoint)paramsList[paramIndex - 1];
-                    gp.latitude = previousGp.latitude;
-                    gp.longitude = previousGp.longitude;
-                    gp.altitude = previousGp.altitude;
-                    paramValue = gp;
+                    latitude = previousGp.latitude;
+                    longitude = previousGp.longitude;
+                    altitude = previousGp.altitude;
                     guiState.Log("New GeoPoint set to previous.");
                 }
                 // if there is no previous geo point, set it to where the camera is looking at
@@ -44,70 +71,50 @@ namespace SmarcGUI
                 {
                     var point = guiState.GetCameraLookAtPoint();
                     var (lat, lon) = globalReferencePoint.GetLatLonFromUnityXZ(point.x, point.z);
-                    gp.latitude = lat;
-                    gp.longitude = lon;
-                    gp.altitude = point.y;
-                    paramValue = gp;
+                    latitude = lat;
+                    longitude = lon;
+                    altitude = point.y;
                     guiState.Log("New GeoPoint set to where the camera is looking at.");
                 }
             }
 
-            LatField.text = gp.latitude.ToString();
-            LonField.text = gp.longitude.ToString();
-            AltField.text = gp.altitude.ToString();
+            UpdateTexts();
 
             LatField.onValueChanged.AddListener(OnLatChanged);
             LonField.onValueChanged.AddListener(OnLonChanged);
             AltField.onValueChanged.AddListener(OnAltChanged);
 
             var WorldMarkers = GameObject.Find(WorldMarkersName).transform;
-            worldMaker = Instantiate(WorldMarkerPrefab, WorldMarkers);
-            worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
+            worldMaker = Instantiate(WorldMarkerPrefab, WorldMarkers).GetComponent<GeoPointMarker>();
+            worldMaker.SetGeoPointParamGUI(this);
+        }
+
+        public void UpdateTexts()
+        {
+            LatField.text = latitude.ToString();
+            LonField.text = longitude.ToString();
+            AltField.text = altitude.ToString();
         }
 
         void OnLatChanged(string s)
         {
-            var gp = (GeoPoint)paramValue;
-            try
-            {
-                gp.latitude = double.Parse(s);
-            }
-            catch
-            {
-                return;
-            }
-            paramValue = gp;
-            worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
+            try {latitude = double.Parse(s);}
+            catch {return;}
+            worldMaker.UpdateLines();
         }
 
         void OnLonChanged(string s)
         {
-            var gp = (GeoPoint)paramValue;
-            try
-            {
-                gp.longitude = double.Parse(s);
-            }
-            catch
-            {
-                return;
-            }
-            paramValue = gp;
-            worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
+            try{longitude = double.Parse(s);}
+            catch{return;}
+            worldMaker.UpdateLines();
         }   
 
         void OnAltChanged(string s)
         {
-            var gp = (GeoPoint)paramValue;
-            try
-            {
-                gp.altitude = double.Parse(s);
-            }
-            catch
-            {
-                return;
-            }
-            paramValue = gp;
-            worldMaker.GetComponent<GeoPointMarker>().SetGeoPoint(gp);
+            try{altitude = float.Parse(s);}
+            catch{return;}
+            worldMaker.UpdateLines();
         }
 
         void OnDestroy()
