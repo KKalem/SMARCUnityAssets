@@ -98,6 +98,7 @@ namespace SmarcGUI
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
                 contextMenu.SetTask(eventData.position, task);
             }
+
         }
 
         public void OnPointerExit(PointerEventData eventData)
@@ -115,7 +116,7 @@ namespace SmarcGUI
             if(needsHeightUpdate) ActuallyUpdateHeight();
         }
 
-        public void OnDestroy()
+        public void OnDisable()
         {
             foreach (Transform child in Params.transform)
             {

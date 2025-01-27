@@ -17,10 +17,14 @@ namespace SmarcGUI
         protected ListParamGUI listParamGUI;
 
         public RectTransform HighlightRT;
+        public RectTransform SelectedHighlightRT;
+        
         public GameObject ContextMenuPrefab;
 
         protected MissionPlanStore missionPlanStore;
         protected GUIState guiState;
+
+        protected bool isSelected;
  
 
         void Awake()
@@ -96,6 +100,12 @@ namespace SmarcGUI
                 var contextMenuGO = Instantiate(ContextMenuPrefab);
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
                 contextMenu.SetParam(eventData.position, this);
+            }
+
+            if(eventData.button == PointerEventData.InputButton.Left)
+            {
+                isSelected = !isSelected;
+                SelectedHighlightRT?.gameObject.SetActive(isSelected);
             }
         }
 

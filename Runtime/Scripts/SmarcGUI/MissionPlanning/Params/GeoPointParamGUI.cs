@@ -16,6 +16,7 @@ namespace SmarcGUI
 
         GeoPointMarker worldMaker;
         GlobalReferencePoint globalReferencePoint;
+        bool selected = false;
 
         public float altitude
         {
@@ -122,5 +123,6 @@ namespace SmarcGUI
         {
             Destroy(worldMaker.gameObject);
         }
+
     }
 }
