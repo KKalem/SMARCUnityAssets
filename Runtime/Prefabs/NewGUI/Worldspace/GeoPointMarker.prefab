@@ -315,6 +315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 180e24b18552e3a49a08708d3cffa152, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  draggingObject: {fileID: 8398789352144562615}
   Circle: {fileID: 6063109614881400750}
   SurfacePointer: {fileID: 2270476087086515361}
   circleRadius: 1
@@ -412,5 +413,10 @@ PrefabInstance:
 --- !u!4 &4575458066839229773 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7480239099355543948, guid: e13d9e0dfa45aa54993b9b2a435dff50, type: 3}
+  m_PrefabInstance: {fileID: 6390729962239225025}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8398789352144562615 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3188004691369657718, guid: e13d9e0dfa45aa54993b9b2a435dff50, type: 3}
   m_PrefabInstance: {fileID: 6390729962239225025}
   m_PrefabAsset: {fileID: 0}

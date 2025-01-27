@@ -14,9 +14,9 @@ namespace SmarcGUI
         public GameObject WorldMarkerPrefab;
         public string WorldMarkersName = "WorldMarkers";
 
-        GeoPointMarker worldMaker;
+        GeoPointMarker worldMarker;
         GlobalReferencePoint globalReferencePoint;
-        bool selected = false;
+        Transform WorldMarkers;
 
         public float altitude
         {
@@ -53,6 +53,7 @@ namespace SmarcGUI
         {
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             guiState = FindFirstObjectByType<GUIState>();
+            WorldMarkers = GameObject.Find(WorldMarkersName).transform;
         }
 
         protected override void SetupFields()
@@ -86,9 +87,9 @@ namespace SmarcGUI
             LonField.onValueChanged.AddListener(OnLonChanged);
             AltField.onValueChanged.AddListener(OnAltChanged);
 
-            var WorldMarkers = GameObject.Find(WorldMarkersName).transform;
-            worldMaker = Instantiate(WorldMarkerPrefab, WorldMarkers).GetComponent<GeoPointMarker>();
-            worldMaker.SetGeoPointParamGUI(this);
+            worldMarker = Instantiate(WorldMarkerPrefab, WorldMarkers).GetComponent<GeoPointMarker>();
+            worldMarker.SetGeoPointParamGUI(this);
+            OnSelectedChange();
         }
 
         void UpdateTexts()
@@ -102,26 +103,31 @@ namespace SmarcGUI
         {
             try {latitude = double.Parse(s);}
             catch {return;}
-            worldMaker.UpdateLines();
+            worldMarker.UpdateLines();
         }
 
         void OnLonChanged(string s)
         {
             try{longitude = double.Parse(s);}
             catch{return;}
-            worldMaker.UpdateLines();
+            worldMarker.UpdateLines();
         }   
 
         void OnAltChanged(string s)
         {
             try{altitude = float.Parse(s);}
             catch{return;}
-            worldMaker.UpdateLines();
+            worldMarker.UpdateLines();
         }
 
         public void OnDisable()
         {
-            Destroy(worldMaker.gameObject);
+            Destroy(worldMarker.gameObject);
+        }
+
+        protected override void OnSelectedChange()
+        {
+            worldMarker.ToggleDraggable(isSelected);
         }
 
     }

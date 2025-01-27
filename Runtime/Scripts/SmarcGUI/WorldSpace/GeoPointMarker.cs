@@ -8,6 +8,7 @@ namespace SmarcGUI
     {
         GeoPointParamGUI gppgui;
 
+        public GameObject draggingObject;
         GlobalReferencePoint globalReferencePoint;
         public LineRenderer Circle, SurfacePointer;
         public float circleRadius = 1;
@@ -17,6 +18,7 @@ namespace SmarcGUI
         public Color SurfaceColor = Color.white;
         public Color UnderwaterColor = new(1f,0.4f,0f); //orange
         public Color InAirColor = Color.cyan;
+
 
         GUIState guiState;
 
@@ -35,7 +37,6 @@ namespace SmarcGUI
                 return;
             }
 
-            
             UpdateLines();
         }
 
@@ -91,6 +92,11 @@ namespace SmarcGUI
             gppgui.longitude = lon;
             gppgui.altitude = transform.position.y;
             UpdateLines();
+        }
+
+        public void ToggleDraggable(bool draggable)
+        {
+            draggingObject.SetActive(draggable);
         }
 
     }

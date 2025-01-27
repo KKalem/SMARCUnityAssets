@@ -106,6 +106,7 @@ namespace SmarcGUI
             {
                 isSelected = !isSelected;
                 SelectedHighlightRT?.gameObject.SetActive(isSelected);
+                OnSelectedChange();
             }
         }
 
@@ -117,6 +118,11 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightRT?.gameObject.SetActive(true);
+        }
+
+        protected virtual void OnSelectedChange()
+        {
+            return;
         }
 
     }
