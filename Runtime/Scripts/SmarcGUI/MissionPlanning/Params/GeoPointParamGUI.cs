@@ -1,8 +1,6 @@
 using GeoRef;
 using TMPro;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-
 
 
 namespace SmarcGUI
@@ -26,6 +24,7 @@ namespace SmarcGUI
                 var gp = (GeoPoint)paramValue;
                 gp.altitude = value;
                 paramValue = gp;
+                AltField.text = value.ToString();
             }
         }
         public double latitude
@@ -35,6 +34,7 @@ namespace SmarcGUI
                 var gp = (GeoPoint)paramValue;
                 gp.latitude = value;
                 paramValue = gp;
+                LatField.text = value.ToString();
             }
         }
         public double longitude
@@ -44,6 +44,7 @@ namespace SmarcGUI
                 var gp = (GeoPoint)paramValue;
                 gp.longitude = value;
                 paramValue = gp;
+                LonField.text = value.ToString();
             }
         }
 
@@ -89,7 +90,7 @@ namespace SmarcGUI
             worldMaker.SetGeoPointParamGUI(this);
         }
 
-        public void UpdateTexts()
+        void UpdateTexts()
         {
             LatField.text = latitude.ToString();
             LonField.text = longitude.ToString();
@@ -117,9 +118,9 @@ namespace SmarcGUI
             worldMaker.UpdateLines();
         }
 
-        void OnDestroy()
+        public void OnDisable()
         {
-            Destroy(worldMaker);
+            Destroy(worldMaker.gameObject);
         }
     }
 }

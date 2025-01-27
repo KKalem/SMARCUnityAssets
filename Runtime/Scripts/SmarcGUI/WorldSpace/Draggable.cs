@@ -16,6 +16,7 @@ namespace SmarcGUI
 
     public class Draggable : MonoBehaviour, IDragHandler, IEndDragHandler
     {
+        public PointerEventData.InputButton Button = PointerEventData.InputButton.Left;
         public DragConstraint DragConstraint = DragConstraint.XZ;
         public Transform DraggedObject;
 
@@ -30,6 +31,9 @@ namespace SmarcGUI
 
         public void OnDrag(PointerEventData eventData)
         {
+            if (eventData.button != Button) return;
+            if (guiState.CurrentCam == null) return;
+            
             // https://gist.github.com/SimonDarksideJ/477f5674285b63cba8e752c43950ed7c
             Ray camRay = guiState.CurrentCam.ScreenPointToRay(Input.mousePosition); // Get the ray from mouse position
             Vector3 planeOrigin = transform.position; // Take current position of this draggable object as Plane's Origin

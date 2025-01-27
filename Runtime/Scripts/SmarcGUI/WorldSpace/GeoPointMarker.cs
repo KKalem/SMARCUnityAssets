@@ -90,7 +90,6 @@ namespace SmarcGUI
             gppgui.latitude = lat;
             gppgui.longitude = lon;
             gppgui.altitude = transform.position.y;
-            gppgui.UpdateTexts();
             UpdateLines();
         }
 

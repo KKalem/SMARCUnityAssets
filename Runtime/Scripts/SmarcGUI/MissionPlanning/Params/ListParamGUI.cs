@@ -114,7 +114,7 @@ namespace SmarcGUI
             rt.sizeDelta = new Vector2(rt.sizeDelta.x, selfHeight);
         }
 
-        public void OnDestroy()
+        void OnDisable()
         {
             foreach (Transform child in content)
             {
