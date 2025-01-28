@@ -43,6 +43,7 @@ namespace SmarcGUI
             tst.CommonParams["execution-unit"] = guiState.SelectedRobotName;
             UpdateFieldTexts();
             UpdateTasksDropdown();
+            UpdateTasksGUI();
 
             DescriptionField.onValueChanged.AddListener((string desc) => tst.Description = desc);
             ExecutionUnitField.onValueChanged.AddListener((string eu) => tst.CommonParams["execution-unit"] = eu);
@@ -110,10 +111,14 @@ namespace SmarcGUI
                     break;
             }
             tst.Children.Add(newTask);
+            CreateTaskGUI(newTask);
+        }
 
+        void CreateTaskGUI(Task task)
+        {
             var taskGO = Instantiate(missionPlanStore.TaskPrefab, missionPlanStore.TasksScrollContent);
             var taskGUI = taskGO.GetComponent<TaskGUI>();
-            taskGUI.SetTask(newTask);
+            taskGUI.SetTask(task);
             taskGUIs.Add(taskGUI);
         }
 
@@ -158,12 +163,20 @@ namespace SmarcGUI
 
         void UpdateTasksGUI()
         {
+            // maybe the first time creating this gui
+            if(taskGUIs.Count == 0)
+            {
+                foreach(var task in tst.Children)
+                {
+                    CreateTaskGUI(task);
+                }
+            }
+
             foreach(Transform child in missionPlanStore.TasksScrollContent)
             {
                 child.gameObject.SetActive(false);
             }
             if(!isSelected) return;
-
             foreach(var taskGUI in taskGUIs)
             {
                 taskGUI.gameObject.SetActive(true);
