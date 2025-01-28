@@ -22,6 +22,7 @@ namespace SmarcGUI
 
 
         MissionPlanStore missionPlanStore;
+        TSTGUI tstGUI;
         RectTransform rt;
 
         bool needsHeightUpdate = false;
@@ -30,9 +31,10 @@ namespace SmarcGUI
         
         
 
-        public void SetTask(Task task)
+        public void SetTask(Task task, TSTGUI tstGUI)
         {
             this.task = task;
+            this.tstGUI = tstGUI;
             TaskName.text = task.Name;
             DescriptionField.text = task.Description;
 
@@ -98,7 +100,7 @@ namespace SmarcGUI
             HighlightRT.gameObject.SetActive(true);
         }
 
-        public void OnGUI()
+        void OnGUI()
         {
             if(needsHeightUpdate) ActuallyUpdateHeight();
         }
@@ -118,7 +120,7 @@ namespace SmarcGUI
             UpdateHeight();
         }
 
-        public void OnDisable()
+        void OnDisable()
         {
             foreach (Transform child in Params.transform)
             {
@@ -128,17 +130,17 @@ namespace SmarcGUI
 
         public void OnListItemUp()
         {
-            throw new System.NotImplementedException();
+            tstGUI.MoveTaskUp(this);
         }
 
         public void OnListItemDown()
         {
-            throw new System.NotImplementedException();
+            tstGUI.MoveTaskDown(this);
         }
 
         public void OnListItemDelete()
         {
-            throw new System.NotImplementedException();
+            tstGUI.DeleteTask(this);
         }
     }
 }

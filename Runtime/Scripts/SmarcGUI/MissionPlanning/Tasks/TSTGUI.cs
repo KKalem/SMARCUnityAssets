@@ -118,48 +118,40 @@ namespace SmarcGUI
         {
             var taskGO = Instantiate(missionPlanStore.TaskPrefab, missionPlanStore.TasksScrollContent);
             var taskGUI = taskGO.GetComponent<TaskGUI>();
-            taskGUI.SetTask(task);
+            taskGUI.SetTask(task, this);
             taskGUIs.Add(taskGUI);
         }
 
 
 
-        // public void DeleteTask(Task task)
-        // {
-        //     var index = SelectedMissionPlan.Children.IndexOf(task);
-        //     if (index >= 0 && index < TasksScrollContent.childCount)
-        //     {
-        //         SelectedMissionPlan.Children.RemoveAt(index);
-        //         Destroy(TasksScrollContent.GetChild(index).gameObject);
-        //     }
+        public void DeleteTask(TaskGUI taskgui)
+        {
+            var index = tst.Children.IndexOf(taskgui.task);
+            tst.Children.RemoveAt(index);
+            Destroy(taskgui.gameObject);
+        }
 
-        // }
+        public void MoveTaskUp(TaskGUI taskgui)
+        {
+            var index = tst.Children.IndexOf(taskgui.task);
+            if(index == 0) return;
+            tst.Children.RemoveAt(index);
+            tst.Children.Insert(index-1, taskgui.task);
+            // Swap the two TaskGUI objects
+            var guiIndex = taskgui.transform.GetSiblingIndex();
+            taskgui.transform.SetSiblingIndex(guiIndex - 1);
+        }
 
-        // public void MoveTaskUp(Task task)
-        // {
-        //     var index = SelectedMissionPlan.Children.IndexOf(task);
-        //     if(index == 0) return;
-        //     SelectedMissionPlan.Children.RemoveAt(index);
-        //     SelectedMissionPlan.Children.Insert(index-1, task);
-        //     // Swap the two TaskGUI objects
-        //     var taskGO = TasksScrollContent.GetChild(index).gameObject;
-        //     var prevTaskGO = TasksScrollContent.GetChild(index - 1).gameObject;
-        //     taskGO.transform.SetSiblingIndex(index - 1);
-        //     prevTaskGO.transform.SetSiblingIndex(index);
-        // }
-
-        // public void MoveTaskDown(Task task)
-        // {
-        //     var index = SelectedMissionPlan.Children.IndexOf(task);
-        //     if(index == SelectedMissionPlan.Children.Count-1) return;
-        //     SelectedMissionPlan.Children.RemoveAt(index);
-        //     SelectedMissionPlan.Children.Insert(index+1, task);
-        //     // Swap the two TaskGUI objects
-        //     var taskGO = TasksScrollContent.GetChild(index).gameObject;
-        //     var nextTaskGO = TasksScrollContent.GetChild(index + 1).gameObject;
-        //     taskGO.transform.SetSiblingIndex(index + 1);
-        //     nextTaskGO.transform.SetSiblingIndex(index);
-        // }
+        public void MoveTaskDown(TaskGUI taskgui)
+        {
+            var index = tst.Children.IndexOf(taskgui.task);
+            if(index == tst.Children.Count-1) return;
+            tst.Children.RemoveAt(index);
+            tst.Children.Insert(index+1, taskgui.task);
+            // Swap the two TaskGUI objects
+            var guiIndex = taskgui.transform.GetSiblingIndex();
+            taskgui.transform.SetSiblingIndex(guiIndex + 1);
+        }
 
         void UpdateTasksGUI()
         {
