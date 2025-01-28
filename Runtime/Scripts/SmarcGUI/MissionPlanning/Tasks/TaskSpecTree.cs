@@ -22,5 +22,10 @@ namespace SmarcGUI
             foreach (var task in Children)
                 task.RecoverFromJson();
         }
+
+        public string GetKey()
+        {
+            return $"{Name}-{Description}";
+        }
     }
 }

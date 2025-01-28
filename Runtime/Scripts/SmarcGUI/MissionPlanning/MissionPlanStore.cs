@@ -46,6 +46,12 @@ namespace SmarcGUI
 
         void LoadMissionPlans()
         {
+            var existingPlans = new Dictionary<string, TaskSpecTree>();
+            foreach(var plan in MissionPlans)
+            {
+                existingPlans[plan.GetKey()] = plan;
+            }
+
             var i=0;
             foreach (var file in Directory.GetFiles(MissionStoragePath))
             {
@@ -58,6 +64,11 @@ namespace SmarcGUI
                     // by checking for simple fields, and matching them to known classes
                     // Most of the work is done in the Task class
                     plan.RecoverFromJson();
+                    if(existingPlans.ContainsKey(plan.GetKey()))
+                    {
+                        guiState.Log($"Skipping existing mission plan:{plan.GetKey()}. If you want to load this from file, either delete or modify the description of the one in the GUI.");
+                        continue;
+                    }
                     MissionPlans.Add(plan);
                     var tstGUI = Instantiate(TSTPrefab, MissionsScrollContent).GetComponent<TSTGUI>();
                     tstGUI.SetTST(plan);
@@ -78,7 +89,7 @@ namespace SmarcGUI
             foreach (var plan in MissionPlans)
             {
                 var json = JsonConvert.SerializeObject(plan, Formatting.Indented);
-                var path = Path.Combine(MissionStoragePath, $"{plan.Name}-{plan.Description}.json");
+                var path = Path.Combine(MissionStoragePath, $"{plan.GetKey()}.json");
                 File.WriteAllText(path, json);
                 i++;
             }
