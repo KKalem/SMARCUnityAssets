@@ -20,12 +20,18 @@ namespace SmarcGUI
         public Color InAirColor = Color.cyan;
 
 
+        Vector3[] circlePoints, pointerPoints;
+        int numPtsOnCross = 4; 
+
+
         GUIState guiState;
 
         void Awake()
         {
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             guiState = FindFirstObjectByType<GUIState>();
+            circlePoints = new Vector3[numPtsOnCircle];
+            pointerPoints = new Vector3[2 + numPtsOnCross*2];
         }
 
         public void SetGeoPointParamGUI(GeoPointParamGUI gppgui)
@@ -34,63 +40,103 @@ namespace SmarcGUI
             if(gppgui.altitude == 0 && gppgui.latitude == 0 && gppgui.longitude == 0)
             {
                 gameObject.SetActive(false);
+                guiState.Log($"GeoPoint {gppgui.name} is not set, hiding the marker");
                 return;
             }
 
+            CreateLines();
+            OnGUILatLonChanged();
+            OnGUIAltChanged();
             UpdateLines();
         }
 
-        void SetCommonLRParams(LineRenderer lr)
+        void SetLRColor(LineRenderer lr)
+        {
+            if(transform.position.y < 0) lr.startColor = lr.endColor = UnderwaterColor;
+            else if(transform.position.y > 0) lr.startColor = lr.endColor = InAirColor;
+            else lr.startColor = lr.endColor = SurfaceColor;
+        }
+
+        void SetLRSizes(LineRenderer lr)
         {
             lr.startWidth = lineThickness;
             lr.endWidth = lineThickness;
             lr.material = lineMaterial;
-            if(gppgui.altitude < 0) lr.startColor = lr.endColor = UnderwaterColor;
-            else if(gppgui.altitude > 0) lr.startColor = lr.endColor = InAirColor;
-            else lr.startColor = lr.endColor = SurfaceColor;
         }
 
-        public void UpdateLines()
+        void CreateLines()
         {
-            var (tx,tz) = globalReferencePoint.GetUnityXZFromLatLon(gppgui.latitude, gppgui.longitude);
-            transform.position = new Vector3((float)tx, gppgui.altitude, (float)tz);
-
-            var circlePoints = new Vector3[numPtsOnCircle];
             for(int i=0; i<numPtsOnCircle; i++)
             {
                 float rad = i * 2*Mathf.PI / (numPtsOnCircle-1);
-                var x = transform.position.x + circleRadius * Mathf.Cos(rad);
-                var z = transform.position.z + circleRadius * Mathf.Sin(rad);
-                circlePoints[i] = new Vector3(x, transform.position.y, z);
+                var x = circleRadius * Mathf.Cos(rad);
+                var z = circleRadius * Mathf.Sin(rad);
+                circlePoints[i] = new Vector3(x, 0, z);
             }
             Circle.positionCount = circlePoints.Length;
             Circle.SetPositions(circlePoints);
-            SetCommonLRParams(Circle);
+            SetLRColor(Circle);
+            SetLRSizes(Circle);
 
-            int numPtsOnCross = 4;
-            var pointerPoints = new Vector3[2 + numPtsOnCross*2];
-            pointerPoints[0] = new Vector3(transform.position.x, 0, transform.position.z);
-            pointerPoints[1] = transform.position;
+            pointerPoints[0] = new Vector3(0,0,0);
+            pointerPoints[1] = new Vector3(0,0,0);
             for(int i=0; i<numPtsOnCross; i++)
             {
                 float rad = i * Mathf.PI / 2;
-                var x = transform.position.x + circleRadius * Mathf.Cos(rad);
-                var z = transform.position.z + circleRadius * Mathf.Sin(rad);
-                pointerPoints[2 + i * 2] = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-                pointerPoints[2 + i * 2 + 1] = new Vector3(x, transform.position.y, z);
+                var x = circleRadius * Mathf.Cos(rad);
+                var z = circleRadius * Mathf.Sin(rad);
+                pointerPoints[2 + i * 2] = new Vector3(0, 0, 0);
+                pointerPoints[2 + i * 2 + 1] = new Vector3(x, 0, z);
             }
             SurfacePointer.positionCount = pointerPoints.Length;
             SurfacePointer.SetPositions(pointerPoints);
-            SetCommonLRParams(SurfacePointer);
+            SetLRColor(SurfacePointer);
+            SetLRSizes(SurfacePointer);
         }
 
-        public void OnWorldDragEnd(Vector3 motion)
+        public void UpdateLines()
+        {            
+            for(int i=0; i<numPtsOnCircle; i++)
+            {
+                Circle.SetPosition(i, circlePoints[i] + transform.position);
+            }
+            SurfacePointer.SetPosition(0, new Vector3(transform.position.x, 0, transform.position.z));
+            SurfacePointer.SetPosition(1, transform.position);
+            for(int i=0; i<numPtsOnCross; i++)
+            {
+                SurfacePointer.SetPosition(2 + i * 2, transform.position);
+                SurfacePointer.SetPosition(2 + i * 2 + 1, pointerPoints[2 + i * 2 + 1] + transform.position);
+            }
+
+            SetLRColor(Circle);
+            SetLRColor(SurfacePointer);
+        }
+
+        public void OnWorldDrag(Vector3 motion)
         {
             transform.position += motion;
+            UpdateLines();
+        }
+        
+
+        public void OnWorldDragEnd()
+        {
             var (lat, lon) = globalReferencePoint.GetLatLonFromUnityXZ(transform.position.x, transform.position.z);
             gppgui.latitude = lat;
             gppgui.longitude = lon;
             gppgui.altitude = transform.position.y;
+        }
+
+        public void OnGUILatLonChanged()
+        {
+            var (tx,tz) = globalReferencePoint.GetUnityXZFromLatLon(gppgui.latitude, gppgui.longitude);
+            transform.position = new Vector3((float)tx, transform.position.y, (float)tz);
+            UpdateLines();
+        }
+
+        public void OnGUIAltChanged()
+        {
+            transform.position = new Vector3(transform.position.x, gppgui.altitude, transform.position.z);
             UpdateLines();
         }
 

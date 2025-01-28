@@ -4,7 +4,8 @@ namespace SmarcGUI
 {
     public interface IWorldDraggable
     {
-        public void OnWorldDragEnd(Vector3 motion);
+        public void OnWorldDrag(Vector3 newPos);
+        public void OnWorldDragEnd();
 
     }
 }

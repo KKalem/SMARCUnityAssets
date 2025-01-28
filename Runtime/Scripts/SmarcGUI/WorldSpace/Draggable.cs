@@ -69,21 +69,24 @@ namespace SmarcGUI
                     break;
             }
 
+            motion = newPos - transform.position;
+
             if (DraggedObject != null)
             {
-                motion = newPos - transform.position;
-                DraggedObject.position += motion;
+                DraggedObject?.GetComponent<IWorldDraggable>()?.OnWorldDrag(motion);
+                // transform.position = newPos;
             }
             else
             {
-                transform.position = newPos;
+                transform.position += motion;
             }
+            
+            motion = Vector3.zero;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            DraggedObject?.GetComponent<IWorldDraggable>()?.OnWorldDragEnd(motion);
-            motion = Vector3.zero;
+            DraggedObject?.GetComponent<IWorldDraggable>()?.OnWorldDragEnd();
         }
     }
 }

@@ -102,22 +102,37 @@ namespace SmarcGUI
         void OnLatChanged(string s)
         {
             try {latitude = double.Parse(s);}
-            catch {return;}
-            worldMarker.UpdateLines();
+            catch 
+            {
+                guiState.Log("Invalid latitude value");
+                LatField.text = latitude.ToString();
+                return;
+            }
+            worldMarker.OnGUILatLonChanged();
         }
 
         void OnLonChanged(string s)
         {
             try{longitude = double.Parse(s);}
-            catch{return;}
-            worldMarker.UpdateLines();
+            catch
+            {
+                guiState.Log("Invalid longitude value");
+                LonField.text = longitude.ToString();
+                return;
+            }
+            worldMarker.OnGUILatLonChanged();
         }   
 
         void OnAltChanged(string s)
         {
             try{altitude = float.Parse(s);}
-            catch{return;}
-            worldMarker.UpdateLines();
+            catch
+            {
+                guiState.Log("Invalid altitude value");
+                AltField.text = altitude.ToString();
+                return;
+            }
+            worldMarker.OnGUIAltChanged();
         }
 
         public void OnDisable()
