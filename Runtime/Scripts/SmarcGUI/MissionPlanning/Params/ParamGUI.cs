@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace SmarcGUI
 {
-    public class ParamGUI : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler
+    public class ParamGUI : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem
     {
         public TMP_Text Label;
         
@@ -77,29 +77,13 @@ namespace SmarcGUI
             throw new System.NotImplementedException();
         }
 
-        public void DeleteParam()
-        {
-            listParamGUI.DeleteParam(this);
-        }
-
-        public void MoveParamUp()
-        {
-            listParamGUI.MoveParamUp(this);
-        }
-
-        public void MoveParamDown()
-        {
-            listParamGUI.MoveParamDown(this);
-        }
-
-
         public void OnPointerClick(PointerEventData eventData)
         {
             if(eventData.button == PointerEventData.InputButton.Right)
             {
                 var contextMenuGO = Instantiate(ContextMenuPrefab);
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
-                contextMenu.SetParam(eventData.position, this);
+                contextMenu.SetItem(eventData.position, this);
             }
 
             if(eventData.button == PointerEventData.InputButton.Left)
@@ -125,5 +109,19 @@ namespace SmarcGUI
             return;
         }
 
+        public void OnListItemUp()
+        {
+            listParamGUI.MoveParamUp(this);
+        }
+
+        public void OnListItemDown()
+        {
+            listParamGUI.MoveParamDown(this);
+        }
+
+        public void OnListItemDelete()
+        {
+            listParamGUI.DeleteParam(this);
+        }
     }
 }

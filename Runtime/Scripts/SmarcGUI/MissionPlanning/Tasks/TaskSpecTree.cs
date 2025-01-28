@@ -1,4 +1,3 @@
-using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -12,9 +11,11 @@ namespace SmarcGUI
         // That means, this is a "linear tree" where the root is a sequence and thats it.
         // if anyone wants the _entire_ L4 spec, i wish you good luck :)
         public Dictionary<string, object> CommonParams = new();
-        public string Name;
+        public string Name{get{return "seq";}}
         public Dictionary<string, object> Params = new();
         public List<Task> Children = new();
+
+        public string Description = "A sequence of tasks";
 
         public void RecoverFromJson()
         {

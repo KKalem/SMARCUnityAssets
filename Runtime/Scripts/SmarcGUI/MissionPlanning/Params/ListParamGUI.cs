@@ -21,10 +21,6 @@ namespace SmarcGUI
             rt = GetComponent<RectTransform>();
         }
 
-        void OnEnable()
-        {
-            UpdateHeight();
-        }
 
         protected override void SetupFields()
         {            
@@ -118,8 +114,19 @@ namespace SmarcGUI
         {
             foreach (Transform child in content)
             {
-                Destroy(child.gameObject);
+                child.gameObject.SetActive(false);
             }
         }
+
+        void OnEnable()
+        {
+            foreach (Transform child in content)
+            {
+                child.gameObject.SetActive(true);
+            }
+            UpdateHeight();
+        }
+
+
     }
 }

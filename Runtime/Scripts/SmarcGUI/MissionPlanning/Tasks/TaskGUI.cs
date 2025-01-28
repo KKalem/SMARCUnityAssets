@@ -2,15 +2,13 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
-using System.Collections;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using System.Linq;
 
 
 namespace SmarcGUI
 {
-    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler
+    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem
     {
         public float BottomPadding = 5;
         public Task task;
@@ -25,26 +23,15 @@ namespace SmarcGUI
 
         MissionPlanStore missionPlanStore;
         RectTransform rt;
-        Canvas canvas;
 
         bool needsHeightUpdate = false;
 
 
         
-        void Awake()
-        {
-            rt = GetComponent<RectTransform>();
-            canvas = transform.root.GetComponentInChildren<Canvas>();
-        }
+        
 
-        void OnEnable()
+        public void SetTask(Task task)
         {
-            UpdateHeight();
-        }
-
-        public void SetTask(Task task, MissionPlanStore store)
-        {
-            missionPlanStore = store;
             this.task = task;
             TaskName.text = task.Name;
             DescriptionField.text = task.Description;
@@ -96,7 +83,7 @@ namespace SmarcGUI
             {
                 var contextMenuGO = Instantiate(ContextMenuPrefab);
                 var contextMenu = contextMenuGO.GetComponent<ListItemContextMenu>();
-                contextMenu.SetTask(eventData.position, task);
+                contextMenu.SetItem(eventData.position, this);
             }
 
         }
@@ -116,13 +103,42 @@ namespace SmarcGUI
             if(needsHeightUpdate) ActuallyUpdateHeight();
         }
 
+        void Awake()
+        {
+            rt = GetComponent<RectTransform>();
+            missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+        }
+
+        void OnEnable()
+        {
+            foreach (Transform child in Params.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+            UpdateHeight();
+        }
+
         public void OnDisable()
         {
             foreach (Transform child in Params.transform)
             {
-                Destroy(child.gameObject);
+                child.gameObject.SetActive(false);
             }
         }
 
+        public void OnListItemUp()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OnListItemDown()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OnListItemDelete()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

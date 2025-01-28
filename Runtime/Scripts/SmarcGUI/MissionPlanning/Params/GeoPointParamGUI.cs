@@ -137,12 +137,17 @@ namespace SmarcGUI
 
         public void OnDisable()
         {
-            Destroy(worldMarker.gameObject);
+            worldMarker?.gameObject.SetActive(false);
+        }
+
+        public void OnEnable()
+        {
+            worldMarker?.gameObject.SetActive(true);
         }
 
         protected override void OnSelectedChange()
         {
-            worldMarker.ToggleDraggable(isSelected);
+            worldMarker?.ToggleDraggable(isSelected);
         }
 
     }
