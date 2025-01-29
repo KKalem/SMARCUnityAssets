@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SmarcGUI
 {
-    public class TSTGUI : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IListItem
+    public class TSTGUI : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IListItem, IPathInWorld, IPathChangeListener
     {
         TaskSpecTree tst;
 
@@ -15,6 +16,7 @@ namespace SmarcGUI
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
         public GameObject ContextMenuPrefab;
+        LineRenderer PathLineRenderer;
 
 
         [Header("Temp")]
@@ -33,6 +35,7 @@ namespace SmarcGUI
         {
             guiState = FindFirstObjectByType<GUIState>();
             missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+            PathLineRenderer = GetComponent<LineRenderer>();
         }
 
 
@@ -129,6 +132,8 @@ namespace SmarcGUI
             var index = tst.Children.IndexOf(taskgui.task);
             tst.Children.RemoveAt(index);
             Destroy(taskgui.gameObject);
+            taskGUIs.Remove(taskgui);
+            OnPathChanged();
         }
 
         public void MoveTaskUp(TaskGUI taskgui)
@@ -140,6 +145,7 @@ namespace SmarcGUI
             // Swap the two TaskGUI objects
             var guiIndex = taskgui.transform.GetSiblingIndex();
             taskgui.transform.SetSiblingIndex(guiIndex - 1);
+            OnPathChanged();
         }
 
         public void MoveTaskDown(TaskGUI taskgui)
@@ -151,6 +157,7 @@ namespace SmarcGUI
             // Swap the two TaskGUI objects
             var guiIndex = taskgui.transform.GetSiblingIndex();
             taskgui.transform.SetSiblingIndex(guiIndex + 1);
+            OnPathChanged();
         }
 
         void UpdateTasksGUI()
@@ -173,10 +180,15 @@ namespace SmarcGUI
             {
                 taskGUI.gameObject.SetActive(true);
             }
+            OnPathChanged();
         }
-
-
-
+        public void OnDisable()
+        {
+            foreach (var taskGUI in taskGUIs)
+            {
+                taskGUI.gameObject.SetActive(false);
+            }
+        }
 
         public void Deselect()
         {
@@ -198,6 +210,28 @@ namespace SmarcGUI
         public void OnListItemDelete()
         {
             missionPlanStore.OnTSTDelete(tst);
+        }
+
+        public List<Vector3> GetWorldPath()
+        {
+            var path = new List<Vector3>();
+            foreach(var taskGUI in taskGUIs)
+            {
+                path.AddRange(taskGUI.GetWorldPath());
+            }
+            return path;
+        }
+
+        void DrawWorldPath()
+        {
+            var path = GetWorldPath();
+            PathLineRenderer.positionCount = path.Count;
+            PathLineRenderer.SetPositions(path.ToArray());
+        }
+
+        public void OnPathChanged()
+        {
+            DrawWorldPath();
         }
     }
 }

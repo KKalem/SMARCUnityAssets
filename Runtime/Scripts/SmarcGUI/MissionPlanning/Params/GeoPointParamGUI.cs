@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GeoRef;
 using TMPro;
 using UnityEngine;
@@ -7,7 +8,7 @@ namespace SmarcGUI
 {
 
 
-    public class GeoPointParamGUI : ParamGUI
+    public class GeoPointParamGUI : ParamGUI, IPathInWorld
     {
         public TMP_InputField LatField, LonField, AltField;
 
@@ -26,6 +27,7 @@ namespace SmarcGUI
                 gp.altitude = value;
                 paramValue = gp;
                 AltField.text = value.ToString();
+                NotifyPathChange();
             }
         }
         public double latitude
@@ -36,6 +38,7 @@ namespace SmarcGUI
                 gp.latitude = value;
                 paramValue = gp;
                 LatField.text = value.ToString();
+                NotifyPathChange();
             }
         }
         public double longitude
@@ -46,7 +49,14 @@ namespace SmarcGUI
                 gp.longitude = value;
                 paramValue = gp;
                 LonField.text = value.ToString();
+                NotifyPathChange();
             }
+        }
+
+        void NotifyPathChange()
+        {
+            taskgui?.OnPathChanged();
+            listParamGUI?.OnPathChanged();
         }
 
         void Awake()
@@ -109,6 +119,7 @@ namespace SmarcGUI
                 return;
             }
             worldMarker.OnGUILatLonChanged();
+            NotifyPathChange();
         }
 
         void OnLonChanged(string s)
@@ -121,6 +132,7 @@ namespace SmarcGUI
                 return;
             }
             worldMarker.OnGUILatLonChanged();
+            NotifyPathChange();
         }   
 
         void OnAltChanged(string s)
@@ -133,6 +145,7 @@ namespace SmarcGUI
                 return;
             }
             worldMarker.OnGUIAltChanged();
+            NotifyPathChange();
         }
 
         public void OnDisable()
@@ -150,5 +163,10 @@ namespace SmarcGUI
             worldMarker?.ToggleDraggable(isSelected);
         }
 
+        public List<Vector3> GetWorldPath()
+        {
+            if(worldMarker == null) return new List<Vector3>();
+            return new List<Vector3> { worldMarker.transform.position };
+        }
     }
 }

@@ -5,6 +5,6 @@ namespace SmarcGUI
 {
     public interface IPathInWorld
     {
-        List<Vector3> GetPath();
+        List<Vector3> GetWorldPath();
     }
 }

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace SmarcGUI
 {
-    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem
+    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem, IPathInWorld, IPathChangeListener
     {
         public float BottomPadding = 5;
         public Task task;
@@ -53,7 +53,7 @@ namespace SmarcGUI
             GameObject paramGO;
             GameObject paramPrefab = missionPlanStore.GetParamPrefab(taskParams[paramKey]);
             paramGO = Instantiate(paramPrefab, parent);
-            paramGO.GetComponent<ParamGUI>().SetParam(taskParams, paramKey);
+            paramGO.GetComponent<ParamGUI>().SetParam(taskParams, paramKey, this);
         }
 
 
@@ -141,6 +141,22 @@ namespace SmarcGUI
         public void OnListItemDelete()
         {
             tstGUI.DeleteTask(this);
+        }
+
+        public List<Vector3> GetWorldPath()
+        {
+            var path = new List<Vector3>();
+            foreach(Transform child in Params.transform)
+            {
+                var paramGUI = child.GetComponent<IPathInWorld>();
+                if(paramGUI != null) path.AddRange(paramGUI.GetWorldPath());
+            }
+            return path;
+        }
+
+        public void OnPathChanged()
+        {
+            tstGUI.OnPathChanged();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace SmarcGUI
         
         protected IDictionary paramsDict;
         protected string paramKey;
+        protected TaskGUI taskgui;
 
         protected IList paramsList;
         public int paramIndex{get; protected set;}
@@ -45,10 +46,11 @@ namespace SmarcGUI
             }
         }
 
-        public void SetParam(IDictionary paramsDict, string paramKey)
+        public void SetParam(IDictionary paramsDict, string paramKey, TaskGUI taskgui)
         {
             this.paramsDict = paramsDict;
             this.paramKey = paramKey;
+            this.taskgui = taskgui;
             UpdateLabel();
             SetupFields();
         }

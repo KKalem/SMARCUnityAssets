@@ -1,13 +1,12 @@
 using System.Collections;
-using TMPro;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Animations;
 using UnityEngine.UI;
 
 namespace SmarcGUI
 {
-    public class ListParamGUI : ParamGUI, IHeightUpdatable
+    public class ListParamGUI : ParamGUI, IHeightUpdatable, IPathInWorld, IPathChangeListener
     {
         RectTransform rt;
 
@@ -128,6 +127,20 @@ namespace SmarcGUI
             UpdateHeight();
         }
 
+        public List<Vector3> GetWorldPath()
+        {
+            List<Vector3> path = new();
+            foreach(Transform child in content)
+            {
+                path.AddRange(child.GetComponent<IPathInWorld>().GetWorldPath());
+            }
+            return path;
+        }
 
+        public void OnPathChanged()
+        {
+            taskgui?.OnPathChanged();
+            listParamGUI?.OnPathChanged();
+        }
     }
 }
