@@ -137,12 +137,12 @@ namespace SmarcGUI
 
         public void OnDisable()
         {
-            worldMarker?.gameObject.SetActive(false);
+            worldMarker?.gameObject?.SetActive(false);
         }
 
         public void OnEnable()
         {
-            worldMarker?.gameObject.SetActive(true);
+            worldMarker?.gameObject?.SetActive(true);
         }
 
         protected override void OnSelectedChange()

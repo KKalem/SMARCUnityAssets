@@ -29,6 +29,12 @@ namespace SmarcGUI
         void Awake()
         {
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
+            if(globalReferencePoint == null)
+            {
+                Debug.LogError("GlobalReferencePoint not found, GeoPointMarker will not work, destroying it");
+                Destroy(gameObject);
+                return;
+            }
             guiState = FindFirstObjectByType<GUIState>();
             circlePoints = new Vector3[numPtsOnCircle];
             pointerPoints = new Vector3[2 + numPtsOnCross*2];
@@ -66,6 +72,9 @@ namespace SmarcGUI
 
         void CreateLines()
         {
+            if(circlePoints == null) return;
+            if(pointerPoints == null) return;
+            
             for(int i=0; i<numPtsOnCircle; i++)
             {
                 float rad = i * 2*Mathf.PI / (numPtsOnCircle-1);

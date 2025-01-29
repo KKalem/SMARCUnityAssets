@@ -59,7 +59,6 @@ namespace SmarcGUI
             paramGO.GetComponent<ParamGUI>().SetParam(paramList, math.max(0, paramList.Count - 1), this);
 
             UpdateHeight();
-            transform.parent.GetComponentInParent<IHeightUpdatable>().UpdateHeight();
         }
 
         public void MoveParamUp(ParamGUI paramgui)
@@ -108,6 +107,8 @@ namespace SmarcGUI
             foreach(Transform child in transform)
                 selfHeight += child.GetComponent<RectTransform>().sizeDelta.y;
             rt.sizeDelta = new Vector2(rt.sizeDelta.x, selfHeight);
+
+            transform.parent.GetComponentInParent<IHeightUpdatable>().UpdateHeight();
         }
 
         void OnDisable()
