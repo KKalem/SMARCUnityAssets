@@ -90,11 +90,17 @@ namespace SmarcGUI
             if(eventData.button == PointerEventData.InputButton.Left)
             {
                 isSelected = !isSelected;
-                SelectedHighlightRT?.gameObject.SetActive(isSelected);
-                missionPlanStore.OnTSTSelected(isSelected? this : null);
-                UpdateTasksDropdown();
-                UpdateTasksGUI();
+                OnSelectionChanged();
             }
+        }
+
+        void OnSelectionChanged()
+        {
+            SelectedHighlightRT?.gameObject.SetActive(isSelected);
+            missionPlanStore.OnTSTSelected(isSelected? this : null);
+            UpdateTasksDropdown();
+            UpdateTasksGUI();
+            PathLineRenderer.enabled = isSelected;
         }
 
         public void OnTaskAdded(int index)
@@ -115,6 +121,7 @@ namespace SmarcGUI
             }
             tst.Children.Add(newTask);
             CreateTaskGUI(newTask);
+            OnPathChanged();
         }
 
         void CreateTaskGUI(Task task)
@@ -192,9 +199,9 @@ namespace SmarcGUI
 
         public void Deselect()
         {
+            if(!isSelected) return;
             isSelected = false;
-            SelectedHighlightRT?.gameObject.SetActive(isSelected);
-            UpdateTasksDropdown();
+            OnSelectionChanged();
         }
 
         public void OnListItemUp()
