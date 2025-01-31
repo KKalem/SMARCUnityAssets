@@ -1,16 +1,15 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Client;
-using MQTTnet.Server;
+using MQTTnet.Exceptions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SmarcGUI
 {
-    public class MQTTClientGUI : MonoBehaviour
+    public class MQTTClient : MonoBehaviour
     {
         [Header("UI Elements")]
         public TMP_InputField ServerAddressInput;
@@ -55,10 +54,26 @@ namespace SmarcGUI
             mqttClient = mqttFactory.CreateMqttClient();
             var mqttClientOptions = new MqttClientOptionsBuilder().WithTcpServer(host: ServerAddress, port: ServerPort).Build();
             guiState.Log($"Connecting to {ServerAddress}:{ServerPort} ...");
-            var response = await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
-            ConnectionInputsInteractable(false);
+            MqttClientConnectResult response = null;
+            try
+            {
+                ConnectionInputsInteractable(false);
+                response = await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+            }
+            catch (MqttCommunicationTimedOutException)
+            {
+                ConnectionInputsInteractable(true);
+                guiState.Log($"Timeout while trying to connect to {ServerAddress}:{ServerPort}");
+                return;
+            }
+            catch (OperationCanceledException)
+            {
+                ConnectionInputsInteractable(true);
+                guiState.Log($"Connection to {ServerAddress}:{ServerPort} was canceled");
+                return;
+            }
 
-            if(response.ResultCode != MqttClientConnectResultCode.Success)
+            if(response is null || response.ResultCode != MqttClientConnectResultCode.Success)
             {
                 ConnectionInputsInteractable(true);
                 guiState.Log($"Failed to connect to {ServerAddress}:{ServerPort}, result code == {response.ResultCode}");
@@ -71,7 +86,16 @@ namespace SmarcGUI
         {
             var mqttFactory = new MqttFactory();
             var mqttClientDisconnectOptions = mqttFactory.CreateClientDisconnectOptionsBuilder().Build();
-            await mqttClient.DisconnectAsync(mqttClientDisconnectOptions, CancellationToken.None);
+            try
+            {
+                await mqttClient.DisconnectAsync(mqttClientDisconnectOptions, CancellationToken.None);
+            }
+            catch (MqttClientNotConnectedException)
+            {
+                guiState.Log($"Not connected to broker on {ServerAddress}:{ServerPort}!");
+                ConnectionInputsInteractable(true);
+                return;
+            }
             ConnectionInputsInteractable(true);
             guiState.Log($"Disconnected from broker on {ServerAddress}:{ServerPort}!");
         }
