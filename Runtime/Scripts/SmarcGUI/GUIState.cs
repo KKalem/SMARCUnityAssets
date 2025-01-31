@@ -18,7 +18,6 @@ namespace SmarcGUI
     public class GUIState : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler
     {
         public GuiMode CurrentMode{get; private set;}
-        public string SelectedRobotName{get; private set;}
         public string UUID{get; private set;}
         public bool MouseOnGUI{get; private set;}
 
@@ -31,12 +30,10 @@ namespace SmarcGUI
         [Header("GUI Elements")]
         public TMP_Dropdown modeDropdown;
         public TMP_Dropdown cameraDropdown;
-        public TMP_Dropdown robotDropdown;
-
-        public GameObject KeyboardButtonsPanel;
         public TMP_Text KeyboardButtonsText;
-
         public TMP_Text LogText;
+        public GameObject RobotGuiPrefab;
+        public RectTransform RobotsScrollContent;
 
 
 
@@ -50,7 +47,9 @@ namespace SmarcGUI
 
         Dictionary<string, string> cameraTextToObjectPath;
         public Camera CurrentCam { get; private set; }
-        GameObject selectedRobot;
+        List<RobotGUI> robotGUIs = new();
+        public RobotGUI SelectedRobotGUI {get; private set;}
+        public string SelectedRobotName => SelectedRobotGUI?.RobotName;
         KeyboardController[] keyboardControllers;
         WaterRenderToggle[] waterRenderToggles;
 
@@ -109,51 +108,25 @@ namespace SmarcGUI
             OnCameraChanged(cameraDropdown.value);
         }
 
-        void InitRobotDropdown()
-        {
-            robotDropdown.onValueChanged.AddListener(OnRobotChanged);
-
-            var robots = GameObject.FindGameObjectsWithTag("robot");
-            if(robots.Length <= 0) return;
-            foreach(var robot in robots)
-            {
-                robotDropdown.options.Add(new TMP_Dropdown.OptionData(){text=robot.name});
-            }
-            robotDropdown.value = DefaultRobotIndex;
-            robotDropdown.RefreshShownValue();
-            OnRobotChanged(robotDropdown.value);
-        }
-
 
         void InitKeyboardControllers()
         {
             keyboardControllers = FindObjectsByType<KeyboardController>(FindObjectsSortMode.None);
             foreach(var k in keyboardControllers) k.enabled = false;
-            KeyboardButtonsPanel.SetActive(false);
+            KeyboardButtonsText.gameObject.SetActive(false);
         }
 
-
-        void DrawModeBorder()
+        void InitRobotGuis()
         {
-            // Display a 1px border around the screen
-            GUI.color = CurrentMode switch
+            GameObject[] robots = GameObject.FindGameObjectsWithTag("robot");
+            foreach (var robot in robots)
             {
-                GuiMode.Monitoring => ColorMonitoring,
-                GuiMode.MissionPlanning => ColorMissionPlanning,
-                GuiMode.KeyboardControl => ColorRemoteControlling,
-                _ => Color.white,
-            };
-            int borderSize = 1;
-
-            // Top border
-            GUI.DrawTexture(new Rect(0, 0, Screen.width, borderSize), Texture2D.whiteTexture);
-            // Bottom border
-            GUI.DrawTexture(new Rect(0, Screen.height - borderSize, Screen.width, borderSize), Texture2D.whiteTexture);
-            // Left border
-            GUI.DrawTexture(new Rect(0, 0, borderSize, Screen.height), Texture2D.whiteTexture);
-            // Right border
-            GUI.DrawTexture(new Rect(Screen.width - borderSize, 0, borderSize, Screen.height), Texture2D.whiteTexture);
+                var robotGui = Instantiate(RobotGuiPrefab, RobotsScrollContent).GetComponent<RobotGUI>();
+                robotGui.SetSimRobot(robot);
+                robotGUIs.Add(robotGui);
+            }
         }
+
 
         public void OnModeChanged(int modeIndex)
         {
@@ -172,6 +145,31 @@ namespace SmarcGUI
                 Log("Enabling water rendering.");
                 foreach(var w in waterRenderToggles) w.ToggleWaterRender(true);
             }
+
+            if (CurrentMode == GuiMode.KeyboardControl)
+            {
+                if(SelectedRobotGUI == null) return;
+                // see if this is a robot we have in the sim, or if its a ghost from mqtt
+                var selectedRobot = GameObject.Find(SelectedRobotGUI.RobotName);
+                if(selectedRobot == null) return;
+                
+                KeyboardButtonsText.gameObject.SetActive(true);
+                string text = "";
+                text += $"Keyboard Controls: ";
+                var kbController = selectedRobot.GetComponentInChildren<KeyboardController>();
+                foreach(var kf in kbController.KeysAndFunctions)
+                {
+                    text += $"{kf.Item1}={kf.Item2}  ";
+                }
+                KeyboardButtonsText.text = text;
+                foreach (var k in keyboardControllers) k.enabled = k.gameObject == selectedRobot;
+            }
+            else
+            {
+                KeyboardButtonsText.gameObject.SetActive(false);
+                foreach (var k in keyboardControllers) k.enabled = false;
+            }
+
         }
 
 
@@ -187,13 +185,18 @@ namespace SmarcGUI
             CurrentCam = selectedGO.GetComponent<Camera>();
             CurrentCam.enabled = true;
         }
-        
 
-        public void OnRobotChanged(int robotIndex)
+        public void OnRobotSelectionChanged(RobotGUI robotgui)
         {
-            SelectedRobotName = robotDropdown.options[robotIndex].text;
-            selectedRobot = GameObject.Find(SelectedRobotName);
+            if(robotgui.IsSelected) SelectedRobotGUI = robotgui;
+            foreach(var r in robotGUIs)
+            {
+                if(r != robotgui) r.Deselect();
+            }
+            Log($"Selected robot: {robotgui.RobotName}");
+            OnModeChanged((int)DefaultMode);
         }
+        
 
         public void Log(string text)
         {
@@ -237,7 +240,7 @@ namespace SmarcGUI
             InitKeyboardControllers();
             InitModeDropdown();
             InitCameraDropdown();
-            InitRobotDropdown();
+            InitRobotGuis();
             waterRenderToggles = FindObjectsByType<WaterRenderToggle>(FindObjectsSortMode.None);
         }
 
@@ -246,35 +249,31 @@ namespace SmarcGUI
             if(Input.GetKeyDown(KeyCode.Escape))
             {
                 OnModeChanged((int)DefaultMode);
-            }
-
-            if (CurrentMode == GuiMode.KeyboardControl)
-            {
-                KeyboardButtonsPanel.SetActive(true);
-                string text = "";
-                text += $"Keyboard Controls: ";
-                var kbController = selectedRobot.GetComponentInChildren<KeyboardController>();
-                foreach(var kf in kbController.KeysAndFunctions)
-                {
-                    text += $"{kf.Item1}={kf.Item2}  ";
-                }
-                KeyboardButtonsText.text = text;
-                foreach (var k in keyboardControllers) k.enabled = k.gameObject == selectedRobot;
-            }
-            else
-            {
-                KeyboardButtonsPanel.SetActive(false);
-                foreach (var k in keyboardControllers) k.enabled = false;
-            }
-            
+            }            
         }
 
         void OnGUI()
         {
-            // for things that dont need any interaction, we can draw straight to the screen
-            // things like status strings, etc.
-            DrawModeBorder();
-            // Draw the UUID at the bottom left of the screen
+            // Display a 1px border around the screen
+            GUI.color = CurrentMode switch
+            {
+                GuiMode.Monitoring => ColorMonitoring,
+                GuiMode.MissionPlanning => ColorMissionPlanning,
+                GuiMode.KeyboardControl => ColorRemoteControlling,
+                _ => Color.white,
+            };
+            int borderSize = 1;
+
+            // Top border
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, borderSize), Texture2D.whiteTexture);
+            // Bottom border
+            GUI.DrawTexture(new Rect(0, Screen.height - borderSize, Screen.width, borderSize), Texture2D.whiteTexture);
+            // Left border
+            GUI.DrawTexture(new Rect(0, 0, borderSize, Screen.height), Texture2D.whiteTexture);
+            // Right border
+            GUI.DrawTexture(new Rect(Screen.width - borderSize, 0, borderSize, Screen.height), Texture2D.whiteTexture);
+
+            // UUID
             GUI.color = Color.white;
             GUI.Label(new Rect(0, Screen.height - 20, 400, 20), $"UUID: {UUID}");
         }

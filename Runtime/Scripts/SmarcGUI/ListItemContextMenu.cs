@@ -1,39 +1,16 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
 namespace SmarcGUI
 {
-    public class ListItemContextMenu : MonoBehaviour, IPointerExitHandler
+    public class ListItemContextMenu : ContextMenu
     {
-        // Task task;
-        // MissionPlanStore missionPlanStore;
-        Canvas canvas;
-        RectTransform rt;
-        IListItem item;
-
-        // ParamGUI paramGui;
-
-
         public Button DeleteButton;
         public Button MoveUpButton;
         public Button MoveDownButton;
 
-    
-
-        void Awake()
-        {
-            rt = GetComponent<RectTransform>();
-            canvas = FindFirstObjectByType<Canvas>();
-        }
-
-        void SetOnTop(Vector2 position)
-        {
-            rt.SetParent(canvas.transform, false);
-            rt.position = position;
-            rt.SetAsLastSibling();
-        }
+        IListItem item;
 
         public void SetItem(Vector2 position, IListItem item)
         {
@@ -62,11 +39,6 @@ namespace SmarcGUI
             Destroy(gameObject);
         }
         
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            Destroy(gameObject);
-        }
 
     }
 }
