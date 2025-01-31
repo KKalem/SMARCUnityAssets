@@ -34,6 +34,12 @@ namespace SmarcGUI
         }
 
 
+        public void PingMQTT()
+        {
+            var pingCommand = new PingCommand();
+            guiState.Log($"Sending ping to {RobotName}, {pingCommand.ToJson()}");
+        }
+
 
         public void OnPointerClick(PointerEventData eventData)
         {

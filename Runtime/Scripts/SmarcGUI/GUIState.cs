@@ -32,8 +32,10 @@ namespace SmarcGUI
         public TMP_Dropdown cameraDropdown;
         public TMP_Text KeyboardButtonsText;
         public TMP_Text LogText;
-        public GameObject RobotGuiPrefab;
         public RectTransform RobotsScrollContent;
+
+        [Header("Prefabs")]
+        public GameObject RobotGuiPrefab;
 
 
 
