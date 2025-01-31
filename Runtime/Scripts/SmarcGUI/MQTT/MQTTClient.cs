@@ -101,6 +101,34 @@ namespace SmarcGUI
         }
 
     
+        public async void Publish(string topic, string payload)
+        {
+            if(mqttClient is null || !mqttClient.IsConnected)
+            {
+                return;
+            }
+
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .Build();
+
+
+            try
+            {
+                await mqttClient.PublishAsync(message, CancellationToken.None);
+            }
+            catch (MqttCommunicationTimedOutException)
+            {
+                guiState.Log($"Timeout while trying to publish message to {ServerAddress}:{ServerPort}");
+                return;
+            }
+            catch (OperationCanceledException)
+            {
+                guiState.Log($"Publishing message to {ServerAddress}:{ServerPort} was canceled");
+                return;
+            }
+        }
 
         
 
