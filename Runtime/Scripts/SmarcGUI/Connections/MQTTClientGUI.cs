@@ -12,6 +12,7 @@ using MQTTnet.Protocol;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace SmarcGUI.Connections
 {
@@ -39,6 +40,8 @@ namespace SmarcGUI.Connections
         int ServerPort => int.Parse(PortInput.text);
 
         MQTTPublisher[] publishers;
+
+        HashSet<string> robotsAddedFromHeartbeat = new HashSet<string>();
 
         void Awake()
         {
@@ -86,6 +89,11 @@ namespace SmarcGUI.Connections
             {
                 case "heartbeat":
                     Debug.Log($"Hearbeat from: {agentName}");
+                    if(!robotsAddedFromHeartbeat.Contains(agentName))
+                    {
+                        robotsAddedFromHeartbeat.Add(agentName);
+                        guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT);
+                    }
                     break;
                 default:
                     Debug.Log($"Received uhandled message on MQTT topic: {topic}");

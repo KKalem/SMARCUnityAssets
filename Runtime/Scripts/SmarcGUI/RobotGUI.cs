@@ -1,4 +1,6 @@
+using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -27,10 +29,12 @@ namespace SmarcGUI
 
         public bool IsSelected{get; private set;}
         GUIState guiState;
+        MQTTClientGUI mqttClient;
 
         void Awake()
         {
             guiState = FindFirstObjectByType<GUIState>();
+            mqttClient = FindFirstObjectByType<MQTTClientGUI>();
         }
 
 
@@ -38,7 +42,7 @@ namespace SmarcGUI
         {
             this.infoSource = infoSource;
             RobotNameText.text = robotname;
-            InfoSourceText.text = infoSource.ToString();
+            InfoSourceText.text = $"({infoSource})";
         }
         
 
@@ -73,14 +77,14 @@ namespace SmarcGUI
             if(eventData.button == PointerEventData.InputButton.Left)
             {
                 IsSelected = !IsSelected;
-                OnSelectedChange();
+                OnSelectedChange(true);
             }
         }
 
-        void OnSelectedChange()
+        void OnSelectedChange(bool notify = false)
         {
             SelectedHighlightRT?.gameObject.SetActive(IsSelected);
-            guiState.OnRobotSelectionChanged(this);
+            if(notify) guiState.OnRobotSelectionChanged(this);
         }
 
         public void Deselect()
