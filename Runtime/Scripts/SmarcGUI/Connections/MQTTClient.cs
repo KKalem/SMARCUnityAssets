@@ -1,8 +1,15 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
+// Because we have a "Task" under SmarcGUI too... meh.
+using SystemTask = System.Threading.Tasks.Task;
+
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Exceptions;
+using MQTTnet.Packets;
+using MQTTnet.Protocol;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,11 +55,42 @@ namespace SmarcGUI
             DisconnectButton.interactable = !interactable;
         }
 
+
+        SystemTask OnMsgReceived(MqttApplicationMessageReceivedEventArgs e)
+        {
+            var topic = e.ApplicationMessage.Topic;
+            var payload = e.ApplicationMessage.ConvertPayloadToString();
+
+            // wara stuff is formatted like: smarc/unit/subsurface/simulation/sam1/heartbeat
+            // {context}/unit/{air,ground,surface,subsurface}/{real,simulation,playback}/{agentName}/{topic}
+            var topicParts = topic.Split('/');
+            var context = topicParts[0];
+            var domain = topicParts[2];
+            var realism = topicParts[3];
+            var agentName = topicParts[4];
+            var messageType = topicParts[5];
+
+            switch(messageType)
+            {
+                case "heartbeat":
+                    Debug.Log($"Hearbeat from: {agentName}");
+                    break;
+                default:
+                    Debug.Log($"Received uhandled message on MQTT topic: {topic}");
+                    break;
+            }
+            return SystemTask.CompletedTask;
+        }
+
+
         async void ConnectToBroker()
         {
             var mqttFactory = new MqttFactory();
             mqttClient = mqttFactory.CreateMqttClient();
             var mqttClientOptions = new MqttClientOptionsBuilder().WithTcpServer(host: ServerAddress, port: ServerPort).Build();
+
+            mqttClient.ApplicationMessageReceivedAsync += OnMsgReceived;
+
             guiState.Log($"Connecting to {ServerAddress}:{ServerPort} ...");
             MqttClientConnectResult response = null;
             try
@@ -80,6 +118,8 @@ namespace SmarcGUI
                 return;
             }
             guiState.Log($"Connected to broker on {ServerAddress}:{ServerPort}!");
+
+            SubToHeartbeats();
         }
 
         async void DisconnectFromBroker()
@@ -103,10 +143,7 @@ namespace SmarcGUI
     
         public async void Publish(string topic, string payload)
         {
-            if(mqttClient is null || !mqttClient.IsConnected)
-            {
-                return;
-            }
+            if(mqttClient is null || !mqttClient.IsConnected) return;
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
@@ -129,6 +166,26 @@ namespace SmarcGUI
                 return;
             }
         }
+
+        async void SubToHeartbeats()
+        {
+            guiState.Log("Subscribing to heartbeats...");
+            
+            // mqttClient.ApplicationMessageReceivedAsync += OnHeartbeatReceived;
+
+            var topic = "+/unit/+/+/+/heartbeat";
+            var mqttFactory = new MqttFactory();
+            var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
+                .WithTopicFilter(topic)
+                .Build();
+
+            await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
+
+            Debug.Log($"MQTT client subscribed to topic: {topic}");
+        }
+
+        
+        
 
         
 
