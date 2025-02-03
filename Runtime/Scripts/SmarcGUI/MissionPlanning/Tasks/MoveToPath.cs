@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Tasks
 {
     public struct GeoPoint
     {

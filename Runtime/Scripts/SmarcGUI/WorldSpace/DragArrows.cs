@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SmarcGUI
+namespace SmarcGUI.WorldSpace
 {
     public class DragArrows : MonoBehaviour
     {

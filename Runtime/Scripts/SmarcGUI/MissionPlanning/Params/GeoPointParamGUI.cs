@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using GeoRef;
+using SmarcGUI.MissionPlanning.Tasks;
+using SmarcGUI.WorldSpace;
 using TMPro;
 using UnityEngine;
 
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Params
 {
 
 

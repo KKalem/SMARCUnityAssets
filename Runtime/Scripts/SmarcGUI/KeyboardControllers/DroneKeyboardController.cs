@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Propeller = VehicleComponents.Actuators.Propeller;
 
-namespace SmarcGUI
+namespace SmarcGUI.KeyboardControllers
 {
     public class DroneKeyboardController : KeyboardController
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine; 
 
-namespace SmarcGUI
+namespace SmarcGUI.KeyboardControllers
 {
     // Base class for keyboard controllers of all robots
 

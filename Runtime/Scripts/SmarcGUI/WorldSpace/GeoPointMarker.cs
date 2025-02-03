@@ -1,7 +1,8 @@
 using GeoRef;
+using SmarcGUI.MissionPlanning.Params;
 using UnityEngine;
 
-namespace SmarcGUI
+namespace SmarcGUI.WorldSpace
 {
 
     public class GeoPointMarker : MonoBehaviour, IWorldDraggable

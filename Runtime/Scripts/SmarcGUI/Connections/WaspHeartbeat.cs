@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 
-namespace SmarcGUI
+namespace SmarcGUI.Connections
 {
 
     public enum WaspUnitType
@@ -60,7 +60,7 @@ namespace SmarcGUI
         public string Context = "smarc";
         public string TopicBase => $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
 
-        MQTTClient mqttClient;
+        MQTTClientGUI mqttClient;
         WaspHeartbeatMsg msg;
         bool publish = false;
 
@@ -72,7 +72,7 @@ namespace SmarcGUI
         void Awake()
         {
             AgentUUID = Guid.NewGuid().ToString();
-            mqttClient = FindFirstObjectByType<MQTTClient>();
+            mqttClient = FindFirstObjectByType<MQTTClientGUI>();
 
             msg = new WaspHeartbeatMsg(
                 agentType: AgentType,

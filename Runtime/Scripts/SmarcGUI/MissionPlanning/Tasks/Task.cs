@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Tasks
 {
     [JsonObject(NamingStrategyType = typeof(Newtonsoft.Json.Serialization.KebabCaseNamingStrategy))]
     public class Task

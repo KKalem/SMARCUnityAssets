@@ -1,4 +1,4 @@
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Tasks
 {
     public class CustomTask : Task
     {

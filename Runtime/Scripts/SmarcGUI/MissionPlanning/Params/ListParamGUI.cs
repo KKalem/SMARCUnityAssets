@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using SmarcGUI.WorldSpace;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Params
 {
     public class ListParamGUI : ParamGUI, IHeightUpdatable, IPathInWorld, IPathChangeListener
     {

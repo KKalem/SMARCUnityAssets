@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Utils = DefaultNamespace.Utils;
 using VehicleComponents.Sensors;
 using UnityEngine.EventSystems;
+using SmarcGUI.KeyboardControllers;
+using SmarcGUI.Water;
 
 namespace SmarcGUI
 {
@@ -124,7 +126,7 @@ namespace SmarcGUI
             foreach (var robot in robots)
             {
                 var robotGui = Instantiate(RobotGuiPrefab, RobotsScrollContent).GetComponent<RobotGUI>();
-                robotGui.SetSimRobot(robot);
+                robotGui.SetRobot(robot.transform.root.name, InfoSource.SIM);
                 robotGUIs.Add(robotGui);
             }
         }

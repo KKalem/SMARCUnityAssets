@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SmarcGUI
+namespace SmarcGUI.Water
 {
     [RequireComponent(typeof(MeshRenderer))]
     public class SimpleMeshToggle : WaterRenderToggle

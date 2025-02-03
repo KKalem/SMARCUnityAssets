@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Params
 {
 
     class PrimitiveParamGUI : ParamGUI

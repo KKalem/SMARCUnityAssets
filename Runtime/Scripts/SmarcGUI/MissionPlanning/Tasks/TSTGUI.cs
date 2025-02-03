@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.IO;
+using SmarcGUI.WorldSpace;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Tasks
 {
     public class TSTGUI : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IListItem, IPathInWorld, IPathChangeListener
     {

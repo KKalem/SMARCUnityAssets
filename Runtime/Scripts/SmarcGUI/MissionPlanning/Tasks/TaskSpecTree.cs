@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Tasks
 {
     [JsonObject(NamingStrategyType = typeof(Newtonsoft.Json.Serialization.KebabCaseNamingStrategy))]
     public class TaskSpecTree

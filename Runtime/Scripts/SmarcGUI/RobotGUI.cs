@@ -1,10 +1,18 @@
-using System.Collections;
+using SmarcGUI.MissionPlanning;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SmarcGUI
 {
+    public enum InfoSource
+    {
+        SIM,
+        MQTT,
+        ROS
+    }
+
+
     public class RobotGUI : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler
     {
         [Header("UI Elements")]
@@ -12,12 +20,12 @@ namespace SmarcGUI
         public RectTransform SelectedHighlightRT;
         public GameObject ContextMenuPrefab;
         public TMP_Text RobotNameText;
-        public TMP_Text RobotTypeText;
+        public TMP_Text InfoSourceText;
+        InfoSource infoSource;
 
         public string RobotName => RobotNameText.text;
 
         public bool IsSelected{get; private set;}
-        public bool IsSimulated{get; private set;}
         GUIState guiState;
 
         void Awake()
@@ -26,18 +34,30 @@ namespace SmarcGUI
         }
 
 
-        public void SetSimRobot(GameObject robot)
+        public void SetRobot(string robotname, InfoSource infoSource)
         {
-            IsSimulated = true;
-            RobotNameText.text = robot.name;
-            RobotTypeText.text = "Simulated";
+            this.infoSource = infoSource;
+            RobotNameText.text = robotname;
+            InfoSourceText.text = infoSource.ToString();
         }
+        
 
 
-        public void PingMQTT()
+        public void Ping()
         {
-            var pingCommand = new PingCommand();
-            guiState.Log($"Sending ping to {RobotName}, {pingCommand.ToJson()}");
+            switch(infoSource)
+            {
+                case InfoSource.SIM:
+                    guiState.Log($"Ping! -> {RobotName} in SIM");
+                    break;
+                case InfoSource.MQTT:
+                    var pingCommand = new PingCommand();
+                    guiState.Log($"Pinging {RobotName} through MQTT, {pingCommand.ToJson()}");
+                    break;
+                case InfoSource.ROS:
+                    guiState.Log($"Ping! -> {RobotName} in ROS");
+                    break;
+            }
         }
 
 

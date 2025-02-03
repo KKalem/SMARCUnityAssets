@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SmarcGUI
+namespace SmarcGUI.WorldSpace
 {
     public interface IPathInWorld
     {

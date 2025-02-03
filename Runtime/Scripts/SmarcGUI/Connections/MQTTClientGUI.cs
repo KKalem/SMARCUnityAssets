@@ -1,8 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-// Because we have a "Task" under SmarcGUI too... meh.
-using SystemTask = System.Threading.Tasks.Task;
+using SystemTask = System.Threading.Tasks.Task; // to diff from SmarcGUI.MissionPlanning.Tasks.Task
 
 using MQTTnet;
 using MQTTnet.Client;
@@ -14,9 +13,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SmarcGUI
+namespace SmarcGUI.Connections
 {
-    public class MQTTClient : MonoBehaviour
+    public class MQTTClientGUI : MonoBehaviour
     {
         [Header("UI Elements")]
         public TMP_InputField ServerAddressInput;

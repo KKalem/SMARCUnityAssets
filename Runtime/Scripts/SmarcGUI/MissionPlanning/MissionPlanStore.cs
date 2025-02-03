@@ -7,9 +7,10 @@ using System;
 using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Collections;
+using SmarcGUI.MissionPlanning.Tasks;
 
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning
 {
     [RequireComponent(typeof(GUIState))]
     public class MissionPlanStore : MonoBehaviour

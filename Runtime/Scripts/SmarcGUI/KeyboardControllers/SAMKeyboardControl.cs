@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System;
-using Force;
 using UnityEngine;
 using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
 using Prismatic = VehicleComponents.Actuators.Prismatic;
 
-namespace SmarcGUI
+namespace SmarcGUI.KeyboardControllers
 {
     public class SAMKeyboardControl : KeyboardController
     {

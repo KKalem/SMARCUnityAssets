@@ -18,7 +18,7 @@ namespace SmarcGUI
 
         void OnPing()
         {
-            item.PingMQTT();
+            item.Ping();
             Destroy(gameObject);
         }
 

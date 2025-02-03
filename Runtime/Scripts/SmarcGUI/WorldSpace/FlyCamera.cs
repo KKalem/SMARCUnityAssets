@@ -4,7 +4,7 @@ using UnityEngine;
 // with some mods.
 
 
-namespace SmarcGUI
+namespace SmarcGUI.WorldSpace
 {
 	[RequireComponent( typeof(Camera) )]
 	public class FlyCamera : MonoBehaviour {

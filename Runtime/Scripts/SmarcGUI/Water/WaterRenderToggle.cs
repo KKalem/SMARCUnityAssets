@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SmarcGUI
+namespace SmarcGUI.Water
 {
     public abstract class WaterRenderToggle : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SmarcGUI
+namespace SmarcGUI.Connections
 {
     public class MQTTPublisher : MonoBehaviour
     {

@@ -1,8 +1,9 @@
 using System;
 using Newtonsoft.Json;
+using SmarcGUI.MissionPlanning.Tasks;
 
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning
 {
     //https://api-docs.waraps.org/#/agent_communication/tasks/commands
 

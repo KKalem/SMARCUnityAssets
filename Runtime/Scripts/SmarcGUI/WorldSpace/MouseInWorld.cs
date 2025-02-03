@@ -1,24 +1,27 @@
 using UnityEngine;
 
-public class MouseInWorld : MonoBehaviour
+namespace SmarcGUI.WorldSpace
 {
-    private Camera mainCamera;
-
-    void Update()
+    public class MouseInWorld : MonoBehaviour
     {
-        mainCamera = Camera.main;
-        if (mainCamera == null)
-        {
-            Debug.LogError("Main camera not found");
-            return;
-        }
+        private Camera mainCamera;
 
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
+        void Update()
         {
-            transform.position = hit.point;
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogError("Main camera not found");
+                return;
+            }
+
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                transform.position = hit.point;
+            }
         }
     }
 }

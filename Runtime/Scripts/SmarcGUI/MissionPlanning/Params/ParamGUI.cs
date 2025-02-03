@@ -1,9 +1,10 @@
 using System.Collections;
+using SmarcGUI.MissionPlanning.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Params
 {
     public class ParamGUI : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Robotics.ROSTCPConnector;
 
-namespace SmarcGUI
+namespace SmarcGUI.Connections
 {
     public class ROSClientGUI : MonoBehaviour
     {

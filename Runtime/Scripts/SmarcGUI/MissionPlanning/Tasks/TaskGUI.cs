@@ -4,9 +4,11 @@ using System.Collections.Generic;
 
 using UnityEngine.EventSystems;
 using System.Linq;
+using SmarcGUI.WorldSpace;
+using SmarcGUI.MissionPlanning.Params;
 
 
-namespace SmarcGUI
+namespace SmarcGUI.MissionPlanning.Tasks
 {
     public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem, IPathInWorld, IPathChangeListener
     {
