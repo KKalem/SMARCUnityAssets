@@ -113,6 +113,7 @@ namespace SmarcGUI
             MissionPlans.Add(newPlan);
             var tstGUI = Instantiate(TSTPrefab, MissionsScrollContent).GetComponent<TSTGUI>();
             tstGUI.SetTST(newPlan);
+            tstGUI.Select();
         }
 
         public void OnTSTDelete(TaskSpecTree tst)
@@ -195,20 +196,6 @@ namespace SmarcGUI
 
             InitGUIElements();
         }
-
-        // void OnGUI()
-        // {
-        //     bool enabled = false;
-        //     // if(MissionPlans.Count > 0)
-        //     // {
-        //     //     enabled = SelectedMissionPlan != null;
-        //     // }
-        //     // AvailableTasksDropdown.interactable = enabled;
-        //     // AddTaskButton.interactable = enabled;
-        //     // DeleteMissionPlanButton.interactable = enabled;
-        //     // MissionPlanNameField.interactable = enabled;
-        //     // MissionPlanDropdown.interactable = enabled;
-        // }
 
     }
 }

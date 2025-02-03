@@ -66,6 +66,7 @@ namespace SmarcGUI
             {
                 missionPlanStore.AvailableTasksDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskType });
             }
+            missionPlanStore.AvailableTasksDropdown.RefreshShownValue();
         }
 
         public void OnPointerExit(PointerEventData eventData)
@@ -201,6 +202,13 @@ namespace SmarcGUI
         {
             if(!isSelected) return;
             isSelected = false;
+            OnSelectionChanged();
+        }
+
+        public void Select()
+        {
+            if(isSelected) return;
+            isSelected = true;
             OnSelectionChanged();
         }
 
