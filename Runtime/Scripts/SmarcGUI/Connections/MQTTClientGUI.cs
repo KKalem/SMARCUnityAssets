@@ -1,13 +1,10 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using SystemTask = System.Threading.Tasks.Task; // to diff from SmarcGUI.MissionPlanning.Tasks.Task
 
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Exceptions;
-using MQTTnet.Packets;
-using MQTTnet.Protocol;
 
 using TMPro;
 using UnityEngine;
@@ -16,6 +13,23 @@ using System.Collections.Generic;
 
 namespace SmarcGUI.Connections
 {
+    public enum WaspUnitType
+    {
+        air,
+        ground,
+        surface,
+        subsurface
+    }
+
+    public enum WaspLevels
+    {
+        sensor,
+        direct_execution,
+        tst_execution,
+        delegation
+    }
+
+
     public class MQTTClientGUI : MonoBehaviour
     {
         [Header("UI Elements")]
@@ -41,7 +55,8 @@ namespace SmarcGUI.Connections
 
         MQTTPublisher[] publishers;
 
-        HashSet<string> robotsAddedFromHeartbeat = new HashSet<string>();
+        Dictionary<string, RobotGUI> robotsGuis = new();
+        Queue<Tuple<string, string>> mqttInbox = new();
 
         void Awake()
         {
@@ -75,30 +90,7 @@ namespace SmarcGUI.Connections
         {
             var topic = e.ApplicationMessage.Topic;
             var payload = e.ApplicationMessage.ConvertPayloadToString();
-
-            // wara stuff is formatted like: smarc/unit/subsurface/simulation/sam1/heartbeat
-            // {context}/unit/{air,ground,surface,subsurface}/{real,simulation,playback}/{agentName}/{topic}
-            var topicParts = topic.Split('/');
-            var context = topicParts[0];
-            var domain = topicParts[2];
-            var realism = topicParts[3];
-            var agentName = topicParts[4];
-            var messageType = topicParts[5];
-
-            switch(messageType)
-            {
-                case "heartbeat":
-                    Debug.Log($"Hearbeat from: {agentName}");
-                    if(!robotsAddedFromHeartbeat.Contains(agentName))
-                    {
-                        robotsAddedFromHeartbeat.Add(agentName);
-                        guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT);
-                    }
-                    break;
-                default:
-                    Debug.Log($"Received uhandled message on MQTT topic: {topic}");
-                    break;
-            }
+            mqttInbox.Enqueue(new Tuple<string, string>(topic, payload));
             return SystemTask.CompletedTask;
         }
 
@@ -206,6 +198,7 @@ namespace SmarcGUI.Connections
             }
         }
 
+
         async void SubToHeartbeats(string realism)
         {
             guiState.Log("Subscribing to heartbeats...");
@@ -221,7 +214,43 @@ namespace SmarcGUI.Connections
             Debug.Log($"MQTT client subscribed to topic: {topic}");
         }
 
+
+        void HandleMQTTMsg(Tuple<string, string> topicPayload)
+        {
+            var topic = topicPayload.Item1;
+            var payload = topicPayload.Item2;
+
+            // wara stuff is formatted like: smarc/unit/subsurface/simulation/sam1/heartbeat
+            // {context}/unit/{air,ground,surface,subsurface}/{real,simulation,playback}/{agentName}/{topic}
+            var topicParts = topic.Split('/');
+            var context = topicParts[0];
+            var domain = topicParts[2];
+            var realism = topicParts[3];
+            var agentName = topicParts[4];
+            var messageType = topicParts[5];
+
+            switch(messageType)
+            {
+                case "heartbeat":
+                    if(!robotsGuis.ContainsKey(agentName))
+                    {
+                        string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}";
+                        var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
+                        robotsGuis.Add(agentName, robotgui);
+                    }
+                    robotsGuis[agentName].OnHeartbeatReceived();
+                    break;
+                default:
+                    guiState.Log($"Received uhandled message on MQTT topic: {topic}");
+                    break;
+            }
+        }
         
+        void FixedUpdate()
+        {
+            if(mqttInbox.Count == 0) return;
+            while(mqttInbox.Count > 0) HandleMQTTMsg(mqttInbox.Dequeue());
+        }
         
 
         

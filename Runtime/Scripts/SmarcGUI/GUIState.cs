@@ -120,17 +120,18 @@ namespace SmarcGUI
             KeyboardButtonsText.gameObject.SetActive(false);
         }
 
-        public void CreateNewRobotGUI(string robotName, InfoSource infoSource)
+        public RobotGUI CreateNewRobotGUI(string robotName, InfoSource infoSource, string robotNamespace)
         {
             var robotGui = Instantiate(RobotGuiPrefab, RobotsScrollContent).GetComponent<RobotGUI>();
-            robotGui.SetRobot(robotName, infoSource);
+            robotGui.SetRobot(robotName, infoSource, robotNamespace);
             robotGUIs.Add(robotGui);
+            return robotGui;
         }
 
         void InitRobotGuis()
         {
             GameObject[] robots = GameObject.FindGameObjectsWithTag("robot");
-            foreach (var robot in robots) CreateNewRobotGUI(robot.transform.root.name, InfoSource.SIM);
+            foreach (var robot in robots) CreateNewRobotGUI(robot.transform.root.name, InfoSource.SIM, "-");
         }
 
 

@@ -20,12 +20,14 @@ namespace SmarcGUI
         [Header("UI Elements")]
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
+        public RectTransform HeartRT;
         public GameObject ContextMenuPrefab;
         public TMP_Text RobotNameText;
         public TMP_Text InfoSourceText;
         InfoSource infoSource;
 
         public string RobotName => RobotNameText.text;
+        string robotNamespace;
 
         public bool IsSelected{get; private set;}
         GUIState guiState;
@@ -38,11 +40,15 @@ namespace SmarcGUI
         }
 
 
-        public void SetRobot(string robotname, InfoSource infoSource)
+        public void SetRobot(string robotname, InfoSource infoSource, string robotNamespace)
         {
             this.infoSource = infoSource;
+            this.robotNamespace = robotNamespace;
+
             RobotNameText.text = robotname;
             InfoSourceText.text = $"({infoSource})";
+
+            if(infoSource == InfoSource.SIM) HeartRT.gameObject.SetActive(false);
         }
         
 
@@ -56,7 +62,7 @@ namespace SmarcGUI
                     break;
                 case InfoSource.MQTT:
                     var pingCommand = new PingCommand();
-                    guiState.Log($"Pinging {RobotName} through MQTT, {pingCommand.ToJson()}");
+                    mqttClient.Publish($"{robotNamespace}/exec/command", pingCommand.ToJson());
                     break;
                 case InfoSource.ROS:
                     guiState.Log($"Ping! -> {RobotName} in ROS");
@@ -103,6 +109,14 @@ namespace SmarcGUI
             HighlightRT?.gameObject.SetActive(true);
         }
 
-        
+        public void OnHeartbeatReceived()
+        {
+            HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+        }
+
+        public void OnGUI()
+        {
+            HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);
+        }
     }
 }

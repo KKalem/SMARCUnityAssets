@@ -7,22 +7,6 @@ using UnityEngine;
 namespace SmarcGUI.Connections
 {
 
-    public enum WaspUnitType
-    {
-        air,
-        ground,
-        surface,
-        subsurface
-    }
-
-    public enum WaspLevels
-    {
-        sensor,
-        direct_execution,
-        tst_execution,
-        delegation
-    }
-
     [JsonObject(NamingStrategyType = typeof(Newtonsoft.Json.Serialization.KebabCaseNamingStrategy))]
     public class WaspHeartbeatMsg
     {
