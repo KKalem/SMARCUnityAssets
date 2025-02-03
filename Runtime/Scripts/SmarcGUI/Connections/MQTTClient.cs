@@ -21,6 +21,10 @@ namespace SmarcGUI
         [Header("UI Elements")]
         public TMP_InputField ServerAddressInput;
         public TMP_InputField PortInput;
+        public TMP_InputField ContextInput;
+        public Toggle SubToSimToggle;
+        public Toggle SubToRealToggle;
+
         public Button ConnectButton;
         public Button DisconnectButton;
 
@@ -30,12 +34,18 @@ namespace SmarcGUI
         IMqttClient mqttClient;
         GUIState guiState;
 
+        public string Context => ContextInput.text;
+
         string ServerAddress => ServerAddressInput.text;
         int ServerPort => int.Parse(PortInput.text);
+
+        MQTTPublisher[] publishers;
 
         void Awake()
         {
             guiState = FindFirstObjectByType<GUIState>();
+            ContextInput.text = "smarcsim";
+            publishers = FindObjectsByType<MQTTPublisher>(FindObjectsSortMode.None);
         }
 
         void Start()
@@ -52,6 +62,9 @@ namespace SmarcGUI
             ConnectButton.interactable = interactable;
             ServerAddressInput.interactable = interactable;
             PortInput.interactable = interactable;
+            ContextInput.interactable = interactable;
+            SubToRealToggle.interactable = interactable;
+            SubToSimToggle.interactable = interactable;
             DisconnectButton.interactable = !interactable;
         }
 
@@ -80,6 +93,24 @@ namespace SmarcGUI
                     break;
             }
             return SystemTask.CompletedTask;
+        }
+
+        void OnConnetionMade()
+        {
+            if(SubToRealToggle.isOn) SubToHeartbeats("real");
+            if(SubToSimToggle.isOn) SubToHeartbeats("simulation");
+            foreach(var publisher in publishers)
+            {
+                publisher.StartPublishing();
+            }
+        }
+
+        void OnconnectionLost()
+        {
+            foreach(var publisher in publishers)
+            {
+                publisher.StopPublishing();
+            }
         }
 
 
@@ -119,7 +150,7 @@ namespace SmarcGUI
             }
             guiState.Log($"Connected to broker on {ServerAddress}:{ServerPort}!");
 
-            SubToHeartbeats();
+            OnConnetionMade();
         }
 
         async void DisconnectFromBroker()
@@ -138,6 +169,7 @@ namespace SmarcGUI
             }
             ConnectionInputsInteractable(true);
             guiState.Log($"Disconnected from broker on {ServerAddress}:{ServerPort}!");
+            OnconnectionLost();
         }
 
     
@@ -167,13 +199,11 @@ namespace SmarcGUI
             }
         }
 
-        async void SubToHeartbeats()
+        async void SubToHeartbeats(string realism)
         {
             guiState.Log("Subscribing to heartbeats...");
-            
-            // mqttClient.ApplicationMessageReceivedAsync += OnHeartbeatReceived;
 
-            var topic = "+/unit/+/+/+/heartbeat";
+            var topic = $"{Context}/unit/+/{realism}/+/heartbeat";
             var mqttFactory = new MqttFactory();
             var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
                 .WithTopicFilter(topic)

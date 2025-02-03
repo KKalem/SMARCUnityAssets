@@ -54,7 +54,7 @@ namespace SmarcGUI
         }
     }
 
-    public class WaspHeartbeat : MonoBehaviour
+    public class WaspHeartbeat : MQTTPublisher
     {
         public WaspUnitType UnitType;
         public string Context = "smarc";
@@ -62,6 +62,7 @@ namespace SmarcGUI
 
         MQTTClient mqttClient;
         WaspHeartbeatMsg msg;
+        bool publish = false;
 
         public float HeartbeatRate = 1.0f;
         public string AgentUUID{get; private set;}
@@ -78,9 +79,19 @@ namespace SmarcGUI
                 agentUuid: AgentUUID,
                 levels: new string[]{WaspLevels.sensor.ToString(), WaspLevels.direct_execution.ToString(), WaspLevels.tst_execution.ToString()},
                 name: AgentName,
-                rate: HeartbeatRate);
+                rate: HeartbeatRate);            
+        }
 
+        public override void StartPublishing()
+        {
+            Context = mqttClient.Context;
+            publish = true;
             StartCoroutine(HeartbeatCoroutine());
+        }
+
+        public override void StopPublishing()
+        {
+            publish = false;
         }
 
         IEnumerator HeartbeatCoroutine()
@@ -88,7 +99,8 @@ namespace SmarcGUI
             while (true)
             {
                 mqttClient.Publish(TopicBase + "heartbeat", msg.ToJson());
-                yield return new WaitForSeconds(HeartbeatRate);
+                if(publish) yield return new WaitForSeconds(HeartbeatRate);
+                else break;
             }
         }
     }
