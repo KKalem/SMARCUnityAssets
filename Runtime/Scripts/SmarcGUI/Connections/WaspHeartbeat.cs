@@ -57,7 +57,7 @@ namespace SmarcGUI
     {
         public WaspUnitType UnitType;
         public string Context = "smarc";
-        public string TopicBase{get; private set;}
+        public string TopicBase => $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
 
         MQTTClient mqttClient;
         WaspHeartbeatMsg msg;
@@ -70,9 +70,7 @@ namespace SmarcGUI
         void Awake()
         {
             AgentUUID = Guid.NewGuid().ToString();
-
             mqttClient = FindFirstObjectByType<MQTTClient>();
-            TopicBase = $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
 
             msg = new WaspHeartbeatMsg(
                 agentType: AgentType,
