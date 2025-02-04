@@ -66,6 +66,15 @@ namespace SmarcGUI
 
             if(infoSource == InfoSource.SIM) HeartRT.gameObject.SetActive(false);
 
+            if(infoSource == InfoSource.MQTT) 
+            {
+                mqttClient.SubToTopic($"{robotNamespace}/sensor_info");
+                mqttClient.SubToTopic($"{robotNamespace}/sensor/position");
+                mqttClient.SubToTopic($"{robotNamespace}/sensor/heading");
+                mqttClient.SubToTopic($"{robotNamespace}/sensor/course");
+                mqttClient.SubToTopic($"{robotNamespace}/sensor/speed");
+            }
+
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
             {
                 if(robotname.ToLower().Contains("sam")) ghostTF = Instantiate(SAMGhostPrefab).transform;
@@ -141,7 +150,7 @@ namespace SmarcGUI
 
         public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
         {
-            guiState.Log($"Received sensor info from {RobotName}: {msg.SensorDataProvided}");
+            return;
         }
 
         public void OnPositionReceived(GeoPoint pos)
@@ -151,13 +160,11 @@ namespace SmarcGUI
             if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
             var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
             ghostTF.position = new Vector3(x, pos.altitude, z);
-            guiState.Log($"Received position from {RobotName}: {pos.latitude}, {pos.longitude}, {pos.altitude}");
         }
 
         public void OnHeadingReceived(float heading)
         {
             ghostTF.rotation = Quaternion.Euler(0, heading, 0);
-            guiState.Log($"Received heading from {RobotName}: {heading}");
         }
 
         public void OnCourseReceived(float course)
@@ -165,13 +172,11 @@ namespace SmarcGUI
             var speed = ghostRB.velocity.magnitude;
             // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
             ghostRB.velocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
-            guiState.Log($"Received course from {RobotName}: {course}");
         }
 
         public void OnSpeedReceived(float speed)
         {
             ghostRB.velocity = ghostRB.velocity.normalized * speed;
-            guiState.Log($"Received speed from {RobotName}: {speed}");
         }
 
         public void OnGUI()

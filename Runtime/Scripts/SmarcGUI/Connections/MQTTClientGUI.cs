@@ -58,6 +58,7 @@ namespace SmarcGUI.Connections
 
         Dictionary<string, RobotGUI> robotsGuis = new();
         Queue<Tuple<string, string>> mqttInbox = new();
+        HashSet<string> subscribedTopics = new();
 
         void Awake()
         {
@@ -111,6 +112,7 @@ namespace SmarcGUI.Connections
             {
                 publisher.StopPublishing();
             }
+            subscribedTopics.Clear();
         }
 
 
@@ -199,12 +201,15 @@ namespace SmarcGUI.Connections
             }
         }
 
-
-        async void SubToHeartbeats(string realism)
+        public async void SubToTopic(string topic)
         {
-            guiState.Log("Subscribing to heartbeats...");
+            Debug.Log($"Subscribing to topic: {topic} ...");
+            if(subscribedTopics.Contains(topic))
+            {
+                Debug.Log($"Already subscribed to topic: {topic}");
+                return;
+            }
 
-            var topic = $"{Context}/unit/+/{realism}/+/heartbeat";
             var mqttFactory = new MqttFactory();
             var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
                 .WithTopicFilter(topic)
@@ -212,9 +217,15 @@ namespace SmarcGUI.Connections
 
             await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
 
+            subscribedTopics.Add(topic);
             Debug.Log($"MQTT client subscribed to topic: {topic}");
         }
 
+        void SubToHeartbeats(string realism)
+        {
+            var topic = $"{Context}/unit/+/{realism}/+/heartbeat";
+            SubToTopic(topic);
+        }
 
         void HandleMQTTMsg(Tuple<string, string> topicPayload)
         {
@@ -242,12 +253,10 @@ namespace SmarcGUI.Connections
             {
                 case "heartbeat":
                     robotsGuis[agentName].OnHeartbeatReceived();
-                    guiState.Log($"Received heartbeat from {agentName}");
                     break;
                 case "sensor_info":
                     WaspSensorInfoMsg sensorInfo = new(payload);
                     robotsGuis[agentName].OnSensorInfoReceived(sensorInfo);
-                    guiState.Log($"Received sensor_info from {agentName}: {sensorInfo.SensorDataProvided}");
                     break;
                 case "sensor":
                     // there could be _many_ different kinds of sensors,
@@ -255,7 +264,6 @@ namespace SmarcGUI.Connections
                     // of position, heading, course, speed
                     // others, we will have some generic ways... eventually.
                     var sensor_type = topicParts[6];
-                    guiState.Log($"Received sensor info from {agentName}: for sensor type {sensor_type}");
                     switch(sensor_type)
                     {
                         case "position":
@@ -275,7 +283,7 @@ namespace SmarcGUI.Connections
                             robotsGuis[agentName].OnSpeedReceived(velocity);
                             break;
                         default:
-                            guiState.Log($"Received unhandled sensor info from {agentName}: {payload}");
+                            guiState.Log($"Received unhandled sensor info from {topic}");
                             break;
                     }
                     break;
