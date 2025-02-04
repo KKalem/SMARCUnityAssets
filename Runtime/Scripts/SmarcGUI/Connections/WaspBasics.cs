@@ -50,7 +50,7 @@ namespace SmarcGUI.Connections
         {
             if(!body.isValid) return;
             publish = true;
-            StartCoroutine(HeartbeatCoroutine());
+            StartCoroutine(PublishCoroutine());
         }
 
         public override void StopPublishing()
@@ -58,7 +58,7 @@ namespace SmarcGUI.Connections
             publish = false;
         }
 
-        IEnumerator HeartbeatCoroutine()
+        IEnumerator PublishCoroutine()
         {
             while (publish)
             {

@@ -10,6 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using SmarcGUI.MissionPlanning.Tasks;
 
 namespace SmarcGUI.Connections
 {
@@ -234,16 +235,49 @@ namespace SmarcGUI.Connections
                 string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}";
                 var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
                 robotsGuis.Add(agentName, robotgui);
+                guiState.Log($"Created new RobotGUI for {agentName}");
             }
 
             switch(messageType)
             {
                 case "heartbeat":
                     robotsGuis[agentName].OnHeartbeatReceived();
+                    guiState.Log($"Received heartbeat from {agentName}");
                     break;
                 case "sensor_info":
                     WaspSensorInfoMsg sensorInfo = new(payload);
                     robotsGuis[agentName].OnSensorInfoReceived(sensorInfo);
+                    guiState.Log($"Received sensor_info from {agentName}: {sensorInfo.SensorDataProvided}");
+                    break;
+                case "sensor":
+                    // there could be _many_ different kinds of sensors,
+                    // some of these, we will have specific ways to visualize, like the basics
+                    // of position, heading, course, speed
+                    // others, we will have some generic ways... eventually.
+                    var sensor_type = topicParts[6];
+                    guiState.Log($"Received sensor info from {agentName}: for sensor type {sensor_type}");
+                    switch(sensor_type)
+                    {
+                        case "position":
+                            GeoPoint pos = new(payload);
+                            robotsGuis[agentName].OnPositionReceived(pos);
+                            break;
+                        case "heading":
+                            float heading = float.Parse(payload);
+                            robotsGuis[agentName].OnHeadingReceived(heading);
+                            break;
+                        case "course":
+                            float course = float.Parse(payload);
+                            robotsGuis[agentName].OnCourseReceived(course);
+                            break;
+                        case "speed":
+                            float velocity = float.Parse(payload);
+                            robotsGuis[agentName].OnSpeedReceived(velocity);
+                            break;
+                        default:
+                            guiState.Log($"Received unhandled sensor info from {agentName}: {payload}");
+                            break;
+                    }
                     break;
                 default:
                     guiState.Log($"Received uhandled message on MQTT topic: {topic}");

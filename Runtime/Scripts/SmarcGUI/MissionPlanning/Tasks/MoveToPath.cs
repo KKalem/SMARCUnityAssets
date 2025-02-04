@@ -15,6 +15,14 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             return JsonConvert.SerializeObject(this);
         }
+
+        public GeoPoint(string json)
+        {
+            var gp = JsonConvert.DeserializeObject<GeoPoint>(json);
+            latitude = gp.latitude;
+            longitude = gp.longitude;
+            altitude = gp.altitude;
+        }
     }
 
     public struct MoveSpeed

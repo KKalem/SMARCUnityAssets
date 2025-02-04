@@ -95,11 +95,11 @@ MonoBehaviour:
   HighlightRT: {fileID: 293169852996438269}
   SelectedHighlightRT: {fileID: 596127834733949244}
   HeartRT: {fileID: 8502857442311414601}
-  SensorInfoPanelRT: {fileID: 0}
-  SensorInfoHeartRT: {fileID: 0}
-  ContextMenuPrefab: {fileID: 6887179358533236570, guid: d0a976700cb536948812b70770096ce0, type: 3}
   RobotNameText: {fileID: 7759744501316869989}
   InfoSourceText: {fileID: 7967547059244762704}
+  ContextMenuPrefab: {fileID: 6887179358533236570, guid: d0a976700cb536948812b70770096ce0, type: 3}
+  GenericGhostPrefab: {fileID: 4101801440365519181, guid: 036e77a074ae0da478957710f1cfb689, type: 3}
+  SAMGhostPrefab: {fileID: 3181005593662985397, guid: 17ef068908d4826489bbbb32dbee9971, type: 3}
 --- !u!1 &3943119065301169302
 GameObject:
   m_ObjectHideFlags: 0

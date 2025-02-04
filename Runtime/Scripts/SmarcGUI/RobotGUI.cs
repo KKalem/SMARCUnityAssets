@@ -1,6 +1,7 @@
+using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
-
+using SmarcGUI.MissionPlanning.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,9 +22,21 @@ namespace SmarcGUI
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
         public RectTransform HeartRT;
-        public GameObject ContextMenuPrefab;
         public TMP_Text RobotNameText;
         public TMP_Text InfoSourceText;
+        public string WorldMarkerName = "WorldMarkers";
+
+        [Header("Prefabs")]
+        public GameObject ContextMenuPrefab;
+        public GameObject GenericGhostPrefab;
+        public GameObject SAMGhostPrefab;
+
+
+        Transform worldMarkersTF;
+        Transform ghostTF;
+        Rigidbody ghostRB;
+        Vector3 ghostVelocity;
+
         InfoSource infoSource;
 
         public string RobotName => RobotNameText.text;
@@ -32,11 +45,14 @@ namespace SmarcGUI
         public bool IsSelected{get; private set;}
         GUIState guiState;
         MQTTClientGUI mqttClient;
+        GlobalReferencePoint globalReferencePoint;
 
         void Awake()
         {
             guiState = FindFirstObjectByType<GUIState>();
             mqttClient = FindFirstObjectByType<MQTTClientGUI>();
+            worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
+            globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
         }
 
 
@@ -49,6 +65,15 @@ namespace SmarcGUI
             InfoSourceText.text = $"({infoSource})";
 
             if(infoSource == InfoSource.SIM) HeartRT.gameObject.SetActive(false);
+
+            if(infoSource != InfoSource.SIM && worldMarkersTF != null)
+            {
+                if(robotname.ToLower().Contains("sam")) ghostTF = Instantiate(SAMGhostPrefab).transform;
+                else ghostTF = Instantiate(GenericGhostPrefab).transform;
+                ghostTF.SetParent(worldMarkersTF);
+                ghostTF.gameObject.SetActive(false);
+                ghostRB = ghostTF.GetComponent<Rigidbody>();
+            }
         }
         
 
@@ -116,7 +141,37 @@ namespace SmarcGUI
 
         public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
         {
-            var a = msg.SensorDataProvided;
+            guiState.Log($"Received sensor info from {RobotName}: {msg.SensorDataProvided}");
+        }
+
+        public void OnPositionReceived(GeoPoint pos)
+        {
+            if(globalReferencePoint == null) return;
+            if(ghostTF == null) return;
+            if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
+            var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
+            ghostTF.position = new Vector3(x, pos.altitude, z);
+            guiState.Log($"Received position from {RobotName}: {pos.latitude}, {pos.longitude}, {pos.altitude}");
+        }
+
+        public void OnHeadingReceived(float heading)
+        {
+            ghostTF.rotation = Quaternion.Euler(0, heading, 0);
+            guiState.Log($"Received heading from {RobotName}: {heading}");
+        }
+
+        public void OnCourseReceived(float course)
+        {
+            var speed = ghostRB.velocity.magnitude;
+            // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
+            ghostRB.velocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
+            guiState.Log($"Received course from {RobotName}: {course}");
+        }
+
+        public void OnSpeedReceived(float speed)
+        {
+            ghostRB.velocity = ghostRB.velocity.normalized * speed;
+            guiState.Log($"Received speed from {RobotName}: {speed}");
         }
 
         public void OnGUI()
