@@ -4,6 +4,8 @@ namespace SmarcGUI.Connections
 {
     public class MQTTPublisher : MonoBehaviour
     {
+        protected bool publish = false;
+
         public virtual void StartPublishing()
         {
             throw new System.NotImplementedException();

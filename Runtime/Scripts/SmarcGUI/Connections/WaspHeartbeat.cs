@@ -27,11 +27,9 @@ namespace SmarcGUI.Connections
             Rate = rate;
         }
 
-        
-
         public string ToJson()
         {
-            Stamp = Time.time;
+            Stamp = (DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds;
             return JsonConvert.SerializeObject(this);
         }
     }
@@ -44,7 +42,6 @@ namespace SmarcGUI.Connections
 
         MQTTClientGUI mqttClient;
         WaspHeartbeatMsg msg;
-        bool publish = false;
 
         public float HeartbeatRate = 1.0f;
         public string AgentUUID{get; private set;}
@@ -78,11 +75,10 @@ namespace SmarcGUI.Connections
 
         IEnumerator HeartbeatCoroutine()
         {
-            while (true)
+            while (publish)
             {
                 mqttClient.Publish(TopicBase + "heartbeat", msg.ToJson());
-                if(publish) yield return new WaitForSeconds(HeartbeatRate);
-                else break;
+                yield return new WaitForSeconds(HeartbeatRate);
             }
         }
     }
