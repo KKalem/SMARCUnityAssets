@@ -229,16 +229,21 @@ namespace SmarcGUI.Connections
             var agentName = topicParts[4];
             var messageType = topicParts[5];
 
+            if(!robotsGuis.ContainsKey(agentName))
+            {
+                string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}";
+                var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
+                robotsGuis.Add(agentName, robotgui);
+            }
+
             switch(messageType)
             {
                 case "heartbeat":
-                    if(!robotsGuis.ContainsKey(agentName))
-                    {
-                        string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}";
-                        var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
-                        robotsGuis.Add(agentName, robotgui);
-                    }
                     robotsGuis[agentName].OnHeartbeatReceived();
+                    break;
+                case "sensor_info":
+                    WaspSensorInfoMsg sensorInfo = new(payload);
+                    robotsGuis[agentName].OnSensorInfoReceived(sensorInfo);
                     break;
                 default:
                     guiState.Log($"Received uhandled message on MQTT topic: {topic}");

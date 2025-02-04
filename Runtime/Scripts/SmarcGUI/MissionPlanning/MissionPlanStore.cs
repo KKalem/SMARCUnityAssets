@@ -156,13 +156,12 @@ namespace SmarcGUI.MissionPlanning
 
         public void OnTSTSelected(TSTGUI tstGUI)
         {
-            SelectedTSTGUI = tstGUI;
-            if(tstGUI == null) return;
             foreach(Transform child in MissionsScrollContent)
             {
                 var tst = child.GetComponent<TSTGUI>();
                 if(tst != tstGUI) tst.Deselect();
             }
+            SelectedTSTGUI = tstGUI;
         }
             
 

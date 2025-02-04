@@ -196,6 +196,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             {
                 taskGUI.gameObject.SetActive(false);
             }
+            Deselect();
         }
 
         public void Deselect()

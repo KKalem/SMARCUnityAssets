@@ -52,7 +52,7 @@ namespace SmarcGUI.MissionPlanning.Params
 
             paramList.Add(newParam);
 
-            // Instantiate the new parameter GUI")
+            // Instantiate the new parameter GUI
             missionPlanStore ??= FindFirstObjectByType<MissionPlanStore>();
             GameObject paramPrefab = missionPlanStore.GetParamPrefab(newParam);
             GameObject paramGO = Instantiate(paramPrefab, content);

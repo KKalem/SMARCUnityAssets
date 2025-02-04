@@ -23,6 +23,11 @@ namespace SmarcGUI
         public string UUID{get; private set;}
         public bool MouseOnGUI{get; private set;}
 
+        [Tooltip("Cursor position in normalized coordinates on the screen (0-1)")]
+        public Vector2 CursorInView => new(0.5f, 0.5f);
+        float cursorX => Screen.width*CursorInView.x;
+        float cursorY => Screen.height*CursorInView.y;
+
         [Header("Colors")]
         public Color ColorMonitoring = Color.green;
         public Color ColorMissionPlanning = Color.red;
@@ -218,7 +223,8 @@ namespace SmarcGUI
 
         public Vector3 GetCameraLookAtPoint()
         {
-            Ray ray = CurrentCam.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+
+            Ray ray = CurrentCam.ScreenPointToRay(new Vector3(cursorX, cursorY, 0));
             Plane zeroPlane = new(Vector3.up, Vector3.zero);
             var dist = 10f;
             bool hitWater = false;
@@ -283,6 +289,13 @@ namespace SmarcGUI
             // UUID
             GUI.color = Color.white;
             GUI.Label(new Rect(0, Screen.height - 20, 400, 20), $"UUID: {UUID}");
+
+            // Cursor position a small plus sign
+            GUI.color = Color.red;
+            float cursorSize = 30;
+            float cursorWidth = 5;
+            GUI.DrawTexture(new Rect(cursorX - cursorSize/2, cursorY - cursorWidth/2, cursorSize, cursorWidth), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(cursorX - cursorWidth/2, cursorY - cursorSize/2, cursorWidth, cursorSize), Texture2D.whiteTexture);
         }
 
         public void OnPointerExit(PointerEventData eventData)

@@ -114,6 +114,11 @@ namespace SmarcGUI
             HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         }
 
+        public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
+        {
+            var a = msg.SensorDataProvided;
+        }
+
         public void OnGUI()
         {
             HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);

@@ -1,4 +1,4 @@
-namespace SmarcGUI
+namespace SmarcGUI.WorldSpace
 {
     public interface IPathChangeListener
     {

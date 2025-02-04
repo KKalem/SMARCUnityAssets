@@ -22,6 +22,11 @@ namespace SmarcGUI.Connections
             SensorDataProvided = sensorDataProvided;
         }
 
+        public WaspSensorInfoMsg(string payload)
+        {
+            JsonConvert.PopulateObject(payload, this);
+        }
+
         public string ToJson()
         {
             Stamp = (DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds;
