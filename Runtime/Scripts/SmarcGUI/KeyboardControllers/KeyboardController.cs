@@ -9,7 +9,9 @@ namespace SmarcGUI.KeyboardControllers
     
     public class KeyboardController : MonoBehaviour
     {
-        public List<Tuple<string, string>> KeysAndFunctions = new List<Tuple<string, string>>();
+        public List<Tuple<string, string>> KeysAndFunctions = new();
+
+        
 
     }
 }

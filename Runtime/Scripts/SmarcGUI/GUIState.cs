@@ -160,10 +160,20 @@ namespace SmarcGUI
 
             if (CurrentMode == GuiMode.KeyboardControl)
             {
-                if(SelectedRobotGUI == null) return;
-                // see if this is a robot we have in the sim, or if its a ghost from mqtt
+                // this removes focus from everything so we dont spam things into
+                // input fields :)
+                if(SelectedRobotGUI == null || SelectedRobotGUI.InfoSource != InfoSource.SIM)
+                {
+                    // Selection is invalid if not a SIM robot
+                    OnModeChanged((int)DefaultMode);
+                    return;
+                }
                 var selectedRobot = GameObject.Find(SelectedRobotGUI.RobotName);
-                if(selectedRobot == null) return;
+                if(selectedRobot == null)
+                {
+                    OnModeChanged((int)DefaultMode);
+                    return;
+                }
                 
                 KeyboardButtonsText.gameObject.SetActive(true);
                 string text = "";
@@ -206,7 +216,8 @@ namespace SmarcGUI
                 if(r != robotgui) r.Deselect();
             }
             Log($"Selected robot: {robotgui.RobotName}");
-            OnModeChanged((int)DefaultMode);
+            // refresh anything to do with mode that might depend on the robot selection
+            OnModeChanged((int)CurrentMode); 
         }
         
 

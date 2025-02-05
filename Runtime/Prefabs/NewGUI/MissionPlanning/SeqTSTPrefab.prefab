@@ -616,6 +616,7 @@ GameObject:
   - component: {fileID: 341382263736502821}
   - component: {fileID: 8060222489812293561}
   - component: {fileID: 2774775277558434756}
+  - component: {fileID: -4201193313241824858}
   m_Layer: 1
   m_Name: SeqTSTPrefab
   m_TagString: Untagged
@@ -780,16 +781,16 @@ LineRenderer:
       key0: {r: 0.018076181, g: 1, b: 0, a: 1}
       key1: {r: 1, g: 0, b: 0.14328861, a: 1}
       key2: {r: 1, g: 0, b: 0.9887943, a: 0}
-      key3: {r: 0, g: 0, b: 0, a: 0}
-      key4: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 1, b: 0, a: 0}
+      key4: {r: 0, g: 1, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
       ctime1: 32768
       ctime2: 65535
-      ctime3: 0
-      ctime4: 0
+      ctime3: 65535
+      ctime4: 65535
       ctime5: 0
       ctime6: 0
       ctime7: 0
@@ -802,7 +803,7 @@ LineRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 2
-      m_ColorSpace: -1
+      m_ColorSpace: 0
       m_NumColorKeys: 3
       m_NumAlphaKeys: 2
     numCornerVertices: 1
@@ -816,6 +817,20 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &-4201193313241824858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5083224055965222135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dcd747053fa44e44b08666dd5cd8953, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 1
+  animate: 1
 --- !u!1 &6045732081252829966
 GameObject:
   m_ObjectHideFlags: 0

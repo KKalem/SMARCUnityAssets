@@ -37,7 +37,7 @@ namespace SmarcGUI
         Rigidbody ghostRB;
         Vector3 ghostVelocity;
 
-        InfoSource infoSource;
+        public InfoSource InfoSource{get; private set;}
 
         public string RobotName => RobotNameText.text;
         string robotNamespace;
@@ -58,7 +58,7 @@ namespace SmarcGUI
 
         public void SetRobot(string robotname, InfoSource infoSource, string robotNamespace)
         {
-            this.infoSource = infoSource;
+            InfoSource = infoSource;
             this.robotNamespace = robotNamespace;
 
             RobotNameText.text = robotname;
@@ -89,7 +89,7 @@ namespace SmarcGUI
 
         public void Ping()
         {
-            switch(infoSource)
+            switch(InfoSource)
             {
                 case InfoSource.SIM:
                     guiState.Log($"Ping! -> {RobotName} in SIM");
