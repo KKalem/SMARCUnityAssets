@@ -46,7 +46,7 @@ namespace SmarcGUI.Connections
         public float HeartbeatRate = 1.0f;
         public string AgentUUID{get; private set;}
         public string AgentType => UnitType.ToString();
-        public string AgentName => transform.root.name;
+        public string AgentName => $"{Environment.UserName}__{transform.root.name}";
 
         void Awake()
         {

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +14,7 @@ namespace SmarcGUI
         void Start()
         {
             lineRendererToChange = GetComponent<LineRenderer>();
-            StartCoroutine(AnimateLoop());
+            lineRendererToChange.colorGradient = AddInitialCopy(lineRendererToChange.colorGradient);
         }
 
         //Source: https://pastebin.com/72vt01HE
@@ -50,47 +49,43 @@ namespace SmarcGUI
             return newIntersectionColor;
         }
 
-        IEnumerator AnimateLoop()
+        void OnGUI()
         {
-            lineRendererToChange.colorGradient = AddInitialCopy(lineRendererToChange.colorGradient);
-            while(animate)
+            if(!animate) return;
+            List<GradientColorKey> currentColorKeys = RemoveFirstAndLast(lineRendererToChange.colorGradient);
+            float highestTime=0;
+            float lowestTime=1;
+            int highestIndex = currentColorKeys.Count-1;
+            int lowestIndex = 0;
+            //Move all inner ones.
+            for(int i = 0 ;i<currentColorKeys.Count;i++)
             {
-                List<GradientColorKey> currentColorKeys = RemoveFirstAndLast(lineRendererToChange.colorGradient);
-                float highestTime=0;
-                float lowestTime=1;
-                int highestIndex = currentColorKeys.Count-1;
-                int lowestIndex = 0;
-                //Move all inner ones.
-                for(int i = 0 ;i<currentColorKeys.Count;i++)
+                GradientColorKey tempColorKey = currentColorKeys[i];
+                float newTime = tempColorKey.time + movementPerTick;
+                
+                if(newTime>1)
                 {
-                    GradientColorKey tempColorKey = currentColorKeys[i];
-                    float newTime = tempColorKey.time + movementPerTick;
-                    
-                    if(newTime>1)
-                    {
-                        newTime = newTime-1;
-                    }
-                    tempColorKey.time = newTime;
-                    currentColorKeys[i] = tempColorKey;
-                    if(newTime<lowestTime)
-                    {
-                        lowestTime = newTime;
-                        lowestIndex = i;
-                    }
-                    if(newTime>highestTime)
-                    {
-                        highestTime = newTime;
-                        highestIndex = i;
-                    }
+                    newTime = newTime-1;
                 }
-                Color newIntersectionColor = GetIntersectionColor(currentColorKeys,lowestIndex,highestIndex);
-                currentColorKeys.Insert(0,new GradientColorKey(newIntersectionColor,0));
-                currentColorKeys.Add(new GradientColorKey(newIntersectionColor,1));
-                Gradient tempGradient = lineRendererToChange.colorGradient;
-                tempGradient.colorKeys = currentColorKeys.ToArray();
-                lineRendererToChange.colorGradient = tempGradient;  
-                yield return null;
+                tempColorKey.time = newTime;
+                currentColorKeys[i] = tempColorKey;
+                if(newTime<lowestTime)
+                {
+                    lowestTime = newTime;
+                    lowestIndex = i;
+                }
+                if(newTime>highestTime)
+                {
+                    highestTime = newTime;
+                    highestIndex = i;
+                }
             }
+            Color newIntersectionColor = GetIntersectionColor(currentColorKeys,lowestIndex,highestIndex);
+            currentColorKeys.Insert(0,new GradientColorKey(newIntersectionColor,0));
+            currentColorKeys.Add(new GradientColorKey(newIntersectionColor,1));
+            Gradient tempGradient = lineRendererToChange.colorGradient;
+            tempGradient.colorKeys = currentColorKeys.ToArray();
+            lineRendererToChange.colorGradient = tempGradient;  
         }
     }
 }
