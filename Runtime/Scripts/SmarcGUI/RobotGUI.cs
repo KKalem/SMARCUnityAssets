@@ -29,6 +29,7 @@ namespace SmarcGUI
         public TMP_Text InfoSourceText;
         public TMP_Dropdown TasksAvailableDropdown;
         public Button AddTaskButton;
+        public RectTransform TasksPanelRT;
         public string WorldMarkerName = "WorldMarkers";
 
         [Header("Prefabs")]
@@ -55,6 +56,8 @@ namespace SmarcGUI
         MQTTClientGUI mqttClient;
         GlobalReferencePoint globalReferencePoint;
         MissionPlanStore missionPlanStore;
+        RectTransform rt;
+        float minHeight;
 
         void Awake()
         {
@@ -64,8 +67,9 @@ namespace SmarcGUI
             worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(TasksAvailableDropdown.value));
-            AddTaskButton.interactable = false;
-            TasksAvailableDropdown.interactable = false;
+            rt = GetComponent<RectTransform>();
+            minHeight = rt.sizeDelta.y;
+            TasksPanelRT.gameObject.SetActive(false);
         }
 
         void UpdateTasksDropdown()
@@ -97,8 +101,8 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"sensor/heading");
                 mqttClient.SubToTopic(robotNamespace+"sensor/course");
                 mqttClient.SubToTopic(robotNamespace+"sensor/speed");
-                AddTaskButton.interactable = true;
-                TasksAvailableDropdown.interactable = true;
+                TasksPanelRT.gameObject.SetActive(true);
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + TasksPanelRT.sizeDelta.y);
             }
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
@@ -220,6 +224,8 @@ namespace SmarcGUI
         public void OnGUI()
         {
             HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);
+            AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
         }
+
     }
 }
