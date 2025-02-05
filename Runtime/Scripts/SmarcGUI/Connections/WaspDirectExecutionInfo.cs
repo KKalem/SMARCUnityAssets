@@ -37,6 +37,11 @@ namespace SmarcGUI.Connections
             return JsonConvert.SerializeObject(this);
         }
 
+        public WaspDirectExecutionInfoMsg(string payload)
+        {
+            JsonConvert.PopulateObject(payload, this);
+        }
+
         public WaspDirectExecutionInfoMsg(string name, float rate, List<TaskSpec> tasksAvailable)
         {
             Name = name;
@@ -44,6 +49,7 @@ namespace SmarcGUI.Connections
             TasksAvailable = tasksAvailable;
             TasksExecuting = new();
         }
+
 
     }
 

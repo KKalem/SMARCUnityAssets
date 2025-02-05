@@ -908,6 +908,7 @@ GameObject:
   - component: {fileID: 4063607294989203507}
   - component: {fileID: 7834276837797943314}
   - component: {fileID: 3157265718287937747}
+  - component: {fileID: 665109666656650325}
   m_Layer: 0
   m_Name: sam_auv_v1
   m_TagString: robot
@@ -1025,6 +1026,7 @@ MonoBehaviour:
   UnitType: 3
   Context: smarc
   HeartbeatRate: 1
+  HasPublihed: 0
 --- !u!114 &7834276837797943314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1053,6 +1055,19 @@ MonoBehaviour:
   robotRB: {fileID: 0}
   robotAB: {fileID: 9003205820621429434}
   Rate: 5
+--- !u!114 &665109666656650325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044450836926195353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d73c420e4eaeed4ba91b5cc24ac8e38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Rate: 0.5
 --- !u!1 &1163357502922114015
 GameObject:
   m_ObjectHideFlags: 0

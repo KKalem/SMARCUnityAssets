@@ -7,6 +7,7 @@ using VehicleComponents.Sensors;
 using UnityEngine.EventSystems;
 using SmarcGUI.KeyboardControllers;
 using SmarcGUI.Water;
+using SmarcGUI.MissionPlanning;
 
 namespace SmarcGUI
 {
@@ -61,6 +62,7 @@ namespace SmarcGUI
         public string SelectedRobotName => SelectedRobotGUI?.RobotName;
         KeyboardController[] keyboardControllers;
         WaterRenderToggle[] waterRenderToggles;
+        MissionPlanStore missionPlanStore;
 
 
         void InitModeDropdown()
@@ -215,9 +217,8 @@ namespace SmarcGUI
             {
                 if(r != robotgui) r.Deselect();
             }
-            Log($"Selected robot: {robotgui.RobotName}");
             // refresh anything to do with mode that might depend on the robot selection
-            OnModeChanged((int)CurrentMode); 
+            OnModeChanged((int)CurrentMode);
         }
         
 
@@ -266,6 +267,7 @@ namespace SmarcGUI
             InitCameraDropdown();
             InitRobotGuis();
             waterRenderToggles = FindObjectsByType<WaterRenderToggle>(FindObjectsSortMode.None);
+            missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
         }
 
         void Update()

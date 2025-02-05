@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SmarcGUI.Connections;
 using SmarcGUI.WorldSpace;
 using TMPro;
 using UnityEngine;
@@ -17,11 +18,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public RectTransform SelectedHighlightRT;
         public GameObject ContextMenuPrefab;
         LineRenderer PathLineRenderer;
-
-
-        [Header("Temp")]
-        // TODO read these options from the robot
-        public List<string> AvailableTasks = new() { "move-to", "move-path", "custom" };
         
 
         bool isSelected = false;
@@ -45,7 +41,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
 
             tst.CommonParams["execution-unit"] = guiState.SelectedRobotName;
             UpdateFieldTexts();
-            UpdateTasksDropdown();
             UpdateTasksGUI();
 
             DescriptionField.onValueChanged.AddListener((string desc) => tst.Description = desc);
@@ -58,16 +53,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
             ExecutionUnitField.text = (string)tst.CommonParams["execution-unit"];
         }
 
-        void UpdateTasksDropdown()
-        {
-            missionPlanStore.AvailableTasksDropdown.options.Clear();
-            if(!isSelected) return;
-            foreach (var taskType in AvailableTasks)
-            {
-                missionPlanStore.AvailableTasksDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskType });
-            }
-            missionPlanStore.AvailableTasksDropdown.RefreshShownValue();
-        }
 
         public void OnPointerExit(PointerEventData eventData)
         {
@@ -99,27 +84,22 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             SelectedHighlightRT?.gameObject.SetActive(isSelected);
             missionPlanStore.OnTSTSelected(isSelected? this : null);
-            UpdateTasksDropdown();
+            // UpdateTasksDropdown();
             UpdateTasksGUI();
             PathLineRenderer.enabled = isSelected;
         }
 
-        public void OnTaskAdded(int index)
+        public void OnTaskAdded(TaskSpec taskSpec)
         {
-            var taskType = AvailableTasks[index];
-            Task newTask = null;
-            switch(taskType)
+            var taskType = taskSpec.Name;
+            // TODO this is brittle... and annoying to remember when time comes to add more tasks
+            Task newTask = taskType switch
             {
-                case "move-to":
-                    newTask = new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint());
-                    break;
-                case "move-path":
-                    newTask = new MovePath("Move along a path", MoveSpeed.STANDARD, new List<GeoPoint>());
-                    break;
-                case "custom":
-                    newTask = new CustomTask("Custom task with a JSON attached", "{\"totally-valid-json\": 42}");
-                    break;
-            }
+                "move-to" => new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint()),
+                "move-path" => new MovePath("Move along a path", MoveSpeed.STANDARD, new List<GeoPoint>()),
+                "custom" => new CustomTask("Custom task with a JSON attached", "{\"totally-valid-json\": 42}"),
+                _ => new CustomTask($"Un-implemented task:{taskType}", "{...}"),
+            };
             tst.Children.Add(newTask);
             CreateTaskGUI(newTask);
             OnPathChanged();
@@ -173,10 +153,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             // maybe the first time creating this gui
             if(taskGUIs.Count == 0)
             {
-                foreach(var task in tst.Children)
-                {
-                    CreateTaskGUI(task);
-                }
+                foreach(var task in tst.Children) CreateTaskGUI(task);
             }
 
             foreach(Transform child in missionPlanStore.TasksScrollContent)
@@ -190,6 +167,8 @@ namespace SmarcGUI.MissionPlanning.Tasks
             }
             OnPathChanged();
         }
+
+
         public void OnDisable()
         {
             foreach (var taskGUI in taskGUIs)
@@ -249,5 +228,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             DrawWorldPath();
         }
+
     }
 }

@@ -258,6 +258,10 @@ namespace SmarcGUI.Connections
                     WaspSensorInfoMsg sensorInfo = new(payload);
                     robotsGuis[agentName].OnSensorInfoReceived(sensorInfo);
                     break;
+                case "direct_execution_info":
+                    WaspDirectExecutionInfoMsg directExecutionInfo = new(payload);
+                    robotsGuis[agentName].OnDirectExecutionInfoReceived(directExecutionInfo);
+                    break;
                 case "sensor":
                     // there could be _many_ different kinds of sensors,
                     // some of these, we will have specific ways to visualize, like the basics

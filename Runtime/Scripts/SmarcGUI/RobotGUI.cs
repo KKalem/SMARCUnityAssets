@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
@@ -5,6 +7,7 @@ using SmarcGUI.MissionPlanning.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SmarcGUI
 {
@@ -24,6 +27,8 @@ namespace SmarcGUI
         public RectTransform HeartRT;
         public TMP_Text RobotNameText;
         public TMP_Text InfoSourceText;
+        public TMP_Dropdown TasksAvailableDropdown;
+        public Button AddTaskButton;
         public string WorldMarkerName = "WorldMarkers";
 
         [Header("Prefabs")]
@@ -38,6 +43,9 @@ namespace SmarcGUI
 
 
         public InfoSource InfoSource{get; private set;}
+        public WaspDirectExecutionInfoMsg DirectExecutionInfo{get; private set;}
+        public List<TaskSpec> TasksAvailable => DirectExecutionInfo.TasksAvailable;
+        public List<Dictionary<string, string>> TasksExecuting => DirectExecutionInfo.TasksExecuting;
 
         public string RobotName => RobotNameText.text;
         string robotNamespace;
@@ -46,13 +54,28 @@ namespace SmarcGUI
         GUIState guiState;
         MQTTClientGUI mqttClient;
         GlobalReferencePoint globalReferencePoint;
+        MissionPlanStore missionPlanStore;
 
         void Awake()
         {
             guiState = FindFirstObjectByType<GUIState>();
             mqttClient = FindFirstObjectByType<MQTTClientGUI>();
+            missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
             worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
+            AddTaskButton.onClick.AddListener(() => OnTaskAdded(TasksAvailableDropdown.value));
+            AddTaskButton.interactable = false;
+            TasksAvailableDropdown.interactable = false;
+        }
+
+        void UpdateTasksDropdown()
+        {
+            TasksAvailableDropdown.options.Clear();
+            foreach (TaskSpec taskSpec in TasksAvailable)
+            {
+                TasksAvailableDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskSpec.Name });
+            }
+            TasksAvailableDropdown.RefreshShownValue();
         }
 
 
@@ -74,6 +97,8 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"sensor/heading");
                 mqttClient.SubToTopic(robotNamespace+"sensor/course");
                 mqttClient.SubToTopic(robotNamespace+"sensor/speed");
+                AddTaskButton.interactable = true;
+                TasksAvailableDropdown.interactable = true;
             }
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
@@ -134,6 +159,12 @@ namespace SmarcGUI
             OnSelectedChange();
         }
 
+        void OnTaskAdded(int index)
+        {
+            var taskSpec = TasksAvailable[index];
+            missionPlanStore.SelectedTSTGUI?.OnTaskAdded(taskSpec);
+        }
+
         public void OnPointerExit(PointerEventData eventData)
         {
             HighlightRT?.gameObject.SetActive(false);
@@ -152,6 +183,12 @@ namespace SmarcGUI
         public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
         {
             return;
+        }
+
+        public void OnDirectExecutionInfoReceived(WaspDirectExecutionInfoMsg msg)
+        {
+            DirectExecutionInfo = msg;
+            UpdateTasksDropdown();
         }
 
         public void OnPositionReceived(GeoPoint pos)

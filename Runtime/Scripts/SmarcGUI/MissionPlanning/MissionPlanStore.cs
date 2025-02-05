@@ -29,8 +29,6 @@ namespace SmarcGUI.MissionPlanning
 
         [Header("Tasks GUI Elements")]
         public Transform TasksScrollContent;
-        public TMP_Dropdown AvailableTasksDropdown;
-        public Button AddTaskButton;
 
 
         [Header("Prefabs")]
@@ -98,14 +96,11 @@ namespace SmarcGUI.MissionPlanning
         }
 
 
-        
-
         void InitGUIElements()
         {
             NewMissionPlanButton.onClick.AddListener(OnNewTST);
             LoadMissionsButton.onClick.AddListener(LoadMissionPlans);
             SaveMissionsButton.onClick.AddListener(SaveMissionPlans);
-            AddTaskButton.onClick.AddListener(() => OnTaskAdded(AvailableTasksDropdown.value));
         }
 
         public void OnNewTST()
@@ -163,13 +158,6 @@ namespace SmarcGUI.MissionPlanning
             }
             SelectedTSTGUI = tstGUI;
         }
-            
-
-
-        void OnTaskAdded(int index)
-        {
-            SelectedTSTGUI?.OnTaskAdded(index);
-        }
 
         
 
@@ -193,7 +181,6 @@ namespace SmarcGUI.MissionPlanning
             MissionStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), Path.Combine("SMaRCUnity", "MissionPlans"));
             Directory.CreateDirectory(MissionStoragePath);
             LoadMissionPlans();
-
             InitGUIElements();
         }
 
