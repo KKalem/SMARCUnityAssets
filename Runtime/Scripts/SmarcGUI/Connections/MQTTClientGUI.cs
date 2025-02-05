@@ -243,7 +243,7 @@ namespace SmarcGUI.Connections
 
             if(!robotsGuis.ContainsKey(agentName))
             {
-                string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}";
+                string robotNamespace = $"{context}/unit/{domain}/{realism}/{agentName}/";
                 var robotgui = guiState.CreateNewRobotGUI(agentName, InfoSource.MQTT, robotNamespace);
                 robotsGuis.Add(agentName, robotgui);
                 guiState.Log($"Created new RobotGUI for {agentName}");

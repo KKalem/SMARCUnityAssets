@@ -40,7 +40,6 @@ namespace SmarcGUI.Connections
         WaspHeartbeat waspHeartbeat;
         public float SensorInfoRate = 1.0f;
 
-        MQTTClientGUI mqttClient;
         WaspSensorInfoMsg msg;
 
         void Awake()

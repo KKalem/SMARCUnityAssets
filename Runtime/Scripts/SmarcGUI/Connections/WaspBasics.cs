@@ -16,7 +16,6 @@ namespace SmarcGUI.Connections
         MixedBody body;
 
         public float Rate = 5.0f;
-        MQTTClientGUI mqttClient;
         WaspHeartbeat waspHeartbeat;
         GlobalReferencePoint globalReferencePoint;
 

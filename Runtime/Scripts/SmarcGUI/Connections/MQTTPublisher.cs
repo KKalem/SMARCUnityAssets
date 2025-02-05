@@ -5,6 +5,7 @@ namespace SmarcGUI.Connections
     public class MQTTPublisher : MonoBehaviour
     {
         protected bool publish = false;
+        protected MQTTClientGUI mqttClient;
 
         public virtual void StartPublishing()
         {

@@ -35,7 +35,7 @@ namespace SmarcGUI
         Transform worldMarkersTF;
         Transform ghostTF;
         Rigidbody ghostRB;
-        Vector3 ghostVelocity;
+
 
         public InfoSource InfoSource{get; private set;}
 
@@ -68,11 +68,12 @@ namespace SmarcGUI
 
             if(infoSource == InfoSource.MQTT) 
             {
-                mqttClient.SubToTopic($"{robotNamespace}/sensor_info");
-                mqttClient.SubToTopic($"{robotNamespace}/sensor/position");
-                mqttClient.SubToTopic($"{robotNamespace}/sensor/heading");
-                mqttClient.SubToTopic($"{robotNamespace}/sensor/course");
-                mqttClient.SubToTopic($"{robotNamespace}/sensor/speed");
+                mqttClient.SubToTopic(robotNamespace+"sensor_info");
+                mqttClient.SubToTopic(robotNamespace+"direct_execution_info");
+                mqttClient.SubToTopic(robotNamespace+"sensor/position");
+                mqttClient.SubToTopic(robotNamespace+"sensor/heading");
+                mqttClient.SubToTopic(robotNamespace+"sensor/course");
+                mqttClient.SubToTopic(robotNamespace+"sensor/speed");
             }
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
@@ -96,7 +97,7 @@ namespace SmarcGUI
                     break;
                 case InfoSource.MQTT:
                     var pingCommand = new PingCommand();
-                    mqttClient.Publish($"{robotNamespace}/exec/command", pingCommand.ToJson());
+                    mqttClient.Publish(robotNamespace+"exec/command", pingCommand.ToJson());
                     break;
                 case InfoSource.ROS:
                     guiState.Log($"Ping! -> {RobotName} in ROS");

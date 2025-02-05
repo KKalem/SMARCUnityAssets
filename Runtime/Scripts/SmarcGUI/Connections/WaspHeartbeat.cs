@@ -38,15 +38,16 @@ namespace SmarcGUI.Connections
     {
         public WaspUnitType UnitType;
         public string Context = "smarc";
+        public string AgentType => UnitType.ToString();
+        public string AgentName => $"{Environment.UserName}__{transform.root.name}";
         public string TopicBase => $"{Context}/unit/{AgentType}/simulation/{AgentName}/";
 
-        MQTTClientGUI mqttClient;
         WaspHeartbeatMsg msg;
 
         public float HeartbeatRate = 1.0f;
         public string AgentUUID{get; private set;}
-        public string AgentType => UnitType.ToString();
-        public string AgentName => $"{Environment.UserName}__{transform.root.name}";
+
+        public bool HasPublihed = false;
 
         void Awake()
         {
@@ -61,11 +62,22 @@ namespace SmarcGUI.Connections
                 rate: HeartbeatRate);            
         }
 
+        void Start()
+        {
+            Context = mqttClient.Context;
+        }
+
+        void OnEnable()
+        {
+            Context = mqttClient.Context;
+        }
+
         public override void StartPublishing()
         {
             Context = mqttClient.Context;
             publish = true;
             StartCoroutine(HeartbeatCoroutine());
+            HasPublihed = true;
         }
 
         public override void StopPublishing()
