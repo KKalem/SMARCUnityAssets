@@ -211,14 +211,14 @@ namespace SmarcGUI
 
         public void OnCourseReceived(float course)
         {
-            var speed = ghostRB.velocity.magnitude;
+            var speed = ghostRB.linearVelocity.magnitude;
             // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
-            ghostRB.velocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
+            ghostRB.linearVelocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
         }
 
         public void OnSpeedReceived(float speed)
         {
-            ghostRB.velocity = ghostRB.velocity.normalized * speed;
+            ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
         }
 
         public void OnGUI()
