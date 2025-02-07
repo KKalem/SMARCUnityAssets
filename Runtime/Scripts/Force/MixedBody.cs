@@ -36,15 +36,6 @@ namespace Force
             get {return ab ? ab.transform : rb.transform; }
         }
 
-        public Vector3 velocity
-        {
-            get {return ab ? ab.velocity : rb.velocity; }
-            set {
-                if(ab != null) ab.velocity = value;
-                else rb.velocity = value;
-            }
-        }
-
         public bool automaticCenterOfMass
         {
             get {return ab ? ab.automaticCenterOfMass : rb.automaticCenterOfMass; }
