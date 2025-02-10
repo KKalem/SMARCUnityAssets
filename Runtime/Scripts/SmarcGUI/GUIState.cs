@@ -210,13 +210,14 @@ namespace SmarcGUI
 
         public void OnRobotSelectionChanged(RobotGUI robotgui)
         {
-            if(robotgui.IsSelected) SelectedRobotGUI = robotgui;
+            SelectedRobotGUI = robotgui.IsSelected? robotgui : null;
             foreach(var r in robotGUIs)
             {
                 if(r != robotgui) r.Deselect();
             }
             // refresh anything to do with mode that might depend on the robot selection
-            OnModeChanged((int)CurrentMode);
+            if(SelectedRobotGUI == null) OnModeChanged((int)DefaultMode);
+            else OnModeChanged((int)CurrentMode);
         }
         
 

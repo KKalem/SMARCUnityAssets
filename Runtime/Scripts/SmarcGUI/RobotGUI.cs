@@ -30,6 +30,8 @@ namespace SmarcGUI
         public TMP_Dropdown TasksAvailableDropdown;
         public Button AddTaskButton;
         public RectTransform TasksPanelRT;
+        public Button KBControlButton;
+        public TMP_Text KBControlText;
         public string WorldMarkerName = "WorldMarkers";
 
         [Header("Prefabs")]
@@ -67,9 +69,11 @@ namespace SmarcGUI
             worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(TasksAvailableDropdown.value));
+            KBControlButton.onClick.AddListener(OnKBControl);
             rt = GetComponent<RectTransform>();
             minHeight = rt.sizeDelta.y;
             TasksPanelRT.gameObject.SetActive(false);
+            KBControlButton.gameObject.SetActive(false);
         }
 
         void UpdateTasksDropdown()
@@ -91,7 +95,11 @@ namespace SmarcGUI
             RobotNameText.text = robotname;
             InfoSourceText.text = $"({infoSource})";
 
-            if(infoSource == InfoSource.SIM) HeartRT.gameObject.SetActive(false);
+            if(infoSource == InfoSource.SIM)
+            {
+                HeartRT.gameObject.SetActive(false);
+                KBControlButton.gameObject.SetActive(true);
+            }
 
             if(infoSource == InfoSource.MQTT) 
             {
@@ -103,6 +111,7 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"sensor/speed");
                 TasksPanelRT.gameObject.SetActive(true);
                 rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + TasksPanelRT.sizeDelta.y);
+                HeartRT.gameObject.SetActive(true);
             }
 
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
@@ -132,6 +141,13 @@ namespace SmarcGUI
                     guiState.Log($"Ping! -> {RobotName} in ROS");
                     break;
             }
+        }
+
+        void OnKBControl()
+        {
+            IsSelected = true;
+            OnSelectedChange(true);
+            guiState.OnModeChanged((int)GuiMode.KeyboardControl);
         }
 
 
@@ -225,6 +241,7 @@ namespace SmarcGUI
         {
             HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);
             AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
+            KBControlText.text = (IsSelected && guiState.CurrentMode == GuiMode.KeyboardControl)? "Controlling" : "KB Control";
         }
 
     }
