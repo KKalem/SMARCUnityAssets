@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
@@ -29,15 +31,18 @@ namespace SmarcGUI
         public TMP_Text InfoSourceText;
         public TMP_Dropdown TasksAvailableDropdown;
         public Button AddTaskButton;
-        public RectTransform TasksPanelRT;
+        public RectTransform AvailTasksPanelRT;
         public Button KBControlButton;
         public TMP_Text KBControlText;
         public string WorldMarkerName = "WorldMarkers";
+        public RectTransform ExecutingTasksScrollContent;
+        public RectTransform ExecTasksPanelRT;
 
         [Header("Prefabs")]
         public GameObject ContextMenuPrefab;
         public GameObject GenericGhostPrefab;
         public GameObject SAMGhostPrefab;
+        public GameObject ExecutingTaskPrefab;
 
 
         Transform worldMarkersTF;
@@ -46,9 +51,10 @@ namespace SmarcGUI
 
 
         public InfoSource InfoSource{get; private set;}
-        public WaspDirectExecutionInfoMsg DirectExecutionInfo{get; private set;}
-        public List<TaskSpec> TasksAvailable => DirectExecutionInfo.TasksAvailable;
-        public List<Dictionary<string, string>> TasksExecuting => DirectExecutionInfo.TasksExecuting;
+        WaspDirectExecutionInfoMsg directExecutionInfo;
+        List<TaskSpec> tasksAvailable => directExecutionInfo.TasksAvailable;
+
+        HashSet<string> executingTaskUuids = new();
 
         public string RobotName => RobotNameText.text;
         string robotNamespace;
@@ -72,18 +78,9 @@ namespace SmarcGUI
             KBControlButton.onClick.AddListener(OnKBControl);
             rt = GetComponent<RectTransform>();
             minHeight = rt.sizeDelta.y;
-            TasksPanelRT.gameObject.SetActive(false);
+            AvailTasksPanelRT.gameObject.SetActive(false);
+            ExecTasksPanelRT.gameObject.SetActive(false);
             KBControlButton.gameObject.SetActive(false);
-        }
-
-        void UpdateTasksDropdown()
-        {
-            TasksAvailableDropdown.options.Clear();
-            foreach (TaskSpec taskSpec in TasksAvailable)
-            {
-                TasksAvailableDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskSpec.Name });
-            }
-            TasksAvailableDropdown.RefreshShownValue();
         }
 
 
@@ -109,8 +106,9 @@ namespace SmarcGUI
                 mqttClient.SubToTopic(robotNamespace+"sensor/heading");
                 mqttClient.SubToTopic(robotNamespace+"sensor/course");
                 mqttClient.SubToTopic(robotNamespace+"sensor/speed");
-                TasksPanelRT.gameObject.SetActive(true);
-                rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + TasksPanelRT.sizeDelta.y);
+                AvailTasksPanelRT.gameObject.SetActive(true);
+                ExecTasksPanelRT.gameObject.SetActive(true);
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight + AvailTasksPanelRT.sizeDelta.y + ExecTasksPanelRT.sizeDelta.y);
                 HeartRT.gameObject.SetActive(true);
             }
 
@@ -128,13 +126,13 @@ namespace SmarcGUI
 
         public void Ping()
         {
+            var pingCommand = new PingCommand();
             switch(InfoSource)
             {
                 case InfoSource.SIM:
                     guiState.Log($"Ping! -> {RobotName} in SIM");
                     break;
                 case InfoSource.MQTT:
-                    var pingCommand = new PingCommand();
                     mqttClient.Publish(robotNamespace+"exec/command", pingCommand.ToJson());
                     break;
                 case InfoSource.ROS:
@@ -142,6 +140,25 @@ namespace SmarcGUI
                     break;
             }
         }
+
+        public void SendSignalCommand(string taskUuid, string signal)
+        {
+            var signalCommand = new SigntalTaskCommand(taskUuid, signal);
+            switch(InfoSource)
+            {
+                case InfoSource.SIM:
+                    guiState.Log($"Sending signal {signal} to {RobotName} in SIM");
+                    break;
+                case InfoSource.MQTT:
+                    mqttClient.Publish(robotNamespace+"exec/command", signalCommand.ToJson());
+                    break;
+                case InfoSource.ROS:
+                    guiState.Log($"Sending signal {signal} to {RobotName} in ROS");
+                    break;
+            }
+            
+        }
+        
 
         void OnKBControl()
         {
@@ -181,7 +198,7 @@ namespace SmarcGUI
 
         void OnTaskAdded(int index)
         {
-            var taskSpec = TasksAvailable[index];
+            var taskSpec = tasksAvailable[index];
             missionPlanStore.SelectedTSTGUI?.OnTaskAdded(taskSpec);
         }
 
@@ -205,11 +222,61 @@ namespace SmarcGUI
             return;
         }
 
+
+
+        void UpdateTasksDropdown(WaspDirectExecutionInfoMsg msg)
+        {
+            var tasksAvailable = msg.TasksAvailable;
+            TasksAvailableDropdown.options.Clear();
+            foreach (TaskSpec taskSpec in tasksAvailable)
+            {
+                TasksAvailableDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskSpec.Name });
+            }
+            TasksAvailableDropdown.RefreshShownValue();
+        }
+
+        void UpdateExecutingTasks(WaspDirectExecutionInfoMsg msg)
+        {
+            var newTasks = msg.TasksExecuting;
+
+            HashSet<string> newUuids = new();
+            foreach (var task in newTasks)
+            {
+                var taskUuid = task["uuid"];
+                newUuids.Add(taskUuid);
+            }
+
+            // old tasks that arent executing anymore
+            var outdatedUuids = executingTaskUuids.Except(newUuids);
+            // new tasks that are now executing, that werent before
+            var newUuidsSet = newUuids.Except(executingTaskUuids);
+
+            foreach (var taskUuid in outdatedUuids)
+            {
+                var index = executingTaskUuids.ToList().IndexOf(taskUuid);
+                Destroy(ExecutingTasksScrollContent.GetChild(index).gameObject);
+            }
+
+            foreach (var taskUuid in newUuidsSet)
+            {
+                var task = newTasks.Find(t => t["uuid"] == taskUuid);
+                var taskName = task["name"];
+                var execTaskGO = Instantiate(ExecutingTaskPrefab, ExecutingTasksScrollContent);
+                var execTaskGUI = execTaskGO.GetComponent<ExecutingTaskGUI>();
+                var taskSpec = msg.TasksAvailable.Find(t => t.Name == taskName);
+                execTaskGUI.SetExecTask(this, taskName, taskUuid, new List<string>(taskSpec.Signals));
+            }
+
+            executingTaskUuids = newUuids;
+        }
+
         public void OnDirectExecutionInfoReceived(WaspDirectExecutionInfoMsg msg)
         {
-            DirectExecutionInfo = msg;
-            UpdateTasksDropdown();
+            UpdateTasksDropdown(msg);
+            UpdateExecutingTasks(msg);
+            directExecutionInfo = msg;
         }
+
 
         public void OnPositionReceived(GeoPoint pos)
         {

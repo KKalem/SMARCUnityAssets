@@ -50,6 +50,14 @@ namespace SmarcGUI.Connections
             TasksExecuting = new();
         }
 
+        public WaspDirectExecutionInfoMsg(string name, float rate, List<TaskSpec> tasksAvailable, List<Dictionary<string, string>> tasksExecuting)
+        {
+            Name = name;
+            Rate = rate;
+            TasksAvailable = tasksAvailable;
+            TasksExecuting = tasksExecuting;
+        }
+
 
     }
 
@@ -69,10 +77,15 @@ namespace SmarcGUI.Connections
                 new("move-path", new[]{"$abort", "$enough", "$pause", "$continue"}),
                 new("do-a-flip", new[]{"$abort", "$enough"})
             };
+            var tasksExecuting = new List<Dictionary<string, string>>
+            {
+                new(){ {"name", "move-to"}, {"uuid", Guid.NewGuid().ToString()} }
+            };
             msg = new(
                 name: waspHeartbeat.AgentName,
                 rate: Rate,
-                tasksAvailable: tasksAvailable
+                tasksAvailable: tasksAvailable,
+                tasksExecuting: tasksExecuting
             );
         }
 
