@@ -30,9 +30,9 @@ namespace SmarcGUI
         float cursorY => Screen.height*CursorInView.y;
 
         [Header("Colors")]
-        public Color ColorMonitoring = Color.green;
+        public Color ColorMonitoring = Color.blue;
         public Color ColorMissionPlanning = Color.red;
-        public Color ColorRemoteControlling = Color.blue;
+        public Color ColorRemoteControlling = Color.green;
 
 
         [Header("GUI Elements")]
