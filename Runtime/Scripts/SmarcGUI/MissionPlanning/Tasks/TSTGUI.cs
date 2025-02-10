@@ -17,7 +17,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
         public GameObject ContextMenuPrefab;
-        LineRenderer PathLineRenderer;
+        public LineRenderer PathLineRenderer;
         
 
         bool isSelected = false;
@@ -31,7 +31,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             guiState = FindFirstObjectByType<GUIState>();
             missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
-            PathLineRenderer = GetComponent<LineRenderer>();
         }
 
 

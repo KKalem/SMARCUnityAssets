@@ -11,7 +11,7 @@ namespace SmarcGUI.WorldSpace
 
         public GameObject draggingObject;
         GlobalReferencePoint globalReferencePoint;
-        public LineRenderer Circle, SurfacePointer;
+        public LineRenderer Circle, SurfacePointer, CrossOne, CrossTwo;
         public float circleRadius = 1;
         public int numPtsOnCircle = 50;
         public float lineThickness = 0.1f;
@@ -21,8 +21,7 @@ namespace SmarcGUI.WorldSpace
         public Color InAirColor = Color.cyan;
 
 
-        Vector3[] circlePoints, pointerPoints;
-        int numPtsOnCross = 4; 
+        Vector3[] circlePoints, pointerPoints, crossOnePoints, crossTwoPoints;
 
 
         GUIState guiState;
@@ -38,7 +37,9 @@ namespace SmarcGUI.WorldSpace
             }
             guiState = FindFirstObjectByType<GUIState>();
             circlePoints = new Vector3[numPtsOnCircle];
-            pointerPoints = new Vector3[2 + numPtsOnCross*2];
+            pointerPoints = new Vector3[2];
+            crossOnePoints = new Vector3[2];
+            crossTwoPoints = new Vector3[2];
         }
 
         public void SetGeoPointParamGUI(GeoPointParamGUI gppgui)
@@ -64,10 +65,17 @@ namespace SmarcGUI.WorldSpace
             else lr.startColor = lr.endColor = SurfaceColor;
         }
 
-        void SetLRSizes(LineRenderer lr)
+        void SetCircleSizes(LineRenderer lr)
         {
             lr.startWidth = lineThickness;
             lr.endWidth = lineThickness;
+            lr.material = lineMaterial;
+        }
+
+        void SetLineSizes(LineRenderer lr)
+        {
+            lr.startWidth = lineThickness/3;
+            lr.endWidth = lineThickness/3;
             lr.material = lineMaterial;
         }
 
@@ -86,22 +94,28 @@ namespace SmarcGUI.WorldSpace
             Circle.positionCount = circlePoints.Length;
             Circle.SetPositions(circlePoints);
             SetLRColor(Circle);
-            SetLRSizes(Circle);
+            SetCircleSizes(Circle);
 
             pointerPoints[0] = new Vector3(0,0,0);
             pointerPoints[1] = new Vector3(0,0,0);
-            for(int i=0; i<numPtsOnCross; i++)
-            {
-                float rad = i * Mathf.PI / 2;
-                var x = circleRadius * Mathf.Cos(rad);
-                var z = circleRadius * Mathf.Sin(rad);
-                pointerPoints[2 + i * 2] = new Vector3(0, 0, 0);
-                pointerPoints[2 + i * 2 + 1] = new Vector3(x, 0, z);
-            }
             SurfacePointer.positionCount = pointerPoints.Length;
             SurfacePointer.SetPositions(pointerPoints);
             SetLRColor(SurfacePointer);
-            SetLRSizes(SurfacePointer);
+            SetLineSizes(SurfacePointer);
+
+            crossOnePoints[0] = circlePoints[0];
+            crossOnePoints[1] = circlePoints[numPtsOnCircle/2];
+            CrossOne.positionCount = crossOnePoints.Length;
+            CrossOne.SetPositions(crossOnePoints);
+            SetLRColor(CrossOne);
+            SetLineSizes(CrossOne);
+
+            crossTwoPoints[0] = circlePoints[numPtsOnCircle/4];
+            crossTwoPoints[1] = circlePoints[numPtsOnCircle*3/4];
+            CrossTwo.positionCount = crossTwoPoints.Length;
+            CrossTwo.SetPositions(crossTwoPoints);
+            SetLRColor(CrossTwo);
+            SetLineSizes(CrossTwo);
         }
 
         public void UpdateLines()
@@ -112,14 +126,17 @@ namespace SmarcGUI.WorldSpace
             }
             SurfacePointer.SetPosition(0, new Vector3(transform.position.x, 0, transform.position.z));
             SurfacePointer.SetPosition(1, transform.position);
-            for(int i=0; i<numPtsOnCross; i++)
-            {
-                SurfacePointer.SetPosition(2 + i * 2, transform.position);
-                SurfacePointer.SetPosition(2 + i * 2 + 1, pointerPoints[2 + i * 2 + 1] + transform.position);
-            }
+
+            CrossOne.SetPosition(0, Circle.GetPosition(0));
+            CrossOne.SetPosition(1, Circle.GetPosition(numPtsOnCircle/2));
+
+            CrossTwo.SetPosition(0, Circle.GetPosition(numPtsOnCircle/4));
+            CrossTwo.SetPosition(1, Circle.GetPosition(numPtsOnCircle*3/4));
 
             SetLRColor(Circle);
             SetLRColor(SurfacePointer);
+            SetLRColor(CrossOne);
+            SetLRColor(CrossTwo);
         }
 
         public void OnWorldDrag(Vector3 motion)
