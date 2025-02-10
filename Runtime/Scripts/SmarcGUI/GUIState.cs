@@ -151,12 +151,10 @@ namespace SmarcGUI
 
             if(CurrentMode == GuiMode.MissionPlanning)
             {
-                Log("Mission Planning mode selected. Disabling water rendering.");
                 foreach(var w in waterRenderToggles) w.ToggleWaterRender(false);
             }
             else
             {
-                Log("Enabling water rendering.");
                 foreach(var w in waterRenderToggles) w.ToggleWaterRender(true);
             }
 

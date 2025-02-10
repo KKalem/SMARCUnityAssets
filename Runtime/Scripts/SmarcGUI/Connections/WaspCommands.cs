@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using SmarcGUI.MissionPlanning.Tasks;
 
 
-namespace SmarcGUI.MissionPlanning
+namespace SmarcGUI.Connections
 {
     //https://api-docs.waraps.org/#/agent_communication/tasks/commands
 
@@ -29,7 +29,7 @@ namespace SmarcGUI.MissionPlanning
         }
     }
 
-    public static class WaraSignals
+    public static class WaspSignals
     {
         public static string ENOUGH = "$enough";
         public static string PAUSE = "$pause";
