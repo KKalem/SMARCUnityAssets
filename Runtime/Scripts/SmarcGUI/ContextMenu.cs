@@ -6,13 +6,13 @@ namespace SmarcGUI
 {
     public class ContextMenu : MonoBehaviour, IPointerExitHandler
     {
-        Canvas canvas;
         RectTransform rt;
+        Canvas canvas;
 
         void Awake()
         {
             rt = GetComponent<RectTransform>();
-            canvas = FindFirstObjectByType<Canvas>();
+            canvas = GameObject.Find("Canvas-Over").GetComponent<Canvas>();
         }
 
         protected void SetOnTop(Vector2 position)
