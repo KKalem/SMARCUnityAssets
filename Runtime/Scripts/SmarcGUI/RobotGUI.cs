@@ -237,6 +237,7 @@ namespace SmarcGUI
 
         void UpdateExecutingTasks(WaspDirectExecutionInfoMsg msg)
         {
+            // bunch of loops here, but usually the item count is < 3 for all of them
             var newTasks = msg.TasksExecuting;
 
             HashSet<string> newUuids = new();
@@ -251,12 +252,14 @@ namespace SmarcGUI
             // new tasks that are now executing, that werent before
             var newUuidsSet = newUuids.Except(executingTaskUuids);
 
+            // nuke outdated tasks
             foreach (var taskUuid in outdatedUuids)
             {
                 var index = executingTaskUuids.ToList().IndexOf(taskUuid);
                 Destroy(ExecutingTasksScrollContent.GetChild(index).gameObject);
             }
 
+            // create new ones
             foreach (var taskUuid in newUuidsSet)
             {
                 var task = newTasks.Find(t => t["uuid"] == taskUuid);
@@ -264,7 +267,9 @@ namespace SmarcGUI
                 var execTaskGO = Instantiate(ExecutingTaskPrefab, ExecutingTasksScrollContent);
                 var execTaskGUI = execTaskGO.GetComponent<ExecutingTaskGUI>();
                 var taskSpec = msg.TasksAvailable.Find(t => t.Name == taskName);
-                execTaskGUI.SetExecTask(this, taskName, taskUuid, new List<string>(taskSpec.Signals));
+                List<string> signals = new();
+                if(taskSpec != null) signals = new List<string>(taskSpec.Signals);
+                execTaskGUI.SetExecTask(this, taskName, taskUuid, signals);
             }
 
             executingTaskUuids = newUuids;

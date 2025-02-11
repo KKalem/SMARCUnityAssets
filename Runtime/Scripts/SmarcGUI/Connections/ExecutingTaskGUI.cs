@@ -25,9 +25,17 @@ namespace SmarcGUI.Connections
             TaskName.text = taskName;
             this.taskUuid = taskUuid;
 
-            TaskSignalsDropdown.ClearOptions();
-            TaskSignalsDropdown.AddOptions(signals);
-            SignalButton.onClick.AddListener(OnSignalButton);
+            if(signals.Count > 0)
+            {
+                TaskSignalsDropdown.ClearOptions();
+                TaskSignalsDropdown.AddOptions(signals);
+                SignalButton.onClick.AddListener(OnSignalButton);
+            }
+            else
+            {
+                TaskSignalsDropdown.gameObject.SetActive(false);
+                SignalButton.gameObject.SetActive(false);
+            }
         }
 
         void OnSignalButton()
