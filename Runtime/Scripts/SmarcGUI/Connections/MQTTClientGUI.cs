@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using SmarcGUI.MissionPlanning.Tasks;
+using System.Security.Authentication;
 
 namespace SmarcGUI.Connections
 {
@@ -39,6 +40,7 @@ namespace SmarcGUI.Connections
         public TMP_InputField ContextInput;
         public Toggle SubToSimToggle;
         public Toggle SubToRealToggle;
+        public Toggle TLSToggle;
 
         public Button ConnectButton;
         public Button DisconnectButton;
@@ -120,7 +122,32 @@ namespace SmarcGUI.Connections
         {
             var mqttFactory = new MqttFactory();
             mqttClient = mqttFactory.CreateMqttClient();
-            var mqttClientOptions = new MqttClientOptionsBuilder().WithTcpServer(host: ServerAddress, port: ServerPort).Build();
+
+            var mqttClientOptionsUnbuilt = new MqttClientOptionsBuilder().WithTcpServer(host: ServerAddress, port: ServerPort);
+
+            if(TLSToggle.isOn)
+            {
+                mqttClientOptionsUnbuilt = mqttClientOptionsUnbuilt.WithTlsOptions(
+                    o =>
+                    {
+                        o.WithCertificateValidationHandler(
+                            eventArgs =>
+                            {
+                                Debug.Log(eventArgs.Certificate.Subject);
+                                Debug.Log(eventArgs.Certificate.GetExpirationDateString());
+                                Debug.Log(eventArgs.Chain.ChainPolicy.RevocationMode);
+                                Debug.Log(eventArgs.Chain.ChainStatus);
+                                Debug.Log(eventArgs.SslPolicyErrors);
+                                return true;
+                            }
+                        );
+
+                        // The default value is determined by the OS. Set manually to force version.
+                        o.WithSslProtocols(SslProtocols.Tls12);
+                    });
+            }
+
+            var mqttClientOptions = mqttClientOptionsUnbuilt.Build();
 
             mqttClient.ApplicationMessageReceivedAsync += OnMsgReceived;
 
@@ -135,6 +162,12 @@ namespace SmarcGUI.Connections
             {
                 ConnectionInputsInteractable(true);
                 guiState.Log($"Timeout while trying to connect to {ServerAddress}:{ServerPort}");
+                return;
+            }
+            catch (MqttCommunicationException)
+            {
+                ConnectionInputsInteractable(true);
+                guiState.Log($"Communication exception while trying to connect to {ServerAddress}:{ServerPort}");
                 return;
             }
             catch (OperationCanceledException)
