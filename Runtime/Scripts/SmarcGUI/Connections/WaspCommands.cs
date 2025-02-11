@@ -68,14 +68,33 @@ namespace SmarcGUI.Connections
             TaskUuid = Guid.NewGuid().ToString();
             Task = task;    
         }
-        
-
     }
+
 
     // Defined but no docs on this, so ignoring for now.
     // public class QueryStatusCommand : Command
     // {
 
     // }
+
+    public class StartTSTCommand : BaseCommand
+    {
+        public string Receiver;
+        public TaskSpecTree tst;
+
+
+        public StartTSTCommand(TaskSpecTree tst, string robot_name)
+        {
+            //https://api-docs.waraps.org/#/agent_communication/tst/tst_commands/start_tst
+            ComUuid = Guid.NewGuid().ToString();
+            Command = "start-tst";
+            Receiver = robot_name;
+
+            this.tst = tst;
+            this.tst.CommonParams["execunit"] = $"/{robot_name}";
+            this.tst.CommonParams["node-uuid"] = Guid.NewGuid().ToString();
+        }
+    }
+
 
 }

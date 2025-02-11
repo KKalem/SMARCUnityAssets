@@ -124,7 +124,7 @@ namespace SmarcGUI
         
 
 
-        public void Ping()
+        public void SendPing()
         {
             var pingCommand = new PingCommand();
             switch(InfoSource)
@@ -155,8 +155,41 @@ namespace SmarcGUI
                 case InfoSource.ROS:
                     guiState.Log($"Sending signal {signal} to {RobotName} in ROS");
                     break;
-            }
-            
+            }   
+        }
+
+        public void SendStartTaskCommand(Task task)
+        {
+            var startTaskCommand = new StartTaskCommand(task, RobotName);
+            switch(InfoSource)
+            {
+                case InfoSource.SIM:
+                    guiState.Log($"Sending StartTaskCommand {task} to {RobotName} in SIM");
+                    break;
+                case InfoSource.MQTT:
+                    mqttClient.Publish(robotNamespace+"exec/command", startTaskCommand.ToJson());
+                    break;
+                case InfoSource.ROS:
+                    guiState.Log($"Sending StartTaskCommand {task} to {RobotName} in ROS");
+                    break;
+            }   
+        }
+
+        public void SendStartTSTCommand(TaskSpecTree tst)
+        {
+            var startTSTCommand = new StartTSTCommand(tst, RobotName);
+            switch(InfoSource)
+            {
+                case InfoSource.SIM:
+                    guiState.Log($"Sending StartTSTCommand {tst} to {RobotName} in SIM");
+                    break;
+                case InfoSource.MQTT:
+                    mqttClient.Publish(robotNamespace+"exec/command", startTSTCommand.ToJson());
+                    break;
+                case InfoSource.ROS:
+                    guiState.Log($"Sending StartTSTCommand {tst} to {RobotName} in ROS");
+                    break;
+            }   
         }
         
 

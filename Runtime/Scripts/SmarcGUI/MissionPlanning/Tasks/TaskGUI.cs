@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using SmarcGUI.WorldSpace;
 using SmarcGUI.MissionPlanning.Params;
+using UnityEngine.UI;
 
 
 namespace SmarcGUI.MissionPlanning.Tasks
@@ -15,23 +16,38 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public float BottomPadding = 5;
         public Task task;
 
+        [Header("UI Elements")]
         public GameObject Params;
         public TMP_InputField DescriptionField;
         public TMP_Text TaskName;
         public RectTransform HighlightRT;
+        public Button RunButton;
 
+        [Header("Prefabs")]
         public GameObject ContextMenuPrefab;
 
 
         MissionPlanStore missionPlanStore;
+        GUIState guiState;
         TSTGUI tstGUI;
         RectTransform rt;
 
         bool needsHeightUpdate = false;
 
-
+        void Awake()
+        {
+            rt = GetComponent<RectTransform>();
+            missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+            guiState = FindFirstObjectByType<GUIState>();
+            DescriptionField.onValueChanged.AddListener(desc => task.Description = desc);
+            RunButton.onClick.AddListener(OnRunTask);
+        }
         
-        
+        void OnRunTask()
+        {
+            var robotgui = guiState.SelectedRobotGUI;
+            robotgui.SendStartTaskCommand(task);
+        }
 
         public void SetTask(Task task, TSTGUI tstGUI)
         {
@@ -39,8 +55,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
             this.tstGUI = tstGUI;
             TaskName.text = task.Name;
             DescriptionField.text = task.Description;
-
-            DescriptionField.onValueChanged.AddListener((string desc) => task.Description = desc);
 
             // instead of a foreach, we need to iterate over index because the param itself could modify the
             // individual parameter at this point
@@ -105,13 +119,10 @@ namespace SmarcGUI.MissionPlanning.Tasks
         void OnGUI()
         {
             if(needsHeightUpdate) ActuallyUpdateHeight();
+            RunButton.interactable = guiState.SelectedRobotGUI != null;
         }
 
-        void Awake()
-        {
-            rt = GetComponent<RectTransform>();
-            missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
-        }
+        
 
         void OnEnable()
         {

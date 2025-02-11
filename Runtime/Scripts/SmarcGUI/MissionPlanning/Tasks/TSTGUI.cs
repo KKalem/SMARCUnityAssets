@@ -4,6 +4,7 @@ using SmarcGUI.WorldSpace;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SmarcGUI.MissionPlanning.Tasks
 {
@@ -13,11 +14,11 @@ namespace SmarcGUI.MissionPlanning.Tasks
 
         [Header("UI Elements")]
         public TMP_InputField DescriptionField;
-        public TMP_InputField ExecutionUnitField;
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
         public GameObject ContextMenuPrefab;
         public LineRenderer PathLineRenderer;
+        public Button RunButton;
         
 
         bool isSelected = false;
@@ -31,6 +32,8 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             guiState = FindFirstObjectByType<GUIState>();
             missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
+            RunButton.onClick.AddListener(OnRunTST);
+            DescriptionField.onValueChanged.AddListener(OnDescriptionChanged);
         }
 
 
@@ -38,18 +41,20 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             this.tst = tst;
 
-            tst.CommonParams["execution-unit"] = guiState.SelectedRobotName;
-            UpdateFieldTexts();
+            DescriptionField.text = tst.Description;
             UpdateTasksGUI();
-
-            DescriptionField.onValueChanged.AddListener((string desc) => tst.Description = desc);
-            ExecutionUnitField.onValueChanged.AddListener((string eu) => tst.CommonParams["execution-unit"] = eu);
         }
 
-        void UpdateFieldTexts()
+        void OnDescriptionChanged(string desc)
         {
-            DescriptionField.text = tst.Description;
-            ExecutionUnitField.text = (string)tst.CommonParams["execution-unit"];
+            if(tst == null) return;
+            tst.Description = desc;
+        }
+
+        void OnRunTST()
+        {
+            var robotgui = guiState.SelectedRobotGUI;
+            robotgui.SendStartTSTCommand(tst);
         }
 
 
@@ -237,6 +242,11 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public void OnPathChanged()
         {
             DrawWorldPath();
+        }
+
+        void OnGUI()
+        {
+            RunButton.interactable = guiState.SelectedRobotGUI != null;
         }
 
     }

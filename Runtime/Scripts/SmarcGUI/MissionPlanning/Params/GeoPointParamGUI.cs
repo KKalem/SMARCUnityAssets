@@ -117,10 +117,11 @@ namespace SmarcGUI.MissionPlanning.Params
             catch 
             {
                 guiState.Log("Invalid latitude value");
-                LatField.text = latitude.ToString();
+                OnLatChanged(latitude.ToString());
                 return;
             }
             worldMarker.OnGUILatLonChanged();
+            NotifyPathChange();
         }
 
         void OnLonChanged(string s)
@@ -129,10 +130,11 @@ namespace SmarcGUI.MissionPlanning.Params
             catch
             {
                 guiState.Log("Invalid longitude value");
-                LonField.text = longitude.ToString();
+                OnLonChanged(longitude.ToString());
                 return;
             }
             worldMarker.OnGUILatLonChanged();
+            NotifyPathChange();
         }   
 
         void OnAltChanged(string s)
@@ -141,10 +143,11 @@ namespace SmarcGUI.MissionPlanning.Params
             catch
             {
                 guiState.Log("Invalid altitude value");
-                AltField.text = altitude.ToString();
+                OnAltChanged(altitude.ToString());
                 return;
             }
             worldMarker.OnGUIAltChanged();
+            NotifyPathChange();
         }
 
         public void OnDisable()
