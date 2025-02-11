@@ -132,6 +132,11 @@ namespace SmarcGUI.MissionPlanning.Tasks
             // Swap the two TaskGUI objects
             var guiIndex = taskgui.transform.GetSiblingIndex();
             taskgui.transform.SetSiblingIndex(guiIndex - 1);
+
+            // and then do the same thing in our taskguis list
+            var guiIndexInList = taskGUIs.IndexOf(taskgui);
+            taskGUIs.RemoveAt(guiIndexInList);
+            taskGUIs.Insert(guiIndexInList-1, taskgui);
             OnPathChanged();
         }
 
@@ -144,6 +149,12 @@ namespace SmarcGUI.MissionPlanning.Tasks
             // Swap the two TaskGUI objects
             var guiIndex = taskgui.transform.GetSiblingIndex();
             taskgui.transform.SetSiblingIndex(guiIndex + 1);
+
+            // and then do the same thing in our taskguis list
+            var guiIndexInList = taskGUIs.IndexOf(taskgui);
+            taskGUIs.RemoveAt(guiIndexInList);
+            taskGUIs.Insert(guiIndexInList+1, taskgui);
+
             OnPathChanged();
         }
 

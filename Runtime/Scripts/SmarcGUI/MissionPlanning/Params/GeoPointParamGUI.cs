@@ -121,7 +121,6 @@ namespace SmarcGUI.MissionPlanning.Params
                 return;
             }
             worldMarker.OnGUILatLonChanged();
-            NotifyPathChange();
         }
 
         void OnLonChanged(string s)
@@ -134,7 +133,6 @@ namespace SmarcGUI.MissionPlanning.Params
                 return;
             }
             worldMarker.OnGUILatLonChanged();
-            NotifyPathChange();
         }   
 
         void OnAltChanged(string s)
@@ -147,7 +145,6 @@ namespace SmarcGUI.MissionPlanning.Params
                 return;
             }
             worldMarker.OnGUIAltChanged();
-            NotifyPathChange();
         }
 
         public void OnDisable()
