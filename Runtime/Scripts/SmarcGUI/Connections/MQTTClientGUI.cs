@@ -10,7 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using SmarcGUI.MissionPlanning.Tasks;
+using SmarcGUI.MissionPlanning.Params;
 using System.Security.Authentication;
 
 namespace SmarcGUI.Connections

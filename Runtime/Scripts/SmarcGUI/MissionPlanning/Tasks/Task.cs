@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
-
+using SmarcGUI.MissionPlanning.Params;
 
 namespace SmarcGUI.MissionPlanning.Tasks
 {

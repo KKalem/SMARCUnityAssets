@@ -4,6 +4,7 @@ using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
 using SmarcGUI.MissionPlanning.Tasks;
+using SmarcGUI.MissionPlanning.Params;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -167,7 +168,7 @@ namespace SmarcGUI
             }   
         }
 
-        public void SendStartTaskCommand(Task task)
+        public StartTaskCommand SendStartTaskCommand(Task task)
         {
             var startTaskCommand = new StartTaskCommand(task, RobotName);
             switch(InfoSource)
@@ -182,9 +183,10 @@ namespace SmarcGUI
                     guiState.Log($"Sending StartTaskCommand {task} to {RobotName} in ROS");
                     break;
             }   
+            return startTaskCommand;
         }
 
-        public void SendStartTSTCommand(TaskSpecTree tst)
+        public StartTSTCommand SendStartTSTCommand(TaskSpecTree tst)
         {
             var startTSTCommand = new StartTSTCommand(tst, RobotName);
             switch(InfoSource)
@@ -199,6 +201,7 @@ namespace SmarcGUI
                     guiState.Log($"Sending StartTSTCommand {tst} to {RobotName} in ROS");
                     break;
             }   
+            return startTSTCommand;
         }
         
 

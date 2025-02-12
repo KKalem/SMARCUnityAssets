@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Collections;
 using SmarcGUI.MissionPlanning.Tasks;
+using SmarcGUI.MissionPlanning.Params;
 using SmarcGUI.Connections;
 
 

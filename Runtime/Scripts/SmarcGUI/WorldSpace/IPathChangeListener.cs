@@ -1,7 +1,7 @@
 namespace SmarcGUI.WorldSpace
 {
-    public interface IPathChangeListener
+    public interface IParamChangeListener
     {
-        void OnPathChanged();
+        void OnParamChanged();
     }
 }

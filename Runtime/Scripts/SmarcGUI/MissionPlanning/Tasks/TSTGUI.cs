@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using SmarcGUI.Connections;
 using SmarcGUI.WorldSpace;
+using SmarcGUI.MissionPlanning.Params;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+
+
 namespace SmarcGUI.MissionPlanning.Tasks
 {
-    public class TSTGUI : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IListItem, IPathInWorld, IPathChangeListener
+    public class TSTGUI : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IListItem, IPathInWorld, IParamChangeListener
     {
         public TaskSpecTree tst{get; private set;}
 
@@ -96,7 +99,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             };
             tst.Children.Add(newTask);
             CreateTaskGUI(newTask);
-            OnPathChanged();
+            OnParamChanged();
         }
 
         void CreateTaskGUI(Task task)
@@ -115,7 +118,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             tst.Children.RemoveAt(index);
             Destroy(taskgui.gameObject);
             taskGUIs.Remove(taskgui);
-            OnPathChanged();
+            OnParamChanged();
         }
 
         public void MoveTaskUp(TaskGUI taskgui)
@@ -132,7 +135,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             var guiIndexInList = taskGUIs.IndexOf(taskgui);
             taskGUIs.RemoveAt(guiIndexInList);
             taskGUIs.Insert(guiIndexInList-1, taskgui);
-            OnPathChanged();
+            OnParamChanged();
         }
 
         public void MoveTaskDown(TaskGUI taskgui)
@@ -150,7 +153,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             taskGUIs.RemoveAt(guiIndexInList);
             taskGUIs.Insert(guiIndexInList+1, taskgui);
 
-            OnPathChanged();
+            OnParamChanged();
         }
 
         void UpdateTasksGUI()
@@ -170,7 +173,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             {
                 taskGUI.gameObject.SetActive(true);
             }
-            OnPathChanged();
+            OnParamChanged();
         }
 
 
@@ -229,7 +232,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             PathLineRenderer.SetPositions(path.ToArray());
         }
 
-        public void OnPathChanged()
+        public void OnParamChanged()
         {
             DrawWorldPath();
         }

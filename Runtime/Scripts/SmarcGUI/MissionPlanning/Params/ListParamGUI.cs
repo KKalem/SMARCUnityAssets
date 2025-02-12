@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace SmarcGUI.MissionPlanning.Params
 {
-    public class ListParamGUI : ParamGUI, IHeightUpdatable, IPathInWorld, IPathChangeListener
+    public class ListParamGUI : ParamGUI, IHeightUpdatable, IPathInWorld, IParamChangeListener
     {
         RectTransform rt;
 
@@ -138,10 +138,10 @@ namespace SmarcGUI.MissionPlanning.Params
             return path;
         }
 
-        public void OnPathChanged()
+        public void OnParamChanged()
         {
-            taskgui?.OnPathChanged();
-            listParamGUI?.OnPathChanged();
+            taskgui?.OnParamChanged();
+            listParamGUI?.OnParamChanged();
         }
     }
 }

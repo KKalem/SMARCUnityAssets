@@ -57,8 +57,8 @@ namespace SmarcGUI.MissionPlanning.Params
 
         void NotifyPathChange()
         {
-            taskgui?.OnPathChanged();
-            listParamGUI?.OnPathChanged();
+            taskgui?.OnParamChanged();
+            listParamGUI?.OnParamChanged();
         }
 
         void Awake()

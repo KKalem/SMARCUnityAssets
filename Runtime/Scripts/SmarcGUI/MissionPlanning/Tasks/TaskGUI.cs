@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace SmarcGUI.MissionPlanning.Tasks
 {
-    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem, IPathInWorld, IPathChangeListener
+    public class TaskGUI : MonoBehaviour, IHeightUpdatable, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler, IListItem, IPathInWorld, IParamChangeListener
     {
         public float BottomPadding = 5;
         public Task task;
@@ -174,9 +174,9 @@ namespace SmarcGUI.MissionPlanning.Tasks
             return path;
         }
 
-        public void OnPathChanged()
+        public void OnParamChanged()
         {
-            tstGUI.OnPathChanged();
+            tstGUI.OnParamChanged();
         }
     }
 }
