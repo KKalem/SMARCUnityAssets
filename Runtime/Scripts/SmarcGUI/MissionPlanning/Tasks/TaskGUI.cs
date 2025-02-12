@@ -32,6 +32,9 @@ namespace SmarcGUI.MissionPlanning.Tasks
         GUIState guiState;
         TSTGUI tstGUI;
         RectTransform rt;
+        Image RunButtonImage;
+        Color RunButtonOriginalColor;
+        TMP_Text RunButtonText;
 
         bool needsHeightUpdate = false;
 
@@ -42,6 +45,9 @@ namespace SmarcGUI.MissionPlanning.Tasks
             guiState = FindFirstObjectByType<GUIState>();
             DescriptionField.onValueChanged.AddListener(desc => task.Description = desc);
             RunButton.onClick.AddListener(OnRunTask);
+            RunButtonImage = RunButton.GetComponent<Image>();
+            RunButtonText = RunButton.GetComponentInChildren<TMP_Text>();
+            RunButtonOriginalColor = RunButtonImage.color;
         }
         
         void OnRunTask()
@@ -121,15 +127,35 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             if(needsHeightUpdate) ActuallyUpdateHeight();
             RunButton.interactable = guiState.SelectedRobotGUI != null;
-            if(guiState.SelectedRobotGUI == null) WarningRT.gameObject.SetActive(false);
+            if(guiState.SelectedRobotGUI == null)
+            {
+                WarningRT.gameObject.SetActive(false);
+                RunButtonImage.color = RunButtonOriginalColor;
+                RunButtonText.text = "Run";
+            }
             else
             {
+                // warning highlight if the selected robot does not have this task available
                 if(guiState.SelectedRobotGUI.InfoSource == InfoSource.SIM) WarningRT.gameObject.SetActive(false);
                 else WarningRT.gameObject.SetActive(!guiState.SelectedRobotGUI.TasksAvailableNames.Contains(task.Name));
-            } 
-        }
 
-        
+                // make the RUN button green if it is already running this task
+                // use the task uuid to check this, since many tasks of the same type can be running
+                // 
+                if(guiState.SelectedRobotGUI.TasksExecutingUuids.Contains(task.TaskUuid))
+                {
+                    RunButtonImage.color = Color.green;
+                    RunButton.interactable = false;
+                    RunButtonText.text = "Running";
+                }
+                else
+                {
+                    RunButtonImage.color = RunButtonOriginalColor;
+                    RunButtonText.text = "Run";
+                }
+            } 
+
+        }
 
         void OnEnable()
         {
@@ -177,6 +203,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public void OnParamChanged()
         {
             tstGUI.OnParamChanged();
+            task.OnTaskModified();
         }
     }
 }

@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using PlasticGui.WorkspaceWindow;
 
 namespace SmarcGUI
 {
@@ -57,8 +58,7 @@ namespace SmarcGUI
         WaspDirectExecutionInfoMsg directExecutionInfo;
         List<TaskSpec> tasksAvailable => directExecutionInfo.TasksAvailable;
         public List<string> TasksAvailableNames = new();
-
-        HashSet<string> executingTaskUuids = new();
+        public HashSet<string> TasksExecutingUuids = new();
 
         public string RobotName => RobotNameText.text;
         string robotNamespace;
@@ -133,7 +133,9 @@ namespace SmarcGUI
         }
         
 
-
+        /////////////////////////////////////////
+        // MQTT STUFF
+        /////////////////////////////////////////
         public void SendPing()
         {
             var pingCommand = new PingCommand();
@@ -203,8 +205,111 @@ namespace SmarcGUI
             }   
             return startTSTCommand;
         }
-        
 
+        public void OnHeartbeatReceived()
+        {
+            HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            lastHeartbeatTime = Time.time;
+        }
+
+        public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
+        {
+            return;
+        }
+
+
+        void UpdateTasksDropdown(WaspDirectExecutionInfoMsg msg)
+        {
+            var tasksAvailable = msg.TasksAvailable;
+            TasksAvailableDropdown.options.Clear();
+            foreach (TaskSpec taskSpec in tasksAvailable)
+            {
+                TasksAvailableDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskSpec.Name });
+            }
+            TasksAvailableDropdown.RefreshShownValue();
+        }
+
+        void UpdateExecutingTasks(WaspDirectExecutionInfoMsg msg)
+        {
+            // bunch of loops here, but usually the item count is < 3 for all of them
+            var newTasks = msg.TasksExecuting;
+
+            HashSet<string> newUuids = new();
+            foreach (var task in newTasks)
+            {
+                var taskUuid = task["uuid"];
+                newUuids.Add(taskUuid);
+            }
+
+            // old tasks that arent executing anymore
+            var outdatedUuids = TasksExecutingUuids.Except(newUuids);
+            // new tasks that are now executing, that werent before
+            var newUuidsSet = newUuids.Except(TasksExecutingUuids);
+
+            // nuke outdated tasks
+            foreach (var taskUuid in outdatedUuids)
+            {
+                var index = TasksExecutingUuids.ToList().IndexOf(taskUuid);
+                Destroy(ExecutingTasksScrollContent.GetChild(index).gameObject);
+            }
+
+            // create new ones
+            foreach (var taskUuid in newUuidsSet)
+            {
+                var task = newTasks.Find(t => t["uuid"] == taskUuid);
+                var taskName = task["name"];
+                var execTaskGO = Instantiate(ExecutingTaskPrefab, ExecutingTasksScrollContent);
+                var execTaskGUI = execTaskGO.GetComponent<ExecutingTaskGUI>();
+                var taskSpec = msg.TasksAvailable.Find(t => t.Name == taskName);
+                List<string> signals = new();
+                if(taskSpec != null) signals = new List<string>(taskSpec.Signals);
+                execTaskGUI.SetExecTask(this, taskName, taskUuid, signals);
+            }
+
+            TasksExecutingUuids = newUuids;
+        }
+
+        public void OnDirectExecutionInfoReceived(WaspDirectExecutionInfoMsg msg)
+        {
+            UpdateTasksDropdown(msg);
+            UpdateExecutingTasks(msg);
+            directExecutionInfo = msg;
+
+            TasksAvailableNames = msg.TasksAvailable.Select(t => t.Name).ToList();
+        }
+
+
+        public void OnPositionReceived(GeoPoint pos)
+        {
+            if(globalReferencePoint == null) return;
+            if(ghostTF == null) return;
+            if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
+            var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
+            ghostTF.position = new Vector3(x, pos.altitude, z);
+        }
+
+        public void OnHeadingReceived(float heading)
+        {
+            ghostTF.rotation = Quaternion.Euler(0, heading, 0);
+        }
+
+        public void OnCourseReceived(float course)
+        {
+            var speed = ghostRB.linearVelocity.magnitude;
+            // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
+            ghostRB.linearVelocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
+        }
+
+        public void OnSpeedReceived(float speed)
+        {
+            ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
+        }
+
+
+
+        /////////////////////////////////////////
+        // GUI STUFF
+        /////////////////////////////////////////
         void OnKBControl()
         {
             IsSelected = true;
@@ -255,106 +360,6 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightRT?.gameObject.SetActive(true);
-        }
-
-        public void OnHeartbeatReceived()
-        {
-            HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-            lastHeartbeatTime = Time.time;
-        }
-
-        public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
-        {
-            return;
-        }
-
-
-
-        void UpdateTasksDropdown(WaspDirectExecutionInfoMsg msg)
-        {
-            var tasksAvailable = msg.TasksAvailable;
-            TasksAvailableDropdown.options.Clear();
-            foreach (TaskSpec taskSpec in tasksAvailable)
-            {
-                TasksAvailableDropdown.options.Add(new TMP_Dropdown.OptionData() { text = taskSpec.Name });
-            }
-            TasksAvailableDropdown.RefreshShownValue();
-        }
-
-        void UpdateExecutingTasks(WaspDirectExecutionInfoMsg msg)
-        {
-            // bunch of loops here, but usually the item count is < 3 for all of them
-            var newTasks = msg.TasksExecuting;
-
-            HashSet<string> newUuids = new();
-            foreach (var task in newTasks)
-            {
-                var taskUuid = task["uuid"];
-                newUuids.Add(taskUuid);
-            }
-
-            // old tasks that arent executing anymore
-            var outdatedUuids = executingTaskUuids.Except(newUuids);
-            // new tasks that are now executing, that werent before
-            var newUuidsSet = newUuids.Except(executingTaskUuids);
-
-            // nuke outdated tasks
-            foreach (var taskUuid in outdatedUuids)
-            {
-                var index = executingTaskUuids.ToList().IndexOf(taskUuid);
-                Destroy(ExecutingTasksScrollContent.GetChild(index).gameObject);
-            }
-
-            // create new ones
-            foreach (var taskUuid in newUuidsSet)
-            {
-                var task = newTasks.Find(t => t["uuid"] == taskUuid);
-                var taskName = task["name"];
-                var execTaskGO = Instantiate(ExecutingTaskPrefab, ExecutingTasksScrollContent);
-                var execTaskGUI = execTaskGO.GetComponent<ExecutingTaskGUI>();
-                var taskSpec = msg.TasksAvailable.Find(t => t.Name == taskName);
-                List<string> signals = new();
-                if(taskSpec != null) signals = new List<string>(taskSpec.Signals);
-                execTaskGUI.SetExecTask(this, taskName, taskUuid, signals);
-            }
-
-            executingTaskUuids = newUuids;
-        }
-
-        public void OnDirectExecutionInfoReceived(WaspDirectExecutionInfoMsg msg)
-        {
-            UpdateTasksDropdown(msg);
-            UpdateExecutingTasks(msg);
-            directExecutionInfo = msg;
-
-            TasksAvailableNames = msg.TasksAvailable.Select(t => t.Name).ToList();
-        }
-
-
-        public void OnPositionReceived(GeoPoint pos)
-        {
-            if(globalReferencePoint == null) return;
-            if(ghostTF == null) return;
-            if(ghostTF.gameObject.activeSelf == false) ghostTF.gameObject.SetActive(true);
-            var (x,z) = globalReferencePoint.GetUnityXZFromLatLon(pos.latitude, pos.longitude);
-            ghostTF.position = new Vector3(x, pos.altitude, z);
-        }
-
-        public void OnHeadingReceived(float heading)
-        {
-            ghostTF.rotation = Quaternion.Euler(0, heading, 0);
-        }
-
-        public void OnCourseReceived(float course)
-        {
-            var speed = ghostRB.linearVelocity.magnitude;
-            // waraps really isnt made for things that move in 3D space, so we'll just set the velocity in the xz plane...
-            ghostRB.linearVelocity = speed * new Vector3(Mathf.Sin(course * Mathf.Deg2Rad), 0, Mathf.Cos(course * Mathf.Deg2Rad));
-        }
-
-        public void OnSpeedReceived(float speed)
-        {
-            ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
         }
 
 

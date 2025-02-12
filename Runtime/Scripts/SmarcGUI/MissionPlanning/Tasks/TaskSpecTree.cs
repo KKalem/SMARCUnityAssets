@@ -14,8 +14,19 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public string Name{get{return "seq";}}
         public Dictionary<string, object> Params = new();
         public List<Task> Children = new();
+        public string TSTUuid;
 
         public string Description = "A sequence of tasks";
+
+        public TaskSpecTree()
+        {
+            OnTSTModified();
+        }
+
+        public void OnTSTModified()
+        {
+            TSTUuid = System.Guid.NewGuid().ToString();
+        }
 
         public void RecoverFromJson()
         {

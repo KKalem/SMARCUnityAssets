@@ -235,6 +235,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public void OnParamChanged()
         {
             DrawWorldPath();
+            tst.OnTSTModified();
         }
 
     }

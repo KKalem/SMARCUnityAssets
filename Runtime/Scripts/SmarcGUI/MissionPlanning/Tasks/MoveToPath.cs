@@ -17,7 +17,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
             new MoveTo("...", MoveSpeed.SLOW, new GeoPoint());
         }
 
-        public MoveTo(string description, string speed, GeoPoint waypoint)
+        public MoveTo(string description, string speed, GeoPoint waypoint) : base()
         {
             Name = "move-to";
             Description = description;
@@ -32,7 +32,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             new MovePath("...", MoveSpeed.SLOW, new List<GeoPoint>());
         }
-        public MovePath(string description, string speed, List<GeoPoint> waypoints)
+        public MovePath(string description, string speed, List<GeoPoint> waypoints) : base()
         {
             Name = "move-path";
             Description = description;

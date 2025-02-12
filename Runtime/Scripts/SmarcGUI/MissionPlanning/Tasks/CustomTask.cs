@@ -8,7 +8,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public CustomTask(
             string name = "custom-task",
             string description = "A custom task with JSON params",
-            string jsonParams = "{}")
+            string jsonParams = "{}") : base()
         {
             Name = name;
             Description = description;

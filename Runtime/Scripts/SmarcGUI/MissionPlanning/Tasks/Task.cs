@@ -9,7 +9,18 @@ namespace SmarcGUI.MissionPlanning.Tasks
     {
         public string Name{get; set;}
         public string Description;
+        public string TaskUuid;
         public Dictionary<string, object> Params = new();
+
+        public Task()
+        {
+            OnTaskModified();
+        }
+
+        public void OnTaskModified()
+        {
+            TaskUuid = System.Guid.NewGuid().ToString();
+        }
 
         public string ToJson()
         {
