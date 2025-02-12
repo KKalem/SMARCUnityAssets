@@ -91,8 +91,8 @@ namespace SmarcGUI.MissionPlanning.Tasks
             {
                 "move-to" => new MoveTo("Move to a point", MoveSpeed.STANDARD, new GeoPoint()),
                 "move-path" => new MovePath("Move along a path", MoveSpeed.STANDARD, new List<GeoPoint>()),
-                "custom" => new CustomTask("Custom task with a JSON attached", "{\"totally-valid-json\": 42}"),
-                _ => new CustomTask($"Un-implemented task:{taskType}", "{...}"),
+                "custom" => new CustomTask("custom-task", "Custom task with a JSON attached", "{\"totally-valid-json\": 42}"),
+                _ => new CustomTask(taskSpec.Name, "Un-implemented task!")
             };
             tst.Children.Add(newTask);
             CreateTaskGUI(newTask);

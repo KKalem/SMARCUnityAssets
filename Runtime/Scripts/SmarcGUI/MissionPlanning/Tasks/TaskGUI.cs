@@ -22,6 +22,7 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public TMP_Text TaskName;
         public RectTransform HighlightRT;
         public Button RunButton;
+        public RectTransform WarningRT;
 
         [Header("Prefabs")]
         public GameObject ContextMenuPrefab;
@@ -120,6 +121,12 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             if(needsHeightUpdate) ActuallyUpdateHeight();
             RunButton.interactable = guiState.SelectedRobotGUI != null;
+            if(guiState.SelectedRobotGUI == null) WarningRT.gameObject.SetActive(false);
+            else
+            {
+                if(guiState.SelectedRobotGUI.InfoSource == InfoSource.SIM) WarningRT.gameObject.SetActive(false);
+                else WarningRT.gameObject.SetActive(!guiState.SelectedRobotGUI.TasksAvailableNames.Contains(task.Name));
+            } 
         }
 
         

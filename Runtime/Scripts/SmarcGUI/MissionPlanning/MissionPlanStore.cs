@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Collections;
 using SmarcGUI.MissionPlanning.Tasks;
+using SmarcGUI.Connections;
 
 
 namespace SmarcGUI.MissionPlanning
@@ -27,12 +28,16 @@ namespace SmarcGUI.MissionPlanning
         public Button LoadMissionsButton;
         public Button SaveMissionsButton;
         
+
         [Header("Mission Control Elements")]
         public Button RunMissionButton;
 
 
         [Header("Tasks GUI Elements")]
         public Transform TasksScrollContent;
+        public TMP_Dropdown TaskTypeDropdown;
+        public Button AddTaskButton;
+        public List<string> BasicTaskTypes = new(){"move-to", "move-path", "custom"};
 
 
         [Header("Prefabs")]
@@ -56,13 +61,17 @@ namespace SmarcGUI.MissionPlanning
             NewMissionPlanButton.onClick.AddListener(OnNewTST);
             LoadMissionsButton.onClick.AddListener(LoadMissionPlans);
             SaveMissionsButton.onClick.AddListener(SaveMissionPlans);
-
             RunMissionButton.onClick.AddListener(() => guiState.SelectedRobotGUI.SendStartTSTCommand(SelectedTSTGUI.tst));
+            AddTaskButton.onClick.AddListener(() => SelectedTSTGUI.OnTaskAdded(new TaskSpec(TaskTypeDropdown.options[TaskTypeDropdown.value].text, null)));
+
+            TaskTypeDropdown.ClearOptions();
+            TaskTypeDropdown.AddOptions(BasicTaskTypes);
         }
 
         void OnGUI()
         {
             RunMissionButton.interactable = (SelectedTSTGUI != null) && (guiState.SelectedRobotGUI != null);
+            AddTaskButton.interactable = SelectedTSTGUI != null;
         }
 
 

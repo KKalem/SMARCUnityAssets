@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
 using GeoRef;
 using SmarcGUI.Connections;
 using SmarcGUI.MissionPlanning;
@@ -53,6 +51,7 @@ namespace SmarcGUI
         public InfoSource InfoSource{get; private set;}
         WaspDirectExecutionInfoMsg directExecutionInfo;
         List<TaskSpec> tasksAvailable => directExecutionInfo.TasksAvailable;
+        public List<string> TasksAvailableNames = new();
 
         HashSet<string> executingTaskUuids = new();
 
@@ -313,6 +312,8 @@ namespace SmarcGUI
             UpdateTasksDropdown(msg);
             UpdateExecutingTasks(msg);
             directExecutionInfo = msg;
+
+            TasksAvailableNames = msg.TasksAvailable.Select(t => t.Name).ToList();
         }
 
 
