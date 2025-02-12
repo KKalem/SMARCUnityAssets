@@ -21,6 +21,10 @@ namespace SmarcGUI
 
     public class RobotGUI : MonoBehaviour, IPointerClickHandler, IPointerExitHandler, IPointerEnterHandler
     {
+        [Header("Params")]
+        [Tooltip("Time in seconds before the robot is considered old")]
+        public float OldnessTime = 10;
+
         [Header("UI Elements")]
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
@@ -65,6 +69,10 @@ namespace SmarcGUI
         MissionPlanStore missionPlanStore;
         RectTransform rt;
         float minHeight;
+        float lastHeartbeatTime = -1;
+        Color originalColor;
+        Image BGImage;
+        bool isOld = false;
 
         void Awake()
         {
@@ -80,6 +88,8 @@ namespace SmarcGUI
             AvailTasksPanelRT.gameObject.SetActive(false);
             ExecTasksPanelRT.gameObject.SetActive(false);
             KBControlButton.gameObject.SetActive(false);
+            BGImage = GetComponent<Image>();
+            originalColor = BGImage.color;
         }
 
 
@@ -247,6 +257,7 @@ namespace SmarcGUI
         public void OnHeartbeatReceived()
         {
             HeartRT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            lastHeartbeatTime = Time.time;
         }
 
         public void OnSensorInfoReceived(WaspSensorInfoMsg msg)
@@ -343,11 +354,22 @@ namespace SmarcGUI
             ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
         }
 
+
         public void OnGUI()
         {
-            HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);
             AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
             KBControlText.text = (IsSelected && guiState.CurrentMode == GuiMode.KeyboardControl)? "Controlling" : "KB Control";
+            
+            if(InfoSource != InfoSource.SIM && lastHeartbeatTime > 0)
+            {
+                HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);
+                isOld = Time.time - lastHeartbeatTime > OldnessTime;
+                AddTaskButton.interactable = !isOld;
+                KBControlButton.interactable = !isOld;
+                TasksAvailableDropdown.interactable = !isOld;
+                BGImage.color = isOld ? Color.yellow : originalColor;
+
+            }
         }
 
     }
