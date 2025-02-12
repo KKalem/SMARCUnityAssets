@@ -26,6 +26,10 @@ namespace SmarcGUI.MissionPlanning
         public Button NewMissionPlanButton;
         public Button LoadMissionsButton;
         public Button SaveMissionsButton;
+        
+        [Header("Mission Control Elements")]
+        public Button RunMissionButton;
+
 
         [Header("Tasks GUI Elements")]
         public Transform TasksScrollContent;
@@ -41,6 +45,25 @@ namespace SmarcGUI.MissionPlanning
         [Header("State of mission planning GUI")]
         public TSTGUI SelectedTSTGUI;
 
+        void Awake()
+        {
+            guiState = GetComponent<GUIState>();
+            // Desktop on win, user home on linux/mac
+            MissionStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), Path.Combine("SMaRCUnity", "MissionPlans"));
+            Directory.CreateDirectory(MissionStoragePath);
+            LoadMissionPlans();
+
+            NewMissionPlanButton.onClick.AddListener(OnNewTST);
+            LoadMissionsButton.onClick.AddListener(LoadMissionPlans);
+            SaveMissionsButton.onClick.AddListener(SaveMissionPlans);
+
+            RunMissionButton.onClick.AddListener(() => guiState.SelectedRobotGUI.SendStartTSTCommand(SelectedTSTGUI.tst));
+        }
+
+        void OnGUI()
+        {
+            RunMissionButton.interactable = (SelectedTSTGUI != null) && (guiState.SelectedRobotGUI != null);
+        }
 
 
         void LoadMissionPlans()
@@ -95,13 +118,6 @@ namespace SmarcGUI.MissionPlanning
             guiState.Log($"Saved {i} mission plans");
         }
 
-
-        void InitGUIElements()
-        {
-            NewMissionPlanButton.onClick.AddListener(OnNewTST);
-            LoadMissionsButton.onClick.AddListener(LoadMissionPlans);
-            SaveMissionsButton.onClick.AddListener(SaveMissionPlans);
-        }
 
         public void OnNewTST()
         {
@@ -173,16 +189,7 @@ namespace SmarcGUI.MissionPlanning
         }
         
 
-        void Awake()
-        {
-            guiState = GetComponent<GUIState>();
-
-            // Desktop on win, user home on linux/mac
-            MissionStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), Path.Combine("SMaRCUnity", "MissionPlans"));
-            Directory.CreateDirectory(MissionStoragePath);
-            LoadMissionPlans();
-            InitGUIElements();
-        }
+        
 
     }
 }

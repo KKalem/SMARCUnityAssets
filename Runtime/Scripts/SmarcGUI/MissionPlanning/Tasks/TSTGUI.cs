@@ -4,22 +4,19 @@ using SmarcGUI.WorldSpace;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace SmarcGUI.MissionPlanning.Tasks
 {
     public class TSTGUI : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IListItem, IPathInWorld, IPathChangeListener
     {
-        TaskSpecTree tst;
+        public TaskSpecTree tst{get; private set;}
 
         [Header("UI Elements")]
         public TMP_InputField DescriptionField;
         public RectTransform HighlightRT;
         public RectTransform SelectedHighlightRT;
         public GameObject ContextMenuPrefab;
-        public LineRenderer PathLineRenderer;
-        public Button RunButton;
-        
+        public LineRenderer PathLineRenderer;        
 
         bool isSelected = false;
         List<TaskGUI> taskGUIs = new();
@@ -32,7 +29,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             guiState = FindFirstObjectByType<GUIState>();
             missionPlanStore = FindFirstObjectByType<MissionPlanStore>();
-            RunButton.onClick.AddListener(OnRunTST);
             DescriptionField.onValueChanged.AddListener(OnDescriptionChanged);
         }
 
@@ -49,12 +45,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         {
             if(tst == null) return;
             tst.Description = desc;
-        }
-
-        void OnRunTST()
-        {
-            var robotgui = guiState.SelectedRobotGUI;
-            robotgui.SendStartTSTCommand(tst);
         }
 
 
@@ -242,11 +232,6 @@ namespace SmarcGUI.MissionPlanning.Tasks
         public void OnPathChanged()
         {
             DrawWorldPath();
-        }
-
-        void OnGUI()
-        {
-            RunButton.interactable = guiState.SelectedRobotGUI != null;
         }
 
     }
