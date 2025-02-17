@@ -51,6 +51,13 @@ namespace SmarcGUI.MissionPlanning
         [Header("State of mission planning GUI")]
         public TSTGUI SelectedTSTGUI;
 
+
+        Image RunMissionButtonImage;
+        Color RunMissionButtonOriginalColor;
+        TMP_Text RunMissionButtonText;
+
+
+
         void Awake()
         {
             guiState = GetComponent<GUIState>();
@@ -67,12 +74,20 @@ namespace SmarcGUI.MissionPlanning
 
             TaskTypeDropdown.ClearOptions();
             TaskTypeDropdown.AddOptions(BasicTaskTypes);
+
+            RunMissionButtonImage = RunMissionButton.GetComponent<Image>();
+            RunMissionButtonText = RunMissionButton.GetComponentInChildren<TMP_Text>();
+            RunMissionButtonOriginalColor = RunMissionButtonImage.color;
         }
 
         void OnGUI()
         {
             RunMissionButton.interactable = (SelectedTSTGUI != null) && (guiState.SelectedRobotGUI != null);
             AddTaskButton.interactable = SelectedTSTGUI != null;
+
+            //TODO do the same thing in taskGUI here, except for the tst, when you
+            // have implemented tst execetuion status feedback...
+            // if(SelectedTSTGUI.tst.TSTUuid == guiState.SelectedRobotGUI.tstexecutinguuid)
         }
 
 
