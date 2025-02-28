@@ -82,12 +82,10 @@ namespace SmarcGUI.MissionPlanning
 
         void OnGUI()
         {
-            RunMissionButton.interactable = (SelectedTSTGUI != null) && (guiState.SelectedRobotGUI != null);
+            RunMissionButton.interactable = SelectedTSTGUI != null &&
+                                            guiState.SelectedRobotGUI != null &&
+                                            guiState.SelectedRobotGUI.TSTExecInfoReceived;
             AddTaskButton.interactable = SelectedTSTGUI != null;
-
-            //TODO do the same thing in taskGUI here, except for the tst, when you
-            // have implemented tst execetuion status feedback...
-            // if(SelectedTSTGUI.tst.TSTUuid == guiState.SelectedRobotGUI.tstexecutinguuid)
         }
 
 

@@ -60,6 +60,8 @@ namespace SmarcGUI
         public List<string> TasksAvailableNames = new();
         public HashSet<string> TasksExecutingUuids = new();
 
+        public bool TSTExecInfoReceived = false;
+
         public string RobotName => RobotNameText.text;
         string robotNamespace;
 
@@ -110,8 +112,9 @@ namespace SmarcGUI
 
             if(infoSource == InfoSource.MQTT) 
             {
-                mqttClient.SubToTopic(robotNamespace+"sensor_info");
+                mqttClient.SubToTopic(robotNamespace+"tst_execution_info");
                 mqttClient.SubToTopic(robotNamespace+"direct_execution_info");
+                mqttClient.SubToTopic(robotNamespace+"sensor_info");
                 mqttClient.SubToTopic(robotNamespace+"sensor/position");
                 mqttClient.SubToTopic(robotNamespace+"sensor/heading");
                 mqttClient.SubToTopic(robotNamespace+"sensor/course");
@@ -278,6 +281,16 @@ namespace SmarcGUI
             TasksAvailableNames = msg.TasksAvailable.Select(t => t.Name).ToList();
         }
 
+        public void OnTSTExecutionInfoReceived(WaspTSTExecutionInfoMsg msg)
+        {
+            // the information about the executing TST is a different message sent
+            // as a reply to the start-command. so this is literally just
+            // a "yes we can start"...
+            Debug.Log("TST exec rece");
+            TSTExecInfoReceived = true;
+            return;
+        }
+
 
         public void OnPositionReceived(GeoPoint pos)
         {
@@ -376,7 +389,12 @@ namespace SmarcGUI
                 KBControlButton.interactable = !isOld;
                 TasksAvailableDropdown.interactable = !isOld;
                 BGImage.color = isOld ? Color.yellow : originalColor;
+            }
 
+            if(isOld)
+            {
+                Debug.Log("Robot is old");
+                TSTExecInfoReceived = false;
             }
         }
 

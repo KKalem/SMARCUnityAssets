@@ -295,6 +295,10 @@ namespace SmarcGUI.Connections
                     WaspDirectExecutionInfoMsg directExecutionInfo = new(payload);
                     robotsGuis[agentName].OnDirectExecutionInfoReceived(directExecutionInfo);
                     break;
+                case "tst_execution_info":
+                    WaspTSTExecutionInfoMsg tstExecutionInfo = new(payload);
+                    robotsGuis[agentName].OnTSTExecutionInfoReceived(tstExecutionInfo);
+                    break;
                 case "sensor":
                     // there could be _many_ different kinds of sensors,
                     // some of these, we will have specific ways to visualize, like the basics
@@ -325,7 +329,7 @@ namespace SmarcGUI.Connections
                     }
                     break;
                 default:
-                    guiState.Log($"Received uhandled message on MQTT topic: {topic}");
+                    guiState.Log($"Received uhandled message on MQTT topic: {topic}. You should add this into MQTTClientGUI.HandleMQTTMsg!");
                     break;
             }
         }
