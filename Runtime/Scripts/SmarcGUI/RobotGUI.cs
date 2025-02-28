@@ -286,7 +286,6 @@ namespace SmarcGUI
             // the information about the executing TST is a different message sent
             // as a reply to the start-command. so this is literally just
             // a "yes we can start"...
-            Debug.Log("TST exec rece");
             TSTExecInfoReceived = true;
             return;
         }
