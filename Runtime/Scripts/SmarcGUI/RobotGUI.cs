@@ -140,6 +140,7 @@ namespace SmarcGUI
                 robotOverlayGO.name = $"{robotname}_Overlay";
                 var robotOverlay = robotOverlayGO.GetComponent<RobotGUIOverlay>();
                 robotOverlay.SetRobot(ghostTF, infoSource);
+                robotOverlay.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
             }
         }
         
