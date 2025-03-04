@@ -347,7 +347,7 @@ GameObject:
   - component: {fileID: 7867281295950721903}
   - component: {fileID: 3485854488179208475}
   m_Layer: 0
-  m_Name: RobotPrefab
+  m_Name: RobotGUIPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -447,7 +447,9 @@ MonoBehaviour:
   GenericGhostPrefab: {fileID: 4101801440365519181, guid: 036e77a074ae0da478957710f1cfb689, type: 3}
   SAMGhostPrefab: {fileID: 3181005593662985397, guid: 17ef068908d4826489bbbb32dbee9971, type: 3}
   ExecutingTaskPrefab: {fileID: 7063269331685360173, guid: d78e77b4af8542a40ada5afa61affa4f, type: 3}
+  RobotGUIOverlayPrefab: {fileID: 999908645906117283, guid: 87917f9c7f773bb4d9d59f11ce469ba8, type: 3}
   TasksAvailableNames: []
+  TSTExecInfoReceived: 0
 --- !u!1 &1169830165892710530
 GameObject:
   m_ObjectHideFlags: 0

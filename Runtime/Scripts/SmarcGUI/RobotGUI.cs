@@ -9,7 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using PlasticGui.WorkspaceWindow;
+
 
 namespace SmarcGUI
 {
@@ -47,6 +47,7 @@ namespace SmarcGUI
         public GameObject GenericGhostPrefab;
         public GameObject SAMGhostPrefab;
         public GameObject ExecutingTaskPrefab;
+        public GameObject RobotGUIOverlayPrefab;
 
 
         Transform worldMarkersTF;
@@ -76,6 +77,7 @@ namespace SmarcGUI
         Color originalColor;
         Image BGImage;
         bool isOld = false;
+        GameObject robotOverlayGO;
 
         void Awake()
         {
@@ -129,9 +131,15 @@ namespace SmarcGUI
             {
                 if(robotname.ToLower().Contains("sam")) ghostTF = Instantiate(SAMGhostPrefab).transform;
                 else ghostTF = Instantiate(GenericGhostPrefab).transform;
+                ghostTF.name = $"{robotname} (Ghost)";
                 ghostTF.SetParent(worldMarkersTF);
                 ghostTF.gameObject.SetActive(false);
                 ghostRB = ghostTF.GetComponent<Rigidbody>();
+
+                robotOverlayGO = Instantiate(RobotGUIOverlayPrefab);
+                robotOverlayGO.name = $"{robotname}_Overlay";
+                var robotOverlay = robotOverlayGO.GetComponent<RobotGUIOverlay>();
+                robotOverlay.SetRobot(ghostTF, infoSource);
             }
         }
         
