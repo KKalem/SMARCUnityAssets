@@ -64,6 +64,8 @@ namespace SmarcGUI
         WaterRenderToggle[] waterRenderToggles;
         MissionPlanStore missionPlanStore;
 
+        List<ICamChangeListener> camChangeListeners = new();
+
 
         void InitModeDropdown()
         {
@@ -195,6 +197,15 @@ namespace SmarcGUI
         }
 
 
+        public void RegisterCamChangeListener(ICamChangeListener listener)
+        {
+            camChangeListeners.Add(listener);
+        }
+
+        public void UnregisterCamChangeListener(ICamChangeListener listener)
+        {
+            camChangeListeners.Remove(listener);
+        }
 
         public void OnCameraChanged(int camIndex)
         {
@@ -206,6 +217,11 @@ namespace SmarcGUI
             if(CurrentCam != null) CurrentCam.enabled = false;
             CurrentCam = selectedGO.GetComponent<Camera>();
             CurrentCam.enabled = true;
+
+            foreach(var listener in camChangeListeners)
+            {
+                listener.OnCamChange(CurrentCam);
+            }
         }
 
         public void OnRobotSelectionChanged(RobotGUI robotgui)
