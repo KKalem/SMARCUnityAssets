@@ -323,7 +323,8 @@ namespace SmarcGUI
 
         public void OnSpeedReceived(float speed)
         {
-            ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
+            if(ghostRB.linearVelocity.sqrMagnitude == 0) ghostRB.linearVelocity = ghostRB.transform.forward * speed;
+            else ghostRB.linearVelocity = ghostRB.linearVelocity.normalized * speed;
         }
 
 
