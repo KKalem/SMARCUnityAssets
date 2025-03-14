@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
+
 using Hinge = VehicleComponents.Actuators.Hinge;
 using Propeller = VehicleComponents.Actuators.Propeller;
 using VBS = VehicleComponents.Actuators.VBS;
@@ -8,7 +8,7 @@ using Prismatic = VehicleComponents.Actuators.Prismatic;
 
 namespace SmarcGUI.KeyboardControllers
 {
-    public class SAMKeyboardControl : KeyboardController
+    public class SAMKeyboardControl : KeyboardControllerBase
     {
 
         public GameObject yawHingeGo;
@@ -24,23 +24,13 @@ namespace SmarcGUI.KeyboardControllers
         Prismatic lcg;
 
 
-        bool mouseDown = false;
-
-
         public float rollRpms = 0.1f;
         public float moveRpms = 800f;
 
-        [Header("Bricks on Keys")] [Tooltip("Use these when you dont want to press down for 10 minutes")]
-        public List<string> PutABrickOnKeys = new List<string>();
 
-        bool GetKeyDown(string key)
-        {
-            if (PutABrickOnKeys.Contains(key))
-            {
-                return true;
-            }
-            return Input.GetKeyDown(key);
-        }
+        InputAction forwardAction, tvAction, vbsAction, lcgAction, rollAction;
+        
+        
 
         void Awake()
         {
@@ -51,112 +41,50 @@ namespace SmarcGUI.KeyboardControllers
             vbs = vbsGo.GetComponent<VBS>();
             lcg = lcgGo.GetComponent<Prismatic>();
 
-            KeysAndFunctions.Add(new Tuple<string, string>("up,down", "Thrust"));
-            KeysAndFunctions.Add(new Tuple<string, string>("q,e", "Roll "));
-            KeysAndFunctions.Add(new Tuple<string, string>("w,a,s,d", "Thrust Vec."));
-            KeysAndFunctions.Add(new Tuple<string, string>("r,f,c", "VBS 0,50,100"));
-            KeysAndFunctions.Add(new Tuple<string, string>("t,g,v", "LCG 0,50,100"));
+            forwardAction = InputSystem.actions.FindAction("Robot/Forward");
+            tvAction = InputSystem.actions.FindAction("Robot/ThrustVector");
+            vbsAction = InputSystem.actions.FindAction("Robot/UpDown");
+            lcgAction = InputSystem.actions.FindAction("Robot/Pitch");
+            rollAction = InputSystem.actions.FindAction("Robot/Roll");
         }
 
         void Update()
         {
-
-            // Ignore inputs while the right mouse
-            // button is held down. Since this is used for camera controls.
-            // There is no "while button down" check, so we DIY.
-            if(Input.GetMouseButtonDown(1)) mouseDown = true;
-            if(Input.GetMouseButtonUp(1)) mouseDown = false;
-            if(mouseDown) return;
-
-            if (GetKeyDown("down"))
+            var rpm = forwardAction.ReadValue<float>() * moveRpms;
+            var rollValue = rollAction.ReadValue<float>();
+            if(rollValue == 0)
             {
-                frontProp.SetRpm(-moveRpms);
-                backProp.SetRpm(-moveRpms);
+                frontProp.SetRpm(rpm);
+                backProp.SetRpm(rpm);
+            }
+            else
+            {
+                frontProp.SetRpm(rpm * rollValue);
+                backProp.SetRpm(rpm * -rollValue);
             }
 
-            if (GetKeyDown("q"))
-            {
-                frontProp.SetRpm(-rollRpms);
-                backProp.SetRpm(rollRpms);
-            }
+            var tv = tvAction.ReadValue<Vector2>();
+            yaw.SetAngle(tv.x * 0.1f);
+            pitch.SetAngle(-tv.y * 0.1f);
 
-            if (GetKeyDown("e"))
-            {
-                frontProp.SetRpm(rollRpms);
-                backProp.SetRpm(-rollRpms);
-            }
+            var vbsValue = vbsAction.ReadValue<float>();
+            vbs.SetPercentage(100 - ((vbsValue+1)/2*100));
 
-            if (GetKeyDown("up"))
-            {
-                frontProp.SetRpm(moveRpms);
-                backProp.SetRpm(moveRpms);
-            }
+            var lcgValue = lcgAction.ReadValue<float>();
+            lcg.SetPercentage(100 - (lcgValue+1)/2*100);
 
-            if (Input.GetKeyUp("up") || Input.GetKeyUp("down") || Input.GetKeyUp("q") || Input.GetKeyUp("e"))
-            {
-                frontProp.SetRpm(0);
-                backProp.SetRpm(0);
-            }
 
-            if (GetKeyDown("a"))
-            {
-                yaw.SetAngle(-1);
-            }
-
-            if (GetKeyDown("d"))
-            {
-                yaw.SetAngle(1);
-            }
-
-            if (Input.GetKeyUp("a") || Input.GetKeyUp("d"))
-            {
-                yaw.SetAngle(0);
-            }
-
-            if (GetKeyDown("w"))
-            {
-                pitch.SetAngle(-1);
-            }
-
-            if (GetKeyDown("s"))
-            {
-                pitch.SetAngle(1);
-            }
-
-            if (Input.GetKeyUp("w") || Input.GetKeyUp("s"))
-            {
-                pitch.SetAngle(0);
-            }
-
-            if (GetKeyDown("r"))
-            {
-                vbs.SetPercentage(0f);
-            }
-
-            if (GetKeyDown("f"))
-            {
-                vbs.SetPercentage(50f);
-            }
-
-            if (GetKeyDown("c"))
-            {
-                vbs.SetPercentage(100f);
-            }
-
-            if (GetKeyDown("t"))
-            {
-                lcg.SetPercentage(0f);
-            }
-
-            if (GetKeyDown("g"))
-            {
-                lcg.SetPercentage(50f);
-            }
-
-            if (GetKeyDown("v"))
-            {
-                lcg.SetPercentage(100f);
-            }
         }
+
+        public override void OnReset()
+        {
+            frontProp.SetRpm(0);
+            backProp.SetRpm(0);
+            pitch.SetAngle(0);
+            yaw.SetAngle(0);
+            vbs.SetPercentage(0);
+            lcg.SetPercentage(0);
+        }
+
     }
 }

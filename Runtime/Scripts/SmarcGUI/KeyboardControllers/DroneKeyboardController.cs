@@ -1,10 +1,10 @@
-using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Propeller = VehicleComponents.Actuators.Propeller;
 
 namespace SmarcGUI.KeyboardControllers
 {
-    public class DroneKeyboardController : KeyboardController
+    public class DroneKeyboardController : KeyboardControllerBase
     {
 
         public GameObject frontleftPropGo;
@@ -16,11 +16,8 @@ namespace SmarcGUI.KeyboardControllers
 
         [Tooltip("RPM to add to props when pressing IJKL")]
         public float MotionRPM = 1500f;
-        [Tooltip("Extra RPMs to add when pressing space and IJKL")]
-        public float LiftingRPM = 1500f;
 
-        bool mouseDown = false;
-
+        InputAction forwardAction, strafeAction, verticalAction, pitchAction, rollAction;
 
         void Awake()
         {
@@ -29,79 +26,59 @@ namespace SmarcGUI.KeyboardControllers
             backrightProp = backrightPropGo.GetComponent<Propeller>();
             backleftProp = backleftPropGo.GetComponent<Propeller>();
 
-            KeysAndFunctions.Add(new Tuple<string, string>("i,k", "forw/back"));
-            KeysAndFunctions.Add(new Tuple<string, string>("j,l", "left/right"));
-            KeysAndFunctions.Add(new Tuple<string, string>("u,n", "up/down"));
-            KeysAndFunctions.Add(new Tuple<string, string>("space", "extra RPMs"));
+            forwardAction = InputSystem.actions.FindAction("Robot/Forward");
+            strafeAction = InputSystem.actions.FindAction("Robot/Strafe");
+            verticalAction = InputSystem.actions.FindAction("Robot/UpDown");
+            pitchAction = InputSystem.actions.FindAction("Robot/Pitch");
+            rollAction = InputSystem.actions.FindAction("Robot/Roll");
         }
 
         void Update()
         {
-            if(Input.GetMouseButtonDown(1)) mouseDown = true;
-            if(Input.GetMouseButtonUp(1)) mouseDown = false;
-            if(mouseDown) return;
+            var forwardValue = forwardAction.ReadValue<float>();
+            var strafeValue = strafeAction.ReadValue<float>();
+            var verticalValue = verticalAction.ReadValue<float>();
+            var pitchValue = pitchAction.ReadValue<float>();
+            var rollValue = rollAction.ReadValue<float>();
 
-            var additionalRPM = MotionRPM;
-            var backright = backrightProp.DefaultHoverRPM;
-            var backleft = backleftProp.DefaultHoverRPM;
-            var frontright = frontrightProp.DefaultHoverRPM;
-            var frontleft = frontleftProp.DefaultHoverRPM;
+            var FR = frontrightProp.DefaultHoverRPM;
+            var FL = frontleftProp.DefaultHoverRPM;
+            var BR = backrightProp.DefaultHoverRPM;
+            var BL = backleftProp.DefaultHoverRPM;
 
-            if(Input.GetKey(KeyCode.Space)) additionalRPM += LiftingRPM;
+            BR += (forwardValue+pitchValue) * MotionRPM;
+            BL += (forwardValue+pitchValue) * MotionRPM;
+            FR -= (forwardValue+pitchValue) * MotionRPM;
+            FL -= (forwardValue+pitchValue) * MotionRPM;
 
-            if (Input.GetKey("i"))
-            {
-                backright += additionalRPM;
-                backleft += additionalRPM;
-                frontright -= additionalRPM;
-                frontleft -= additionalRPM;
-            }
+            BL += (rollValue + strafeValue) * MotionRPM;
+            FL += (rollValue + strafeValue) * MotionRPM;
+            FR -= (rollValue + strafeValue) * MotionRPM;
+            BR -= (rollValue + strafeValue) * MotionRPM;
 
-            if (Input.GetKey("k"))
-            {
-                frontright += additionalRPM;
-                frontleft += additionalRPM;
-                backright -= additionalRPM;
-                backleft -= additionalRPM;
-            }
+            BR += verticalValue * MotionRPM;
+            BL += verticalValue * MotionRPM;
+            FR += verticalValue * MotionRPM;
+            FL += verticalValue * MotionRPM;
 
-            if (Input.GetKey("j"))
-            {
-                frontright += additionalRPM;
-                backright += additionalRPM;
-                frontleft -= additionalRPM;
-                backleft -= additionalRPM;
-            }
+            frontrightProp.SetRpm(FR);
+            frontleftProp.SetRpm(FL);
+            backrightProp.SetRpm(BR);
+            backleftProp.SetRpm(BL);
+        }   
 
-            if (Input.GetKey("l"))
-            {
-                frontleft += additionalRPM;
-                backleft += additionalRPM;
-                frontright -= additionalRPM;
-                backright -= additionalRPM;
-            }
-
-            if (Input.GetKey("u"))
-            {
-                frontleft += additionalRPM/4;
-                frontright += additionalRPM/4;
-                backleft += additionalRPM/4;
-                backright += additionalRPM/4;
-            }            
-
-            if (Input.GetKey("n"))
-            {
-                frontleft -= additionalRPM/4;
-                frontright -= additionalRPM/4;
-                backleft -= additionalRPM/4;
-                backright -= additionalRPM/4; 
-            }
-            
-            backrightProp.SetRpm(backright);
-            backleftProp.SetRpm(backleft);
-            frontrightProp.SetRpm(frontright);
-            frontleftProp.SetRpm(frontleft);
-
+        void AdjustRPM(Propeller prop, float adjustment)
+        {
+            prop.SetRpm(prop.DefaultHoverRPM + adjustment);
         }
+
+        public override void OnReset()
+        {
+            AdjustRPM(backrightProp, 0);
+            AdjustRPM(backleftProp, 0);
+            AdjustRPM(frontrightProp, 0);
+            AdjustRPM(frontleftProp, 0);
+        }
+
     }
 }

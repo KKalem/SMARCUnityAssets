@@ -9,6 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using SmarcGUI.KeyboardControllers;
 
 
 namespace SmarcGUI
@@ -36,8 +37,7 @@ namespace SmarcGUI
         public TMP_Dropdown TasksAvailableDropdown;
         public Button AddTaskButton;
         public RectTransform AvailTasksPanelRT;
-        public Button KBControlButton;
-        public TMP_Text KBControlText;
+        public Toggle UserInputToggle;
         public string WorldMarkerName = "WorldMarkers";
         public RectTransform ExecutingTasksScrollContent;
         public RectTransform ExecTasksPanelRT;
@@ -78,6 +78,7 @@ namespace SmarcGUI
         Image BGImage;
         bool isOld = false;
         GameObject robotOverlayGO;
+        KeyboardControllerBase keyboardController;
 
         void Awake()
         {
@@ -87,12 +88,11 @@ namespace SmarcGUI
             worldMarkersTF = GameObject.Find(WorldMarkerName).transform;
             globalReferencePoint = FindFirstObjectByType<GlobalReferencePoint>();
             AddTaskButton.onClick.AddListener(() => OnTaskAdded(TasksAvailableDropdown.value));
-            KBControlButton.onClick.AddListener(OnKBControl);
             rt = GetComponent<RectTransform>();
             minHeight = rt.sizeDelta.y;
             AvailTasksPanelRT.gameObject.SetActive(false);
             ExecTasksPanelRT.gameObject.SetActive(false);
-            KBControlButton.gameObject.SetActive(false);
+            UserInputToggle.gameObject.SetActive(false);
             BGImage = GetComponent<Image>();
             originalColor = BGImage.color;
         }
@@ -109,7 +109,8 @@ namespace SmarcGUI
             if(infoSource == InfoSource.SIM)
             {
                 HeartRT.gameObject.SetActive(false);
-                KBControlButton.gameObject.SetActive(true);
+                UserInputToggle.gameObject.SetActive(true);
+                keyboardController = GameObject.Find(robotname).GetComponent<KeyboardControllerBase>();
             }
 
             if(infoSource == InfoSource.MQTT) 
@@ -336,7 +337,7 @@ namespace SmarcGUI
         {
             IsSelected = true;
             OnSelectedChange(true);
-            guiState.OnModeChanged((int)GuiMode.KeyboardControl);
+            keyboardController.Enable();
         }
 
 
@@ -366,6 +367,7 @@ namespace SmarcGUI
         {
             IsSelected = false;
             OnSelectedChange();
+            keyboardController.Disable();
         }
 
         void OnTaskAdded(int index)
@@ -388,21 +390,21 @@ namespace SmarcGUI
         public void OnGUI()
         {
             AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
-            KBControlText.text = (IsSelected && guiState.CurrentMode == GuiMode.KeyboardControl)? "Controlling" : "KB Control";
+            keyboardController.enabled = UserInputToggle.isOn && InfoSource == InfoSource.SIM;
+
             
             if(InfoSource != InfoSource.SIM && lastHeartbeatTime > 0)
             {
                 HeartRT.localScale = Vector3.Lerp(HeartRT.localScale, Vector3.one, Time.deltaTime * 10);
                 isOld = Time.time - lastHeartbeatTime > OldnessTime;
                 AddTaskButton.interactable = !isOld;
-                KBControlButton.interactable = !isOld;
                 TasksAvailableDropdown.interactable = !isOld;
                 BGImage.color = isOld ? Color.yellow : originalColor;
             }
 
             if(isOld)
             {
-                Debug.Log("Robot is old");
+                guiState.Log($"Robot {RobotName} is old!");
                 TSTExecInfoReceived = false;
             }
         }
