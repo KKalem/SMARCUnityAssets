@@ -19,11 +19,13 @@ namespace SmarcGUI.WorldSpace
 		Camera cam;
 
 		GUIState guiState;
+		SmoothFollow smoothFollow;
 
 		void Start()
 		{
-			cam = GetComponentInParent<Camera>();
+			cam = GetComponent<Camera>();
 			guiState = FindFirstObjectByType<GUIState>();
+			smoothFollow = GetComponent<SmoothFollow>();
 		}
 
 		static bool Focused {
@@ -51,7 +53,10 @@ namespace SmarcGUI.WorldSpace
 			if( Focused )
 				UpdateInput();
 			else if(cam.enabled && Input.GetMouseButtonDown( 1 ) )
+			{
 				Focused = true;
+				if(smoothFollow) smoothFollow.target = null;
+			}
 
 			// Physics
 			velocity = Vector3.Lerp( velocity, Vector3.zero, dampingCoefficient * Time.deltaTime );

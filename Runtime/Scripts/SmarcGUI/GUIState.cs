@@ -6,6 +6,7 @@ using Utils = DefaultNamespace.Utils;
 using VehicleComponents.Sensors;
 using UnityEngine.EventSystems;
 using SmarcGUI.Water;
+using UnityEngine.UI;
 
 
 namespace SmarcGUI
@@ -26,6 +27,7 @@ namespace SmarcGUI
         public TMP_Dropdown cameraDropdown;
         public TMP_Text LogText;
         public RectTransform RobotsScrollContent;
+        public Button ToggleWaterRenderButton;
 
         [Header("Prefabs")]
         public GameObject RobotGuiPrefab;
@@ -34,6 +36,7 @@ namespace SmarcGUI
 
         [Header("Defaults")]
         public Camera DefaultCamera;
+        int defaultCameraIndex = 0;
         public float DefaultCameraLookAtMin = 1;
         public float DefaultCameraLookAtMax = 100;
 
@@ -44,8 +47,8 @@ namespace SmarcGUI
         public RobotGUI SelectedRobotGUI {get; private set;}
         public string SelectedRobotName => SelectedRobotGUI?.RobotName;
         
-        // TODO add a checkbox for this
         WaterRenderToggle[] waterRenderToggles;
+        bool renderWaters = true;
 
 
 
@@ -79,7 +82,6 @@ namespace SmarcGUI
                 cameraDropdown.options.Add(new TMP_Dropdown.OptionData(){text=ddText});
             }
 
-            int defaultCameraIndex = 0;
             for (int i = 0; i < cameraDropdown.options.Count; i++)
             {
                 if (cameraDropdown.options[i].text == CameraTextFromCamera(DefaultCamera))
@@ -88,6 +90,11 @@ namespace SmarcGUI
                     break;
                 }
             }
+            SelectDefaultCamera();
+        }
+
+        public void SelectDefaultCamera()
+        {
             cameraDropdown.value = defaultCameraIndex;
             cameraDropdown.RefreshShownValue();
             OnCameraChanged(cameraDropdown.value);
@@ -188,6 +195,13 @@ namespace SmarcGUI
             InitCameraDropdown();
             InitRobotGuis();
             waterRenderToggles = FindObjectsByType<WaterRenderToggle>(FindObjectsSortMode.None);
+            ToggleWaterRenderButton.onClick.AddListener(() => {
+                foreach(var toggle in waterRenderToggles)
+                {
+                    renderWaters = !renderWaters;
+                    toggle.ToggleWaterRender(renderWaters);
+                }
+            });
         }
 
     

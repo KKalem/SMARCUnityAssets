@@ -121,7 +121,8 @@ namespace SmarcGUI.MissionPlanning
                 }
                 catch (Exception e)
                 {
-                    guiState.Log($"Failed to load mission plan from {file}: {e.Message}");
+                    guiState.Log($"Failed to load mission plan from {file}! Check debug logs.");
+                    Debug.LogError(e);
                     continue;
                 }
             }

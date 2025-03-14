@@ -10,6 +10,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using SmarcGUI.KeyboardControllers;
+using DefaultNamespace;
+using SmarcGUI.WorldSpace;
 
 
 namespace SmarcGUI
@@ -44,15 +46,20 @@ namespace SmarcGUI
 
         [Header("Prefabs")]
         public GameObject ContextMenuPrefab;
-        public GameObject GenericGhostPrefab;
-        public GameObject SAMGhostPrefab;
         public GameObject ExecutingTaskPrefab;
         public GameObject RobotGUIOverlayPrefab;
+
+        [Header("Ghost Prefabs")]
+        public GameObject GenericGhostPrefab;
+        public GameObject SAMGhostPrefab;
+        public GameObject EvoloGhostPrefab;
 
 
         Transform worldMarkersTF;
         Transform ghostTF;
         Rigidbody ghostRB;
+        GameObject simRobotGO;
+        Transform simRobotBaseLinkTF;
 
 
         public InfoSource InfoSource{get; private set;}
@@ -110,7 +117,9 @@ namespace SmarcGUI
             {
                 HeartRT.gameObject.SetActive(false);
                 UserInputToggle.gameObject.SetActive(true);
-                keyboardController = GameObject.Find(robotname).GetComponent<KeyboardControllerBase>();
+                simRobotGO = GameObject.Find(robotname);
+                simRobotBaseLinkTF = Utils.FindDeepChildWithName(simRobotGO, "base_link").transform;
+                keyboardController = simRobotGO.GetComponent<KeyboardControllerBase>();
             }
 
             if(infoSource == InfoSource.MQTT) 
@@ -131,6 +140,7 @@ namespace SmarcGUI
             if(infoSource != InfoSource.SIM && worldMarkersTF != null)
             {
                 if(robotname.ToLower().Contains("sam")) ghostTF = Instantiate(SAMGhostPrefab).transform;
+                if(robotname.ToLower().Contains("evolo")) ghostTF = Instantiate(EvoloGhostPrefab).transform;
                 else ghostTF = Instantiate(GenericGhostPrefab).transform;
                 ghostTF.name = $"{robotname} (Ghost)";
                 ghostTF.SetParent(worldMarkersTF);
@@ -367,7 +377,7 @@ namespace SmarcGUI
         {
             IsSelected = false;
             OnSelectedChange();
-            keyboardController.Disable();
+            keyboardController?.Disable();
         }
 
         void OnTaskAdded(int index)
@@ -384,6 +394,44 @@ namespace SmarcGUI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightRT?.gameObject.SetActive(true);
+        }
+
+        public void LookAtRobot()
+        {
+            Transform tf;
+            if(InfoSource != InfoSource.SIM)
+            {
+                if(ghostTF == null) return;
+                tf = ghostTF;
+                
+            }
+            else
+            {
+                if(simRobotBaseLinkTF == null) return;
+                tf = simRobotBaseLinkTF;
+            }
+            guiState.SelectDefaultCamera();
+            var cam = guiState.CurrentCam;
+            cam.transform.position = tf.position + new Vector3(0, 10, 0);
+            cam.transform.LookAt(tf);
+        }
+
+        public void FollowRobot()
+        {
+            Transform tf;
+            if(InfoSource != InfoSource.SIM)
+            {
+                if(ghostTF == null) return;
+                tf = ghostTF;
+            }
+            else
+            {
+                if(simRobotBaseLinkTF == null) return;
+                tf = simRobotBaseLinkTF;
+            }
+            guiState.SelectDefaultCamera();
+            var cam = guiState.CurrentCam;
+            cam.GetComponent<SmoothFollow>().target = tf;
         }
 
 

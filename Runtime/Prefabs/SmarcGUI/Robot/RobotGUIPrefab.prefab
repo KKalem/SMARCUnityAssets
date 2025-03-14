@@ -443,10 +443,11 @@ MonoBehaviour:
   ExecutingTasksScrollContent: {fileID: 7024504074742447232}
   ExecTasksPanelRT: {fileID: 5433525304167608268}
   ContextMenuPrefab: {fileID: 6887179358533236570, guid: d0a976700cb536948812b70770096ce0, type: 3}
-  GenericGhostPrefab: {fileID: 4101801440365519181, guid: 036e77a074ae0da478957710f1cfb689, type: 3}
-  SAMGhostPrefab: {fileID: 3181005593662985397, guid: 17ef068908d4826489bbbb32dbee9971, type: 3}
   ExecutingTaskPrefab: {fileID: 7063269331685360173, guid: d78e77b4af8542a40ada5afa61affa4f, type: 3}
   RobotGUIOverlayPrefab: {fileID: 999908645906117283, guid: 87917f9c7f773bb4d9d59f11ce469ba8, type: 3}
+  GenericGhostPrefab: {fileID: 4101801440365519181, guid: 036e77a074ae0da478957710f1cfb689, type: 3}
+  SAMGhostPrefab: {fileID: 3181005593662985397, guid: 17ef068908d4826489bbbb32dbee9971, type: 3}
+  EvoloGhostPrefab: {fileID: 2262435256448856204, guid: d7891a7a48acf3340b871362edf39f77, type: 3}
   TasksAvailableNames: []
   TSTExecInfoReceived: 0
 --- !u!1 &1808457659505454176
