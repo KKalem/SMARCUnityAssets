@@ -390,7 +390,7 @@ namespace SmarcGUI
         public void OnGUI()
         {
             AddTaskButton.interactable = missionPlanStore.SelectedTSTGUI != null;
-            keyboardController.enabled = UserInputToggle.isOn && InfoSource == InfoSource.SIM;
+            if(keyboardController != null) keyboardController.enabled = UserInputToggle.isOn && InfoSource == InfoSource.SIM;
 
             
             if(InfoSource != InfoSource.SIM && lastHeartbeatTime > 0)
