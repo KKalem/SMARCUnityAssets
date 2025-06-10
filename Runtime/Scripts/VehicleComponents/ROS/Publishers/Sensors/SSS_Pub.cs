@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
 using RosMessageTypes.Smarc;
 

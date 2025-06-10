@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using RosMessageTypes.Sensor;
 using Unity.Robotics.Core; //Clock
