@@ -372,7 +372,7 @@ MonoBehaviour:
   velocityDampen: 0.95
   stiffness: 0.99
   iterateCollisionsEvery: 1
-  iterations: 100
+  iterations: 30
   colliderBufferSize: 3
   CurrentRopeLength: 0
 --- !u!114 &5463172129880745976
@@ -738,6 +738,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1587293502138976104}
     m_Modifications:
+    - target: {fileID: 2758860351106988618, guid: 227b1dadc1d92004b98dbc2019661650,
+        type: 3}
+      propertyPath: m_ParentAnchorPosition.z
+      value: 0.6500001
+      objectReference: {fileID: 0}
     - target: {fileID: 2921957018222759010, guid: 227b1dadc1d92004b98dbc2019661650,
         type: 3}
       propertyPath: m_Name
@@ -807,6 +812,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mass
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720056876553825905, guid: 227b1dadc1d92004b98dbc2019661650,
+        type: 3}
+      propertyPath: m_ParentAnchorPosition.z
+      value: -0.0770002
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

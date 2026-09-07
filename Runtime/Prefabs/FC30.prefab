@@ -264,7 +264,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 1
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -1301,7 +1302,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 1
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -1409,7 +1411,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 1
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -2104,7 +2107,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 0
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -3187,21 +3191,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d7762f780cdfee1486fd17ced311c37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SMARC.SMARCAssets::smarc.genericControllers.AltitudeController
+  ControlMode: 0
+  TargetVelocity: 0
+  TargetAltitude: 15
   RobotAB: {fileID: 7280480202250328753}
   RobotRB: {fileID: 0}
-  ControlMode: 0
   OnlyIfMovingForward: 0
   CompensateGravity: 1
   ExtraMassToCompensate: 0
   IncludeChildrenInCom: 0
   IncludeChildrenInGravityComp: 0
+  MinimumDescentTargetVelocity: 0
+  MinimumAscentTargetVelocity: 0
   AscentRate: 2
   DescentRate: 1
   MaxForce: 0
-  TargetVelocity: 0
-  MinimumDescentTargetVelocity: 0
-  MinimumAscentTargetVelocity: 0
-  TargetAltitude: 15
   AltitudeTolerance: 0.15
   GroundLevel: 0
   VelKp: 20
@@ -3225,9 +3229,11 @@ MonoBehaviour:
   ControlMode: 1
   MaxForce: 0
   MaxSpeed: 2
+  CanMoveSideways: 1
   TargetVelocity: {x: 0, y: 0, z: 0}
   TargetUnityPosition: {x: 0, y: 0, z: 0}
   PositionTolerance: 0.5
+  MaxUpDot: 0.5
   VelKp: 50
   VelKi: 0
   VelKd: 5
@@ -3246,20 +3252,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: SMARC.SMARCAssets::smarc.genericControllers.AttitudeController
   RobotAB: {fileID: 7280480202250328753}
   RobotRB: {fileID: 0}
-  YawTolerance: 2
   YawControlMode: 1
-  TargetYawRate: 0
-  OnlyIfMovingForward: 0
-  TargetCompassHeading: 0
-  DesiredYawRate: 20
   TiltMode: 1
-  PitchDirection: 1
-  RollDirection: 1
+  TargetYawRate: 0
+  MaxYawRateDeg: 45
+  TargetCompassHeading: 0
   TargetUp: {x: 0, y: 1, z: 0}
+  UpDotLimit: 0.5
+  YawTolerance: 2
+  OnlyIfMovingForward: 0
   TiltKp: 1.5
   horizontalController: {fileID: 748334044753526551}
   MaxTiltAngle: 20
   ExpectedMaxAccel: 20
+  PitchDirection: 1
+  RollDirection: 1
 --- !u!114 &5321737523370293247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4011,7 +4018,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 1
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -4269,7 +4277,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 0
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -4626,7 +4635,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 0
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -5012,7 +5022,8 @@ MonoBehaviour:
   pitch: 0
   yaw: 0
   FixedRotation: 0
-  reverse: 0
+  reverse_spin: 0
+  reverse_thrust: 0
   orientation: 1
   rpm: 0
   RPMMax: 4000
@@ -6326,17 +6337,17 @@ PrefabInstance:
     - target: {fileID: 2548865424984193880, guid: e327e9efb86338144b9b4afc3b64579b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.1541
+      value: -0.084
       objectReference: {fileID: 0}
     - target: {fileID: 2548865424984193880, guid: e327e9efb86338144b9b4afc3b64579b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.8099499
+      value: -0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2548865424984193880, guid: e327e9efb86338144b9b4afc3b64579b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.13186003
+      value: 0.325
       objectReference: {fileID: 0}
     - target: {fileID: 2548865424984193880, guid: e327e9efb86338144b9b4afc3b64579b,
         type: 3}
