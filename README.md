@@ -30,7 +30,7 @@ You can find more detailed instructions on using all available vehicles, sensors
 
 ## ROS connection
 - We use the [ROS-TCP-Endpoint](https://github.com/KKalem/ROS-TCP-Endpoint) package to speak to ROS2. 
-  - You can use [this simple script](../scripts/unity_ros_bridge.sh) to run the bridge and then use `rviz2` and `rqt` to check what things look like in ROS.
+  - You can use [this simple script](https://github.com/smarc-project/smarc2/blob/humble/scripts/unity_ros_bridge.sh) to run the bridge and then use `rviz2` and `rqt` to check what things look like in ROS.
 - The ROS connection is especially useful when you are running headless.
 
 
